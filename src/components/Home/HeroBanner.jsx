@@ -2,9 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function HeroBanner() {
+
+  const { scrollYProgress } = useScroll();
+  const taxiX = useTransform(scrollYProgress, [0, 0.8], ["0%", "100vw"]);
+
   return (
     <div className="relative h-[90vh] md:h-[100vh] pt-20 md:pt-28 lg:pt-24">
       {/* Background decoration */}
@@ -13,8 +17,8 @@ export default function HeroBanner() {
       <div className="absolute top-[179px] right-[-50px] w-[350px] md:w-[500px] lg:w-[321.028px] h-[305.901px] rounded-[321.028px] bg-radial-red-dark" />
 
       {/* Hero content container */}
-      <div className="container mx-auto px-24 pt-2 md:pt-4 lg:pt-6 pb-2 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-8 justify-center items-center lg:items-baseline lg:justify-between">
+      <div className="container mx-auto px-4 pt-2 md:pt-4 lg:pt-6 pb-2 relative z-10 flex justify-center items-center">
+        <div className="w-[70%] flex flex-col lg:flex-row gap-4 md:gap-8 justify-center items-center lg:items-baseline lg:justify-between">
           {/* Left side with text */}
           <motion.div 
             className="text-center lg:text-left mb-2 md:mb-0"
@@ -39,7 +43,7 @@ export default function HeroBanner() {
             </h3>
             
             {/* Learn More button - now inside the text container for same alignment */}
-            <motion.div 
+            {/* <motion.div 
               className="mt-6"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -59,7 +63,7 @@ export default function HeroBanner() {
                   </div>
                 </button>
               </Link>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
 
           {/* Right side with SVG graphic */}
@@ -79,7 +83,7 @@ export default function HeroBanner() {
               src="https://c.animaapp.com/mg29wexsYAh6GJ/img/subtract.svg"
             />
           </motion.div> */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
@@ -89,12 +93,9 @@ export default function HeroBanner() {
             }}
           >
             <Link href="https://play.google.com/store/apps/details?id=com.dartcube.gdgkolkata" target="_blank"><img className="relative cursor-pointer z-30" src="./google_play.png" alt="Google Play store button" /></Link>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
-
-      {/* Minimal padding before the bridge */}
-      {/* <div className="h-4 md:h-6 lg:h-8"></div> */}
 
       {/* Bridge graphic at bottom */}
       <motion.div 
@@ -116,22 +117,16 @@ export default function HeroBanner() {
       {/* Yellow taxi with left-to-right animation - positioned at the bottom of the bridge */}
       <motion.div
         className="absolute bottom-[2%] lg:bottom-[0%] w-[70px] sm:w-[100px] md:w-[130px] lg:w-[180px] h-auto"
-        initial={{ x: "-100vw", opacity: 0 }}
-        animate={{ 
-          x: ["-100vw", "100vw"],
-          opacity: 1 
+        style={{ 
+          x: taxiX
         }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ 
-          x: {
-            duration: 5,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatDelay: 1,
-            times: [0, 1]
-          },
           opacity: {
             duration: 1,
-            ease: "easeIn"
+            ease: "easeIn",
+            delay: 1
           }
         }}
       >
