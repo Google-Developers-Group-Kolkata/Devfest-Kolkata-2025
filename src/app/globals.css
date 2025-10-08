@@ -39,16 +39,22 @@
 }
 
 .text-fluid {
-  font-size: clamp(4rem, 7vw, 6rem); /* adjusts between ~40px to ~120px */
+  font-size: clamp(4rem, 7vw, 120px); /* adjusts between ~40px to ~120px */
 }
 
 .text-fluid-100 {
-  font-size: clamp(3rem, 6.5vw, 4.75rem); /* ~36px → 100px */
+  font-size: clamp(3rem, 6.5vw, 100px); /* ~36px → 100px */
   line-height: 1;
 }
 
 .bg-radial-green-dark {
-  background: radial-gradient(circle at 30% 50%, #1E1E1E 50%, #1D9518 100%);
+  background: radial-gradient(109.96% 110.09% at 64.56% -8.59%, rgba(30, 30, 30, 0.80) 62.29%, rgba(29, 149, 24, 0.80) 100%);
+  transform: rotate(-68.375deg);
+}
+
+.bg-radial-red-dark {
+  background: radial-gradient(109.96% 110.09% at 64.56% -8.59%, rgba(30, 30, 30, 0.80) 62.29%, rgba(234, 67, 53, 0.80) 100%);
+  transform: rotate(17.634deg);
 }
 
 .albert_sans {

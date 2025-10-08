@@ -1,20 +1,81 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, loading, signInWithGoogle, signOutUser } = useAuth();
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+
+  const profileRef = useRef(null);
+  const drawerRef = useRef(null);
+
+  console.log("user in navbar:", user);
+  
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        isProfileDrawerOpen &&
+        profileRef.current &&
+        drawerRef.current &&
+        !profileRef.current.contains(event.target) &&
+        !drawerRef.current.contains(event.target)
+      ) {
+        setIsProfileDrawerOpen(false);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === 'Escape') {
+        setIsProfileDrawerOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isProfileDrawerOpen]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsSigningIn(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  const handleGoogleSignOut = async () => {
+    try {
+      setIsSigningOut(true);
+      await signOutUser();
+    } catch (error) {
+      console.error("Error signing out", error);
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   return (
     <nav className="relative w-full py-4 z-50">
       <div className="container mx-auto px-4 md:max-w-4xl">
-        <div className="relative flex items-center justify-between bg-black rounded-[30px] py-1 md:py-3 px-5 google-gradient-border">
+        <div className="relative flex items-center justify-between bg-black rounded-[61px] py-1 md:py-3 px-5 google-gradient-border">
           {/* Logo and brand */}
           <div className="flex items-center md:w-auto w-full md:justify-start justify-between">
             <div className="flex items-center">
@@ -23,9 +84,13 @@ export default function Navbar() {
                 alt="DevFest Logo"
                 className="h-12 w-auto mr-2"
               />
-              <span className="font-semibold text-2xl text-white albert_sans">DevFest</span>
+              <span className="font-semibold text-3xl text-white albert_sans">DevFest</span>
             </div>
 
+            <div className="flex items-center md:hidden">
+            {!user && (<button onClick={handleGoogleSignIn} disabled={isSigningIn} className="relative text-black font-semibold py-1 px-4 rounded-[42px] bg-[#FFF3D2] cursor-pointer albert_sans">
+              Log In
+              </button>)}
             {/* Mobile menu button with animation */}
             <div className="md:hidden">
               <motion.button
@@ -72,6 +137,7 @@ export default function Navbar() {
                 </motion.div>
               </motion.button>
             </div>
+            </div>
           </div>
 
           {/* Navigation links - Desktop */}
@@ -85,9 +151,59 @@ export default function Navbar() {
 
           {/* Login button - Desktop */}
           <div className="hidden md:block mr-1">
-            <button className="relative text-black font-semibold py-2 px-6 rounded-r-xl rounded-l-lg hover:scale-105 transition-transform duration-300 bg-white google-gradient-border">
+            {!user && (<button onClick={handleGoogleSignIn} disabled={isSigningIn} className="relative text-black font-semibold py-2 px-6 rounded-[42px] hover:scale-105 transition-transform duration-300 bg-[#FFF3D2] cursor-pointer">
               <span className="relative z-[2] albert_sans">Log In</span>
-            </button>
+            </button>)}
+            {user && (
+              <div className="relative flex flex-col items-center gap-3">
+                <button
+                  ref={profileRef}
+                  onClick={() => setIsProfileDrawerOpen(!isProfileDrawerOpen)}
+                  className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-white/20 transition-all duration-200 cursor-pointer"
+                >
+                  <img className="w-full h-full object-cover" src={user.photoURL} alt="User Profile Image" />
+                </button>
+
+                <AnimatePresence>
+                  {isProfileDrawerOpen && (
+                    <motion.div
+                      ref={drawerRef}
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute right-0 mt-15 w-72 bg-[#1E1E1E] rounded-2xl shadow-lg google-gradient-border overflow-hidden z-50"
+                    >
+                      <div className="p-4">
+                        <div className="flex items-center gap-3 mb-4">
+                          <img 
+                            src={user.photoURL} 
+                            alt="Profile" 
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-semibold truncate albert_sans">
+                              {user.displayName || 'User'}
+                            </p>
+                            <p className="text-white text-sm truncate albert_sans">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={handleGoogleSignOut}
+                          disabled={isSigningOut}
+                          className="w-full text-black font-semibold py-2 px-4 rounded-xl bg-[#FFF3D2] hover:bg-[#FFE4A3] transition-colors duration-200 albert_sans disabled:opacity-50 cursor-pointer"
+                        >
+                          {isSigningOut ? 'Signing out...' : 'Log Out'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </div>
 
@@ -156,8 +272,10 @@ export default function Navbar() {
                   </motion.div>
                 ))}
                 
-                <motion.button 
+                {user && (<motion.button 
                   className="relative text-black font-semibold py-2 rounded-r-xl rounded-l-lg google-gradient-border bg-white px-30"
+                  onClick={handleGoogleSignOut}
+                  disabled={isSigningOut}
                   variants={{
                     open: {
                       opacity: 1,
@@ -179,8 +297,8 @@ export default function Navbar() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span className="relative z-[2] albert_sans">Log In</span>
-                </motion.button>
+                  <span className="relative z-[2] albert_sans">Log Out</span>
+                </motion.button>)}
               </motion.div>
             </motion.div>
           )}
@@ -188,4 +306,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-}
+};
