@@ -4,6 +4,7 @@ import React from "react";
 import HeroBanner from "@/components/Home/HeroBanner";
 import Navbar from "@/components/Home/Navbar";
 import Footer from "@/components/Home/Footer";
+import TicketCard from "../components/Home/Tickets";
 
 const DevFest2025 = () => {
     return (
@@ -27,6 +28,7 @@ const DevFest2025 = () => {
                             About DevFest
                             <div className="w-24 h-1 bg-green-300 mx-auto mt-2 rounded-full animate-pulse"></div>
                         </h2>
+                <TicketCard />
                         <div className="max-w-3xl mx-auto text-white text-lg md:text-xl mt-8 text-center">
                             <p className="mb-4">
                                 DevFest is Google Developer Group{`'`}s biggest
