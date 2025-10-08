@@ -4,6 +4,7 @@ import React from "react";
 import HeroBanner from "@/components/Home/HeroBanner";
 import Navbar from "@/components/Home/Navbar";
 import Footer from "@/components/Home/Footer";
+import TicketCard from "../components/Home/Tickets";
 
 const DevFest2025 = () => {
     return (
@@ -21,6 +22,7 @@ const DevFest2025 = () => {
                 </section>
 
                 {/* About Section */}
+                <TicketCard />
                 <section className="py-16 px-4 albert_sans">
                     <div className="container mx-auto">
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#fff2d1] mb-6 text-center">

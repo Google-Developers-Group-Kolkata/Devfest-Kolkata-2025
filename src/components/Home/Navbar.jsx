@@ -84,7 +84,7 @@ export default function Navbar() {
                 alt="DevFest Logo"
                 className="h-12 w-auto mr-2"
               />
-              <span className="font-semibold text-3xl text-white albert_sans">DevFest</span>
+              {/* <span className="font-semibold text-3xl text-white albert_sans">GDG Kolkata</span> */}
             </div>
 
             <div className="flex items-center md:hidden">
