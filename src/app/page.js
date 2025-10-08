@@ -22,13 +22,13 @@ const DevFest2025 = () => {
                 </section>
 
                 {/* About Section */}
+                <TicketCard />
                 <section className="py-16 px-4 albert_sans">
                     <div className="container mx-auto">
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#fff2d1] mb-6 text-center">
                             About DevFest
                             <div className="w-24 h-1 bg-green-300 mx-auto mt-2 rounded-full animate-pulse"></div>
                         </h2>
-                <TicketCard />
                         <div className="max-w-3xl mx-auto text-white text-lg md:text-xl mt-8 text-center">
                             <p className="mb-4">
                                 DevFest is Google Developer Group{`'`}s biggest
