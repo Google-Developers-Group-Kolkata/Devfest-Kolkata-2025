@@ -1,7 +1,7 @@
+"use client";
+
 import React from "react";
 import HeroBanner from "@/components/Home/HeroBanner";
-import TimeCount from "@/components/Home/TimeCount";
-import TrackCardSection from "@/components/Home/TrackCard";
 import Navbar from "@/components/Home/Navbar";
 import Footer from "@/components/Home/Footer";
 
@@ -18,16 +18,6 @@ const DevFest2025 = () => {
                 {/* Hero Banner Section */}
                 <section className="pb-8 md:pb-8">
                     <HeroBanner />
-                </section>
-
-                {/* Time Counter Section */}
-                <section className="py-12 md:py-16 mt-4">
-                    <TimeCount />
-                </section>
-
-                {/* Tracks Section */}
-                <section className="py-16">
-                    <TrackCardSection />
                 </section>
 
                 {/* About Section */}

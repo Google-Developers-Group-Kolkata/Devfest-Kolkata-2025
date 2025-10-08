@@ -8,11 +8,13 @@ export default function HeroBanner() {
   return (
     <div className="relative h-[90vh] md:h-[100vh] pt-20 md:pt-28 lg:pt-24">
       {/* Background decoration */}
-      <div className="absolute top-[-180px] md:top-[-300px] lg:top-[-280px] left-[-50px] md:left-[-220px] lg:left-[-180px] xl:left-[-50px] w-[350px] md:w-[500px] lg:w-[574px] aspect-square rounded-full bg-radial-green-dark" />
+      <div className="absolute top-[-180px] md:top-[-300px] lg:top-[-120px] left-[-50px] md:left-[-220px] lg:left-[-180px] xl:left-[180px] w-[350px] md:w-[500px] lg:w-[574px] aspect-square rounded-full bg-radial-green-dark" />
+
+      <div className="absolute top-[179px] right-[-50px] w-[350px] md:w-[500px] lg:w-[321.028px] h-[305.901px] rounded-[321.028px] bg-radial-red-dark" />
 
       {/* Hero content container */}
-      <div className="container mx-auto px-4 pt-2 md:pt-4 lg:pt-6 pb-2 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-8 justify-around">
+      <div className="container mx-auto px-24 pt-2 md:pt-4 lg:pt-6 pb-2 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-8 justify-center items-center lg:items-baseline lg:justify-between">
           {/* Left side with text */}
           <motion.div 
             className="text-center lg:text-left mb-2 md:mb-0"
@@ -61,7 +63,7 @@ export default function HeroBanner() {
           </motion.div>
 
           {/* Right side with SVG graphic */}
-          <motion.div 
+          {/* <motion.div 
             className="flex justify-center lg:justify-end items-center"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -76,6 +78,17 @@ export default function HeroBanner() {
               alt="DevFest Graphic"
               src="https://c.animaapp.com/mg29wexsYAh6GJ/img/subtract.svg"
             />
+          </motion.div> */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              delay: 4,
+              duration: 0.8,
+              ease: "easeOut"
+            }}
+          >
+            <Link href="https://play.google.com/store/apps/details?id=com.dartcube.gdgkolkata" target="_blank"><img className="relative cursor-pointer z-30" src="./google_play.png" alt="Google Play store button" /></Link>
           </motion.div>
         </div>
       </div>
