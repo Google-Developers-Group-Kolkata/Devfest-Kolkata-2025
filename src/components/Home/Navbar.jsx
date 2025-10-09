@@ -12,11 +12,29 @@ export default function Navbar() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
 
+  // States for scroll animation
+  const [showNav, setShowNav] = useState(true);
+  const [lastYPos, setLastYPos] = useState(0);
+
   const profileRef = useRef(null);
   const drawerRef = useRef(null);
-
-  console.log("user in navbar:", user);
   
+  // Effect to handle scroll detection
+  useEffect(() => {
+    function handleScroll() {
+      const currentYPos = window.scrollY;
+      const isScrollingUp = currentYPos < lastYPos;
+
+      // Show navbar if scrolling up or at the very top of the page
+      setShowNav(isScrollingUp || currentYPos < 10); 
+      setLastYPos(currentYPos);
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastYPos]);
+
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -71,9 +89,33 @@ export default function Navbar() {
       setIsSigningOut(false);
     }
   };
+  
+  // Framer Motion variants for the navbar animation
+  const navbarVariants = {
+    hidden: {
+      y: '-100%',
+      opacity: 0,
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut'
+      }
+    },
+    visible: {
+      y: '0%',
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut'
+      }
+    }
+  };
 
   return (
-    <nav className="relative w-full py-4 z-50">
+    <motion.nav 
+      variants={navbarVariants}
+      animate={showNav ? "visible" : "hidden"}
+      className="sticky top-0 w-full py-4 z-50" // <-- Changed to sticky
+    >
       <div className="container mx-auto px-4 md:max-w-4xl">
         <div className="relative flex items-center justify-between bg-black rounded-[61px] py-1 md:py-3 px-5 google-gradient-border">
           {/* Logo and brand */}
@@ -212,7 +254,7 @@ export default function Navbar() {
           {isMenuOpen && (
             <motion.div 
               className="md:hidden mx-4 absolute top-full left-0 right-0 mt-2 py-5 
-                        bg-black rounded-[20px] google-gradient-border overflow-hidden"
+                         bg-black rounded-[20px] google-gradient-border overflow-hidden"
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -304,6 +346,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };

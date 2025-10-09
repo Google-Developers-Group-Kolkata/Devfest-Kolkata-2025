@@ -5,14 +5,14 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#2A2A2A] text-white py-6 albert_sans">
+    <footer className="bg-[#1E1E1E] text-white py-6 albert_sans">
       <div className="container mx-auto px-4">
         {/* Main footer content */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
           {/* Left side - Logo and text */}
           <div className="flex flex-col items-baseline mb-4 md:mb-0">
             <span className="text-white text-sm font-normal">
-                Developed by {`-`} 
+                Developed by
             </span>
             <div className="flex items-end">
               <img

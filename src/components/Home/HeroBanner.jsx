@@ -1,16 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function HeroBanner() {
 
-  const { scrollYProgress } = useScroll();
-  const taxiX = useTransform(scrollYProgress, [0, 0.8], ["0%", "100vw"]);
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const taxiX = useTransform(scrollYProgress, [0, 1], ["-100vw", "100vw"]);
 
   return (
-    <div className="relative h-[90vh] md:h-[100vh] pt-20 md:pt-28 lg:pt-24">
+    <div ref={sectionRef} className="relative h-[90vh] md:h-[100vh] pt-20 md:pt-28 lg:pt-24">
       {/* Background decoration */}
       <div className="absolute top-[-180px] md:top-[-300px] lg:top-[-120px] left-[-50px] md:left-[-220px] lg:left-[-180px] xl:left-[180px] w-[350px] md:w-[500px] lg:w-[574px] aspect-square rounded-full bg-radial-green-dark" />
 
@@ -32,10 +36,10 @@ export default function HeroBanner() {
               damping: 15
             }}
           >
-            <h1 className="text-[#FFF3D2] font-bold leading-[1] md:leading-[0.8] text-fluid albert_sans">
+            <h1 className="text-[#FFF3D2] font-bold leading-[1] md:leading-[0.8] text-fluid open_sans">
               DevFest
             </h1>
-            <h2 className="text-[#FFF2D1] font-bold leading-[1.2] md:leading-[1.1] text-fluid albert_sans">
+            <h2 className="text-[#FFF2D1] font-bold leading-[1.2] md:leading-[1.1] text-fluid open_sans">
               Kolkata
             </h2>
             <h3 className="text-[#FFF3D2] font-bold text-fluid-100 albert_sans">
@@ -116,7 +120,7 @@ export default function HeroBanner() {
 
       {/* Yellow taxi with left-to-right animation - positioned at the bottom of the bridge */}
       <motion.div
-        className="absolute bottom-[2%] lg:bottom-[0%] w-[70px] sm:w-[100px] md:w-[130px] lg:w-[180px] h-auto"
+        className="absolute bottom-[2%] lg:bottom-[1%] w-[90px] sm:w-[120px] md:w-[150px] lg:w-[200px] h-auto"
         style={{ 
           x: taxiX
         }}

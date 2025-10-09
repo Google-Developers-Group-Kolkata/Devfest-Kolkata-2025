@@ -61,6 +61,10 @@
   font-family: var(--font-albert-sans), sans-serif;
 }
 
+.open_sans {
+  font-family: var(--font-open-sans), sans-serif;
+}
+
 .aldrich {
   font-family: var(--font-aldrich), sans-serif;
 }
