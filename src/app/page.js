@@ -28,7 +28,7 @@ const DevFest2025 = () => {
                 </section>
 
                 {/* About Section */}
-                <section className="py-16 px-4 open_sans">
+                <section className="py-16 px-8 open_sans">
                     <Venue />
                 </section>
 
