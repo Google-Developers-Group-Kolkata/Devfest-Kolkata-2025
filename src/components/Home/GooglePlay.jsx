@@ -44,6 +44,7 @@ export default function GooglePlay() {
             >
                 <Link
                     href="https://play.google.com/store/apps/details?id=com.dartcube.gdgkolkata"
+                    target="_blank"
                     className="bg-[#1E1E1E] text-[#FFF3D2] py-2 px-4 rounded-full inline-block"
                 >
                     <motion.img
