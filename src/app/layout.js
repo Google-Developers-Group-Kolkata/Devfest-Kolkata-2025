@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Albert_Sans, Aldrich, } from "next/font/google";
+import { Geist, Geist_Mono, Albert_Sans, Aldrich, Open_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -17,6 +17,11 @@ const albertSans = Albert_Sans({
   subsets: ["latin"],
 });
 
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
+  subsets: ["latin"],
+});
+
 const aldrich = Aldrich({
   variable: "--font-aldrich",
   subsets: ["latin"],
@@ -32,7 +37,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${albertSans.variable} ${aldrich.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${albertSans.variable} ${aldrich.variable} ${openSans.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
       </body>
