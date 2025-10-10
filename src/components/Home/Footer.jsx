@@ -14,14 +14,14 @@ export default function Footer() {
             <span className="text-white text-sm font-normal">
                 Developed by
             </span>
-            <div className="flex items-end">
+            <div className="flex items-center">
               <img
                 src="/favicon.svg"
                 alt="GDG Logo"
                 className="h-16 w-auto mr-3"
               />
               <span className="text-white text-sm font-normal">
-                Google Developer Group Kolkata
+                Google Developer Groups Kolkata
               </span>
             </div>
           </div>

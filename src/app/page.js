@@ -1,14 +1,26 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import HeroBanner from "@/components/Home/HeroBanner";
 import Navbar from "@/components/Home/Navbar";
 import Footer from "@/components/Home/Footer";
 import TicketCard from "../components/Home/Tickets";
 import About from "@/components/Home/About";
 import Venue from "@/components/Home/Venue";
+import GooglePlay from "@/components/Home/GooglePlay";
 
 const DevFest2025 = () => {
+    const ticketSectionRef = useRef(null);
+
+    const scrollToTickets = () => {
+        if (ticketSectionRef.current) {
+            ticketSectionRef.current.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#1e1e1e] overflow-x-hidden">
             {/* Navbar */}
@@ -20,10 +32,16 @@ const DevFest2025 = () => {
             <main>
                 {/* Hero Banner Section */}
                 <section className="pb-8 md:pb-8">
-                    <HeroBanner />
+                    <HeroBanner scrollToTickets={scrollToTickets} />
                 </section>
 
+                {/* Google Play Section */}
                 <section className="pb-8 md:pb-8">
+                    <GooglePlay />
+                </section>
+
+                {/* Ticket Section */}
+                <section ref={ticketSectionRef} className="pb-8 md:pb-8">
                     <TicketCard />
                 </section>
 
