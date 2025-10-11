@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1E1E1E] text-white py-6 albert_sans">
+    <footer className="bg-[#1E1E1E] text-white py-6 open_sans">
       <div className="container mx-auto px-4">
         {/* Main footer content */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
@@ -20,9 +20,14 @@ export default function Footer() {
                 alt="GDG Logo"
                 className="h-16 w-auto mr-3"
               />
-              <span className="text-white text-sm font-normal">
-                Google Developer Groups Kolkata
-              </span>
+              <div className="flex flex-col">
+                <span className="text-white text-md font-bold">
+                  Google Developer Groups
+                </span>
+                <span className="text-white text-sm font-normal">
+                  Kolkata
+                </span>
+              </div>
             </div>
           </div>
 

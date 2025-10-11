@@ -26,7 +26,7 @@ export default function HeroBanner({ scrollToTickets }) {
                 <div className="w-[70%] flex flex-col lg:flex-row gap-4 md:gap-8 justify-start items-center lg:items-baseline lg:justify-between h-full">
                     {/* Left side with text */}
                     <motion.div
-                        className="text-center lg:text-left mb-2 md:mb-0 h-[400px] flex flex-col justify-between"
+                        className="text-center lg:text-left mb-2 md:mb-0 h-[400px] flex flex-col justify-around"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{
