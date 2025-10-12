@@ -8,6 +8,7 @@ import TicketCard from "../components/Home/Tickets";
 import About from "@/components/Home/About";
 import Venue from "@/components/Home/Venue";
 import GooglePlay from "@/components/Home/GooglePlay";
+import FAQ from "@/components/Home/FAQ";
 
 const DevFest2025 = () => {
     const ticketSectionRef = useRef(null);
@@ -52,6 +53,10 @@ const DevFest2025 = () => {
 
                 <section className="py-16 px-4 open_sans">
                     <About />
+                </section>
+
+                <section className="py-16 px-4 open_sans">
+                    <FAQ />
                 </section>
             </main>
 
