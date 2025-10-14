@@ -9,6 +9,8 @@ import About from "@/components/Home/About";
 import Venue from "@/components/Home/Venue";
 import GooglePlay from "@/components/Home/GooglePlay";
 import FAQ from "@/components/Home/FAQ";
+import Speakers from "@/components/Home/Speakers";
+import Teams from "@/components/Home/Teams";
 
 const DevFest2025 = () => {
     const ticketSectionRef = useRef(null);
@@ -57,6 +59,16 @@ const DevFest2025 = () => {
 
                 <section className="py-16 px-4 open_sans">
                     <FAQ />
+                </section>
+
+                {/* Speakers Section */}
+                <section>
+                    <Speakers />
+                </section>
+
+                {/* Teams Section */}
+                <section>
+                    <Teams />
                 </section>
             </main>
 
