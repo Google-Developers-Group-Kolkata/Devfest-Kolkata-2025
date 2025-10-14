@@ -72,7 +72,7 @@ export default function Venue() {
             variants={containerVariants}
         >
             <motion.div
-                className="rounded-3xl bg-[#1E1E1E] md:grid md:grid-cols-3 md:w-[80%] w-full md:mx-auto mb-20"
+                className="rounded-3xl bg-[#1E1E1E] md:grid md:grid-cols-3 md:w-[80%] 2xl:w-[65%] w-full md:mx-auto mb-20"
                 variants={cardVariants}
                 whileHover={{
                     scale: 1.02,
@@ -96,25 +96,25 @@ export default function Venue() {
                     }}
                 >
                     <motion.h2
-                        className="text-5xl md:text-6xl font-bold text-[#FFF3D2] mb-3 open_sans"
+                        className="text-5xl md:text-6xl 2xl:text-8xl font-bold text-[#FFF3D2] mb-3 open_sans"
                         variants={itemVariants}
                     >
                         Venue
                     </motion.h2>
                     <motion.h1
-                        className="text-[#FFF3D2] text-2xl font-semibold tracking-tight lg:text-3xl"
+                        className="text-[#FFF3D2] text-2xl 2xl:text-4xl font-semibold tracking-tight lg:text-3xl"
                         variants={itemVariants}
                     >
                         {PLACE_NAME}
                     </motion.h1>
                     <motion.div variants={itemVariants}>
                         <motion.p
-                            className="text-[#FFF3D2] text-center sm:text-left text-sm" 
+                            className="text-[#FFF3D2] text-center sm:text-left text-sm 2xl:text-lg" 
                         >
                             {ADDRESS1}
                         </motion.p>
                         <motion.p
-                            className="text-[#FFF3D2] text-center sm:text-left text-sm"
+                            className="text-[#FFF3D2] text-center sm:text-left text-sm 2xl:text-lg"
                         >
                             {ADDRESS2}
                         </motion.p>
