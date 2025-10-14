@@ -203,7 +203,18 @@ export default function Navbar() {
                   onClick={() => setIsProfileDrawerOpen(!isProfileDrawerOpen)}
                   className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-white/20 transition-all duration-200 cursor-pointer"
                 >
-                  <img className="w-full h-full object-cover" src={user.photoURL} alt="User Profile Image" />
+                  <img
+                    key={user.photoURL || user.uid}
+                    className="w-full h-full object-cover"
+                    src={user.photoURL || "/default-avatar.png"}
+                    alt={user.displayName || "User Profile"}
+                    loading="lazy"
+                    onError={(e) => {
+                      // fallback to a local default image when remote fails
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/default-avatar.png";
+                    }}
+                  />
                 </button>
 
                 <AnimatePresence>
@@ -219,9 +230,15 @@ export default function Navbar() {
                       <div className="p-4">
                         <div className="flex items-center gap-3 mb-4">
                           <img 
-                            src={user.photoURL} 
-                            alt="Profile" 
+                            key={user.photoURL || user.uid + "-drawer"}
+                            src={user.photoURL || "/default-avatar.png"} 
+                            alt={user.displayName || "Profile"} 
                             className="w-12 h-12 rounded-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/default-avatar.png";
+                            }}
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold truncate albert_sans">
