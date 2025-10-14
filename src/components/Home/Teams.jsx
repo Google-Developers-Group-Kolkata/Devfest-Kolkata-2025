@@ -73,7 +73,7 @@ export default function Teams() {
     const teamMembers = [
         {
             id: 1,
-            name: "UDITY BANERJEE",
+            name: "Organiser 1",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Team+1",
             bgColor: "#FF5757",
@@ -85,7 +85,7 @@ export default function Teams() {
         },
         {
             id: 2,
-            name: "UDITY BANERJEE",
+            name: "Organiser 2",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Team+2",
             bgColor: "#4285F4",
@@ -97,7 +97,7 @@ export default function Teams() {
         },
         {
             id: 3,
-            name: "UDITY BANERJEE",
+            name: "Organiser 3",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Team+3",
             bgColor: "#34A853",
@@ -109,7 +109,7 @@ export default function Teams() {
         },
         {
             id: 4,
-            name: "UDITY BANERJEE",
+            name: "Organiser 4",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Team+4",
             bgColor: "#4285F4",
@@ -121,7 +121,7 @@ export default function Teams() {
         },
         {
             id: 5,
-            name: "UDITY BANERJEE",
+            name: "Organiser 5",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Team+5",
             bgColor: "#FBBC04",
@@ -133,7 +133,7 @@ export default function Teams() {
         },
         {
             id: 6,
-            name: "UDITY BANERJEE",
+            name: "Organiser 6",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Team+6",
             bgColor: "#EA4335",

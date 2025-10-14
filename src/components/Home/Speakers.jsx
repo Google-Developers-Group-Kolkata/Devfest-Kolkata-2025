@@ -91,7 +91,7 @@ export default function Speakers() {
     const speakers = [
         {
             id: 1,
-            name: "RAHUL SHARMA",
+            name: "Speaker 1",
             role: "SPEAKER",
             image: "https://placehold.co/240x260/png?text=Speaker+1",
             bgColor: "#FF5757",
@@ -104,7 +104,7 @@ export default function Speakers() {
         },
         {
             id: 2,
-            name: "PRIYA SINGH",
+            name: "Speaker 2",
             role: "SPEAKER",
             image: "https://placehold.co/240x260/png?text=Speaker+2",
             bgColor: "#FBBC04",
@@ -117,7 +117,7 @@ export default function Speakers() {
         },
         {
             id: 3,
-            name: "AMIT KUMAR",
+            name: "Speaker 3",
             role: "SPEAKER",
             image: "https://placehold.co/240x260/png?text=Speaker+3",
             bgColor: "#34A853",
@@ -130,7 +130,7 @@ export default function Speakers() {
         },
         {
             id: 4,
-            name: "SNEHA PATEL",
+            name: "Speaker 4",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Speaker+4",
             bgColor: "#4285F4",
@@ -143,7 +143,7 @@ export default function Speakers() {
         },
         {
             id: 5,
-            name: "VIKRAM REDDY",
+            name: "Speaker 5",
             role: "ORGANISER",
             image: "https://placehold.co/240x260/png?text=Speaker+5",
             bgColor: "#EA4335",
