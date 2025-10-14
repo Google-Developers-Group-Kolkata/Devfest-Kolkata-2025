@@ -12,7 +12,7 @@ export async function DELETE(request) {
     } catch (error) {
         console.error("Error deleting user:", error);
         return NextResponse.json(
-            { error: "Failed to delete user" },
+            { error: error.message || "Failed to delete user account" },
             { status: 500 }
         );
     }
