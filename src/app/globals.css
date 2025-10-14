@@ -39,11 +39,11 @@
 }
 
 .text-fluid {
-  font-size: clamp(4rem, 7vw, 120px); /* adjusts between ~40px to ~120px */
+  font-size: clamp(4rem, 5vw, 120px); /* adjusts between ~40px to ~120px */
 }
 
 .text-fluid-100 {
-  font-size: clamp(3rem, 6.5vw, 100px); /* ~36px → 100px */
+  font-size: clamp(3rem, 4.5vw, 100px); /* ~36px → 100px */
   line-height: 1;
 }
 
