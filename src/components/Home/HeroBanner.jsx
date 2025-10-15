@@ -14,7 +14,7 @@ export default function HeroBanner({ scrollToTickets }) {
     return (
         <div
             ref={sectionRef}
-            className="relative h-[90vh] md:h-[100vh] pt-20 md:pt-28 lg:pt-24"
+            className="relative h-[90vh] md:h-[100vh] pt-20 md:pt-28 lg:pt-20 2xl:pt-24"
         >
             {/* Background decoration */}
             <div className="absolute top-[-180px] md:top-[-300px] lg:top-[-120px] left-[-50px] md:left-[-220px] lg:left-[-180px] xl:left-[180px] w-[350px] md:w-[500px] lg:w-[574px] aspect-square rounded-full bg-radial-green-dark" />
@@ -22,11 +22,11 @@ export default function HeroBanner({ scrollToTickets }) {
             <div className="absolute top-[179px] right-[-50px] w-[350px] md:w-[500px] lg:w-[321.028px] h-[305.901px] rounded-[321.028px] bg-radial-red-dark" />
 
             {/* Hero content container */}
-            <div className="container mx-auto px-4 pt-2 md:pt-4 lg:pt-6 pb-2 relative z-10 flex justify-center items-center h-full md:h-fit">
+            <div className="container mx-auto px-4 pt-2 md:pt-4 lg:pt-6 2xl:pt-10 pb-2 relative z-10 flex justify-center items-center h-full md:h-fit">
                 <div className="w-[70%] flex flex-col lg:flex-row gap-4 md:gap-8 justify-start items-center lg:items-baseline lg:justify-between h-full">
                     {/* Left side with text */}
                     <motion.div
-                        className="text-center lg:text-left mb-2 md:mb-0 h-[400px] flex flex-col justify-around"
+                        className="text-center lg:text-left mb-2 md:mb-0 h-[400px] flex flex-col 2xl:justify-around"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{
@@ -49,9 +49,9 @@ export default function HeroBanner({ scrollToTickets }) {
                             </h3>
                         </div>
 
-                        {/* Learn More button - now inside the text container for same alignment */}
+                        {/* Book a Ticket button - now inside the text container for same alignment */}
                         <motion.div
-                            className="mt-6"
+                            className="mt-6 2xl:mt-16"
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{
@@ -60,7 +60,7 @@ export default function HeroBanner({ scrollToTickets }) {
                                 ease: "easeOut",
                             }}
                         >
-                                <button onClick={scrollToTickets} className="relative px-6 py-1.5 md:py-3 text-xl font-semibold text-white rounded-full hover:scale-105 transition-transform duration-300 group google-gradient-border cursor-pointer bg-[#1E1E1E]">
+                                <button onClick={scrollToTickets} className="relative px-6 py-1.5 md:py-2 2xl:py-3 text-xl font-semibold text-white rounded-full hover:scale-105 transition-transform duration-300 group google-gradient-border cursor-pointer bg-[#1E1E1E]">
                                     <div className="flex items-center relative z-[2]">
                                         <span className="albert_sans">
                                             Book a Ticket
