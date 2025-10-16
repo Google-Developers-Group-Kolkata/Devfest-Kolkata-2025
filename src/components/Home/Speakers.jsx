@@ -1,5 +1,6 @@
 "use client";
 import { FaXTwitter, FaLinkedinIn, FaInstagram } from "react-icons/fa6";
+import ComingSoon from "@/components/common/ComingSoon";
 
 const SpeakerCard = ({ name, role, image, bgColor, bgShape, socialLinks }) => {
     return (
@@ -7,36 +8,36 @@ const SpeakerCard = ({ name, role, image, bgColor, bgShape, socialLinks }) => {
             {/* Image Container with Colored Background Shape */}
             <div className="relative w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] mb-6 overflow-visible">
                 {/* Colored Background Shape - positioned behind */}
-                {bgShape === 'rounded-rect' && (
+                {bgShape === "rounded-rect" && (
                     <div
                         className="absolute left-0 top-[30px] w-[200px] h-[180px] sm:w-[240px] sm:h-[200px] rounded-[50px] transition-transform duration-300 group-hover:scale-105"
                         style={{ backgroundColor: bgColor }}
                     />
                 )}
-                {bgShape === 'circle' && (
+                {bgShape === "circle" && (
                     <div
                         className="absolute left-1/2 -translate-x-1/2 top-[30px] w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] rounded-full transition-transform duration-300 group-hover:scale-105"
                         style={{ backgroundColor: bgColor }}
                     />
                 )}
-                {bgShape === 'triangle' && (
+                {bgShape === "triangle" && (
                     <div
                         className="absolute left-1/2 -translate-x-1/2 top-[40px] w-0 h-0 transition-transform duration-300 group-hover:scale-105"
                         style={{
-                            borderLeft: '120px solid transparent',
-                            borderRight: '120px solid transparent',
-                            borderBottom: `200px solid ${bgColor}`
+                            borderLeft: "120px solid transparent",
+                            borderRight: "120px solid transparent",
+                            borderBottom: `200px solid ${bgColor}`,
                         }}
                     />
                 )}
 
                 {/* Speaker Image - Full color, positioned on top */}
                 <div className="relative w-full h-full z-10 flex items-start justify-center">
-                    <img
+                    {/* <img
                         src={image}
                         alt={name}
                         className="w-[200px] h-[220px] sm:w-[240px] sm:h-[260px] object-cover object-top"
-                    />
+                    /> */}
                 </div>
             </div>
 
@@ -99,8 +100,8 @@ export default function Speakers() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 2,
@@ -112,8 +113,8 @@ export default function Speakers() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 3,
@@ -125,8 +126,8 @@ export default function Speakers() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 4,
@@ -138,8 +139,8 @@ export default function Speakers() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 5,
@@ -151,14 +152,15 @@ export default function Speakers() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
-        }
+                instagram: "https://instagram.com",
+            },
+        },
     ];
 
     return (
         <div className="bg-[#1E1E1E] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
+            {/* <div className="max-w-7xl mx-auto"> */}
+            <div className="mx-auto">
                 {/* Section Heading */}
                 <div className="text-center mb-16 sm:mb-20">
                     <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white mb-4 tracking-wider albert_sans font-bold">
@@ -169,19 +171,24 @@ export default function Speakers() {
                     </p>
                 </div>
 
-                {/* Speakers Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-16 place-items-center">
-                    {/* First Row - 3 speakers */}
-                    {speakers.slice(0, 3).map((speaker) => (
-                        <SpeakerCard key={speaker.id} {...speaker} />
-                    ))}
-                </div>
+                <div className="relative ">
+                    {/* Speakers Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-16 place-items-center">
+                        {/* First Row - 3 speakers */}
+                        {speakers.slice(0, 3).map((speaker) => (
+                            <SpeakerCard key={speaker.id} {...speaker} />
+                        ))}
+                    </div>
 
-                {/* Second Row - 2 speakers centered */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 sm:gap-16 place-items-center mt-12 sm:mt-16 max-w-3xl mx-auto">
-                    {speakers.slice(3, 5).map((speaker) => (
-                        <SpeakerCard key={speaker.id} {...speaker} />
-                    ))}
+                    {/* Second Row - 2 speakers centered */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 sm:gap-16 place-items-center mt-12 sm:mt-16 max-w-3xl mx-auto">
+                        {speakers.slice(3, 5).map((speaker) => (
+                            <SpeakerCard key={speaker.id} {...speaker} />
+                        ))}
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center w-full h-full backdrop-blur-2xl">
+                        <ComingSoon description="We're working hard to bring you an amazing lineup of speakers." />
+                    </div>
                 </div>
             </div>
         </div>

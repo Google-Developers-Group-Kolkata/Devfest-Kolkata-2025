@@ -22,11 +22,11 @@ export default function HeroBanner({ scrollToTickets }) {
             <div className="absolute top-[179px] right-[-50px] w-[350px] md:w-[500px] lg:w-[321.028px] h-[305.901px] rounded-[321.028px] bg-radial-red-dark" />
 
             {/* Hero content container */}
-            <div className="container mx-auto px-4 pt-2 md:pt-4 lg:pt-6 2xl:pt-10 pb-2 relative z-10 flex justify-center items-center h-full md:h-fit">
+            <div className="container mx-auto px-4 pt-2 md:pt-4 lg:pt-6 2xl:pt-10 pb-2 relative z-10 flex flex-col justify-center items-center h-fit">
                 <div className="w-[70%] flex flex-col lg:flex-row gap-4 md:gap-8 justify-start items-center lg:items-baseline lg:justify-between h-full">
                     {/* Left side with text */}
                     <motion.div
-                        className="text-center lg:text-left mb-2 md:mb-0 h-[400px] flex flex-col 2xl:justify-around"
+                        className="text-center lg:text-left mb-2 md:mb-0 h-[400px] flex flex-col"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{
@@ -44,43 +44,8 @@ export default function HeroBanner({ scrollToTickets }) {
                             <h2 className="leading-[1.2] md:leading-[1.1] text-fluid open_sans">
                                 Kolkata
                             </h2>
-                            <h3 className="text-fluid-100 albert_sans">
-                                '25
-                            </h3>
+                            <h3 className="text-fluid-100 albert_sans">'25</h3>
                         </div>
-
-                        {/* Book a Ticket button - now inside the text container for same alignment */}
-                        <motion.div
-                            className="mt-6 2xl:mt-16"
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                                delay: 3, // Same timing as the right side image
-                                duration: 0.8,
-                                ease: "easeOut",
-                            }}
-                        >
-                                <button onClick={scrollToTickets} className="relative px-6 py-1.5 md:py-2 2xl:py-3 text-xl font-semibold text-white rounded-full hover:scale-105 transition-transform duration-300 group google-gradient-border cursor-pointer bg-[#1E1E1E]">
-                                    <div className="flex items-center relative z-[2]">
-                                        <span className="albert_sans">
-                                            Book a Ticket
-                                        </span>
-                                        <svg
-                                            className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                        >
-                                            <path
-                                                d="M13 7L18 12M18 12L13 17M18 12H6"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </button>
-                        </motion.div>
                     </motion.div>
 
                     {/* Right side with SVG graphic */}
@@ -101,6 +66,40 @@ export default function HeroBanner({ scrollToTickets }) {
             />
           </motion.div> */}
                 </div>
+                
+                {/* Book a Ticket button */}
+                <motion.div
+                    className="mt-6 md:-mt-20"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                        delay: 3, // Same timing as the right side image
+                        duration: 0.8,
+                        ease: "easeOut",
+                    }}
+                >
+                    <button
+                        onClick={scrollToTickets}
+                        className="relative px-6 py-1.5 md:py-2 2xl:py-3 text-xl font-semibold text-white rounded-full hover:scale-105 transition-transform duration-300 group google-gradient-border cursor-pointer bg-[#1E1E1E]"
+                    >
+                        <div className="flex items-center relative z-[2]">
+                            <span className="albert_sans">Grab your Ticket</span>
+                            <svg
+                                className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                            >
+                                <path
+                                    d="M13 7L18 12M18 12L13 17M18 12H6"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </div>
+                    </button>
+                </motion.div>
             </div>
 
             {/* Bridge graphic at bottom */}

@@ -1,5 +1,6 @@
 "use client";
 import { FaXTwitter, FaLinkedinIn, FaInstagram } from "react-icons/fa6";
+import ComingSoon from "../common/ComingSoon";
 
 const TeamCard = ({ name, role, image, bgColor, socialLinks }) => {
     return (
@@ -14,11 +15,11 @@ const TeamCard = ({ name, role, image, bgColor, socialLinks }) => {
 
                 {/* Team Member Image - Full color, positioned on top */}
                 <div className="relative w-full h-full z-10 flex items-start justify-center">
-                    <img
+                    {/* <img
                         src={image}
                         alt={name}
                         className="w-[200px] h-[220px] sm:w-[240px] sm:h-[260px] object-cover object-top"
-                    />
+                    /> */}
                 </div>
             </div>
 
@@ -80,8 +81,8 @@ export default function Teams() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 2,
@@ -92,8 +93,8 @@ export default function Teams() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 3,
@@ -104,8 +105,8 @@ export default function Teams() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 4,
@@ -116,8 +117,8 @@ export default function Teams() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 5,
@@ -128,8 +129,8 @@ export default function Teams() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
+                instagram: "https://instagram.com",
+            },
         },
         {
             id: 6,
@@ -140,14 +141,15 @@ export default function Teams() {
             socialLinks: {
                 twitter: "https://twitter.com",
                 linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com"
-            }
-        }
+                instagram: "https://instagram.com",
+            },
+        },
     ];
 
     return (
         <div className="bg-[#1E1E1E] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
+            {/* <div className="max-w-7xl mx-auto"> */}
+            <div className="mx-auto">
                 {/* Section Heading */}
                 <div className="text-center mb-16 sm:mb-20">
                     <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white mb-4 tracking-wider albert_sans font-bold">
@@ -159,10 +161,13 @@ export default function Teams() {
                 </div>
 
                 {/* Team Grid - 3 columns */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-16 place-items-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-16 place-items-center relative">
                     {teamMembers.map((member) => (
                         <TeamCard key={member.id} {...member} />
                     ))}
+                    <div className="absolute inset-0 flex items-center justify-center w-full h-full backdrop-blur-2xl">
+                        <ComingSoon description="Our Team members will be announced soon." />
+                    </div>
                 </div>
             </div>
         </div>

@@ -57,10 +57,6 @@ const DevFest2025 = () => {
                     <About />
                 </section>
 
-                <section className="py-16 px-4 open_sans">
-                    <FAQ />
-                </section>
-
                 {/* Speakers Section */}
                 <section>
                     <Speakers />
@@ -69,6 +65,10 @@ const DevFest2025 = () => {
                 {/* Teams Section */}
                 <section>
                     <Teams />
+                </section>
+
+                <section className="py-16 px-4 open_sans">
+                    <FAQ />
                 </section>
             </main>
 
