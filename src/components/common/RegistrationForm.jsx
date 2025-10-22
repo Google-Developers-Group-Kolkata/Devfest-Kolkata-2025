@@ -1,13 +1,26 @@
 import React, { useState } from "react";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema } from "@/schemas/registrationSchema";
 import axios from "axios";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/common/DatePicker";
 
 export default function RegistrationForm({ user }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,14 +58,16 @@ export default function RegistrationForm({ user }) {
             );
             console.log("Registration successful:", response.data);
         } catch (error) {
-            setSubmitError(error.message || "An error occurred during registration");
+            setSubmitError(
+                error.message || "An error occurred during registration"
+            );
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto bg-dark foreground-dark rounded-lg shadow border-2 border-[#FFF3D2] p-8">
+        <div className="max-w-2xl mx-auto bg-dark text-white rounded-lg shadow border-2 border-[#FFF3D2] p-8">
             <h2 className="text-2xl font-bold foreground-dark mb-6 albert_sans">
                 Complete Your Registration
             </h2>
@@ -68,7 +83,10 @@ export default function RegistrationForm({ user }) {
             )}
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
+                >
                     {/* Name Field */}
                     <FormField
                         control={form.control}
@@ -81,7 +99,7 @@ export default function RegistrationForm({ user }) {
                                         {...field}
                                         type="text"
                                         placeholder="Enter your full name"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-dark text-white placeholder:text-gray-400 autofill:bg-dark autofill:text-white [&:-webkit-autofill]:bg-dark [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_#1a1a1a_inset]"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -97,10 +115,12 @@ export default function RegistrationForm({ user }) {
                             <FormItem>
                                 <FormLabel>Date of Birth *</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        {...field}
-                                        type="date"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    <DatePicker
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        className="bg-dark text-white"
+                                        buttonClassName="bg-dark text-white hover:text-[#FFF3D2]"
+                                        popoverClassName="shadow-xl bg-dark text-white"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -115,16 +135,28 @@ export default function RegistrationForm({ user }) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Gender *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
                                     <FormControl>
-                                        <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                        <SelectTrigger
+                                            className="w-full px-3 py-2 border rounded-md shadow-sm bg-dark text-white border-gray-300 hover:text-[#FFF3D2]"
+                                            iconClassName="text-white opacity-100 hover:text-[#FFF3D2]"
+                                        >
                                             <SelectValue placeholder="Select gender" />
                                         </SelectTrigger>
                                     </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="MALE">Male</SelectItem>
-                                        <SelectItem value="FEMALE">Female</SelectItem>
-                                        <SelectItem value="OTHER">Other</SelectItem>
+                                    <SelectContent className="bg-dark text-white border-gray-300">
+                                        <SelectItem value="MALE">
+                                            Male
+                                        </SelectItem>
+                                        <SelectItem value="FEMALE">
+                                            Female
+                                        </SelectItem>
+                                        <SelectItem value="OTHER">
+                                            Other
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -144,7 +176,7 @@ export default function RegistrationForm({ user }) {
                                         {...field}
                                         type="tel"
                                         placeholder="+91 98765 43210"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-dark text-white placeholder:text-gray-400 [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_#1a1a1a_inset]"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -159,13 +191,19 @@ export default function RegistrationForm({ user }) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>T-shirt Size *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
                                     <FormControl>
-                                        <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                        <SelectTrigger
+                                            className="w-full px-3 py-2 border rounded-md shadow-sm bg-dark text-white border-gray-300 hover:text-[#FFF3D2]"
+                                            iconClassName="text-white opacity-100 hover:text-[#FFF3D2]"
+                                        >
                                             <SelectValue placeholder="Select size" />
                                         </SelectTrigger>
                                     </FormControl>
-                                    <SelectContent>
+                                    <SelectContent className="bg-dark text-white border-gray-300">
                                         <SelectItem value="XS">XS</SelectItem>
                                         <SelectItem value="S">S</SelectItem>
                                         <SelectItem value="M">M</SelectItem>
@@ -186,18 +224,29 @@ export default function RegistrationForm({ user }) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Dietary Preference *</FormLabel>
-                                <Select 
-                                    onValueChange={(value) => field.onChange(value === "true")} 
-                                    defaultValue={field.value ? "true" : "false"}
+                                <Select
+                                    onValueChange={(value) =>
+                                        field.onChange(value === "true")
+                                    }
+                                    defaultValue={
+                                        field.value ? "true" : "false"
+                                    }
                                 >
                                     <FormControl>
-                                        <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                        <SelectTrigger
+                                            className="w-full px-3 py-2 border rounded-md shadow-sm bg-dark text-white border-gray-300 hover:text-[#FFF3D2]"
+                                            iconClassName="text-white opacity-100 hover:text-[#FFF3D2]"
+                                        >
                                             <SelectValue placeholder="Select preference" />
                                         </SelectTrigger>
                                     </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="true">Vegetarian</SelectItem>
-                                        <SelectItem value="false">Non-Vegetarian</SelectItem>
+                                    <SelectContent className="bg-dark text-white border-gray-300">
+                                        <SelectItem value="true">
+                                            Vegetarian
+                                        </SelectItem>
+                                        <SelectItem value="false">
+                                            Non-Vegetarian
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -217,7 +266,7 @@ export default function RegistrationForm({ user }) {
                                         {...field}
                                         type="text"
                                         placeholder="Your school, college, or company"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-dark text-white placeholder:text-gray-400 [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_#1a1a1a_inset]"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -237,7 +286,7 @@ export default function RegistrationForm({ user }) {
                                         {...field}
                                         type="url"
                                         placeholder="https://github.com/yourusername"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-dark text-white placeholder:text-gray-400 [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_#1a1a1a_inset]"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -257,7 +306,7 @@ export default function RegistrationForm({ user }) {
                                         {...field}
                                         type="url"
                                         placeholder="https://linkedin.com/in/yourusername"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-dark text-white placeholder:text-gray-400 [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_#1a1a1a_inset]"
                                     />
                                 </FormControl>
                                 <FormMessage />

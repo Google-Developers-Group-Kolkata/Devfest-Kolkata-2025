@@ -112,6 +112,10 @@
   font-family: var(--font-albert-sans), sans-serif;
 }
 
+.product_sans {
+  font-family: var(--font-product-sans), sans-serif;
+}
+
 .open_sans {
   font-family: var(--font-open-sans), sans-serif;
 }
