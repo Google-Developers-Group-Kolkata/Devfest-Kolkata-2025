@@ -18,7 +18,7 @@ export default function TicketComponent({ title, description, features, price, c
     }
 
     return (
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full max-w-lg">
             {/* Ticket Card */}
             <div className="bg-[#FFF8DC] rounded-lg p-6 shadow-2xl">
                 {/* Header */}
@@ -56,10 +56,6 @@ export default function TicketComponent({ title, description, features, price, c
                     </button>
                 </div>
             </div>
-
-            {/* Decorative circles (ticket perforation effect) */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-[#0F0F0F] rounded-full"></div>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-4 h-4 bg-[#0F0F0F] rounded-full"></div>
         </div>
     );
 }

@@ -1,16 +1,36 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Toaster } from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function RegisterLayout({ children }) {
+export default function Layout({ children }) {
+    const { user, loading } = useAuth();
     const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/');
+        }
+    }, [user, loading, router]);
 
     const handleBackClick = () => {
         router.push("/");
     }
+
+    if ( loading || !user ) {
+        return (
+            <div className="bg-dark min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+            </div>
+        );
+    }
+
+    if ( !loading && !user ) return null;
+
     return (
         <div className="bg-dark min-h-screen py-8 px-4 sm:px-6 lg:px-8">
             <nav className="mb-6 md:mb-0 px-2">
@@ -33,6 +53,7 @@ export default function RegisterLayout({ children }) {
             </nav>
             <div className="w-full bg-dark rounded-lg p-3 md:p-5 lg:p-8">
                 {children}
+                <Toaster position="top-center"/>
             </div>
         </div>
     );

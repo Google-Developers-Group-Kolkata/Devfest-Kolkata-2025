@@ -21,10 +21,13 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/common/DatePicker";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function RegistrationForm({ user }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState("");
+    const router = useRouter();
 
     const form = useForm({
         resolver: zodResolver(registrationSchema),
@@ -56,7 +59,17 @@ export default function RegistrationForm({ user }) {
                     },
                 }
             );
-            console.log("Registration successful:", response.data);
+
+            if (response.status !== 200) {
+                setSubmitError(
+                    response.data.message ||
+                        "An error occurred during registration"
+                );
+                return;
+            }
+
+            toast.success("Registration successful!");
+            router.push("/ticket");
         } catch (error) {
             setSubmitError(
                 error.message || "An error occurred during registration"
@@ -319,7 +332,7 @@ export default function RegistrationForm({ user }) {
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-400 foreground-dark font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-400 foreground-dark font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer"
                         >
                             {isSubmitting ? (
                                 <div className="flex items-center justify-center">
