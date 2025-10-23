@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TicketComponent from "@/components/common/TicketComponent";
 import TicketSummary from "@/components/common/TicketSummary";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,7 +13,7 @@ export default function TicketPage() {
     const { user, loading } = useAuth();
     const [isFetchingUserData, setIsFetchingUserData] = useState(false);
 
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
         try {
             setIsFetchingUserData(true);
 
@@ -37,13 +37,13 @@ export default function TicketPage() {
         } finally {
             setIsFetchingUserData(false);
         }
-    };
+    }, [user]);
 
     useEffect(() => {
         if (!loading && user) {
             fetchUserData();
         }
-    }, [loading, user]);
+    }, [loading, user, fetchUserData]);
 
     return (
         <div className="bg-dark">
