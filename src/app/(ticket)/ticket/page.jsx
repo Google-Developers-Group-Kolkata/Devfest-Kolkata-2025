@@ -7,11 +7,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import ticketsData from "@/tickets.json";
 
 export default function TicketPage() {
     const router = useRouter();
     const { user, loading } = useAuth();
     const [isFetchingUserData, setIsFetchingUserData] = useState(false);
+    const tickets = ticketsData.tickets;
+    const ticket = tickets[0];
 
     const fetchUserData = useCallback(async () => {
         try {
@@ -48,22 +51,15 @@ export default function TicketPage() {
     return (
         <div className="bg-dark">
             {!loading && !isFetchingUserData && (
-                <div className="flex flex-col lg:flex-row items-center justify-around gap-8 py-12 px-4 md:px-8 lg:px-20">
+                <div className="flex flex-col lg:flex-row items-center justify-around gap-8 py-12 px-4 md:px-8 lg:px-20 min-h-full">
                     <TicketComponent
-                        title="Early Bird Ticket"
-                        description="I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community."
-                        features={[
-                            "Entry to DevFest",
-                            "Full-access to conference",
-                            "Breakfast & Lunch",
-                            "Hi-Tea",
-                            "Keynotes, Panels",
-                            "Exclusive Discussion Session",
-                        ]}
-                        price="₹ 799"
-                        color="blue"
+                        title={ticket.title}
+                        description={ticket.description}
+                        features={ticket.features}
+                        price={ticket.price}
+                        color={ticket.color}
                     />
-                    <TicketSummary />
+                    <TicketSummary ticketPrice={ticket.price} />
                 </div>
             )}
         </div>

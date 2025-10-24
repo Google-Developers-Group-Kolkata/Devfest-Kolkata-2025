@@ -1,0 +1,49 @@
+{
+    "tickets": [
+        {
+            "id": 1,
+            "title": "Early Bird Ticket",
+            "description": "I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community.",
+            "features": [
+                "Entry to DevFest",
+                "Full-access to conference",
+                "Breakfast & Lunch",
+                "Hi-Tea",
+                "Keynotes, Panels",
+                "Exclusive Discussion Session"
+            ],
+            "price": 799,
+            "color": "blue"
+        },
+        {
+            "id": 2,
+            "title": "Community Fans",
+            "description": "I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community.",
+            "features": [
+                "Entry to DevFest",
+                "Full-access to conference",
+                "Breakfast & Lunch",
+                "Hi-Tea",
+                "Keynotes, Panels",
+                "Exclusive Discussion Session"
+            ],
+            "price": 599,
+            "color": "red"
+        },
+        {
+            "id": 3,
+            "title": "Regular Ticket",
+            "description": "I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community.",
+            "features": [
+                "Entry to DevFest",
+                "Full-access to conference",
+                "Breakfast & Lunch",
+                "Hi-Tea",
+                "Keynotes, Panels",
+                "Exclusive Discussion Session"
+            ],
+            "price": 999,
+            "color": "green"
+        }
+    ]
+}

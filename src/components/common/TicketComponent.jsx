@@ -49,7 +49,7 @@ export default function TicketComponent({ title, description, features, price, c
                 {/* Price and Button */}
                 <div className="flex items-center justify-between">
                     <div className="text-2xl font-bold text-gray-900">
-                        {price}
+                        ₹ {price}
                     </div>
                     <button className={`${bgColors[color]} text-white px-6 py-2 rounded-md font-medium transition-colors cursor-pointer`}>
                         Buy Now
