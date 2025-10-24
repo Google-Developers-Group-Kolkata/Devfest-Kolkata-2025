@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function Navbar() {
+export default function Navbar({ scrollToView, refs }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, loading, signInWithGoogle, signOutUser } = useAuth();
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -137,7 +137,7 @@ export default function Navbar() {
             <div className="md:hidden">
               <motion.button
                 onClick={toggleMenu}
-                className="text-white focus:outline-none p-2"
+                className="text-white focus:outline-none p-2 pr-0"
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.1 }}
               >
@@ -184,11 +184,11 @@ export default function Navbar() {
 
           {/* Navigation links - Desktop */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Home</Link>
+            <span onClick={() => scrollToView(refs.homeRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">Home</span>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Schedule</Link>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Tracks</Link>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Socials</Link>
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">FAQ</Link>
+            <span onClick={() => scrollToView(refs.faqRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">FAQ</span>
           </div>
 
           {/* Login button - Desktop */}
@@ -206,7 +206,7 @@ export default function Navbar() {
                   <img
                     key={user.photoURL || user.uid}
                     className="w-full h-full object-cover"
-                    src={user.photoURL || "/default-avatar.png"}
+                    src={user ? user.photoURL : "/default-avatar.png"}
                     alt={user.displayName || "User Profile"}
                     loading="lazy"
                     onError={(e) => {
