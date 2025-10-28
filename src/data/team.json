@@ -1,0 +1,76 @@
+{
+    "teamMembers": [
+        {
+            "id": 1,
+            "name": "Organiser 1",
+            "role": "ORGANISER",
+            "image": "/team/rahul1.png",
+            "bgColor": "#FBBC04",
+            "socialLinks": {
+                "twitter": "https://x.com/Rahul___Pal",
+                "linkedin": "https://www.linkedin.com/in/rahul---pal",
+                "instagram": "https://www.instagram.com/radiating_rahul_007"
+            }
+        },
+        {
+            "id": 2,
+            "name": "Organiser 2",
+            "role": "ORGANISER",
+            "image": "/team/rahul1.png",
+            "bgColor": "#4285F4",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 3,
+            "name": "Organiser 3",
+            "role": "ORGANISER",
+            "image": "/team/rahul1.png",
+            "bgColor": "#34A853",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 4,
+            "name": "Organiser 4",
+            "role": "ORGANISER",
+            "image": "/team/rahul1.png",
+            "bgColor": "#4285F4",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 5,
+            "name": "Organiser 5",
+            "role": "ORGANISER",
+            "image": "/team/rahul1.png",
+            "bgColor": "#FF5757",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 6,
+            "name": "Organiser 6",
+            "role": "ORGANISER",
+            "image": "/team/rahul1.png",
+            "bgColor": "#EA4335",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        }
+    ]
+}
