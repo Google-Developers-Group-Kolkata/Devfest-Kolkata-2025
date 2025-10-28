@@ -34,42 +34,42 @@ export default function Tickets() {
   const tickets = [
     {
       title: "Community Pass",
-      price: "₹599",
+      price: "₹XXX",
       features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
       buttonColor: "#34A853",
       buttonText: "Register Now"
     },
     {
       title: "Early Bird",
-      price: "₹799",
+      price: "₹XXX",
       features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
       buttonColor: "#FBBC04",
       buttonText: "Register Now"
     },
     {
       title: "Regular Pass",
-      price: "₹999",
+      price: "₹XXX",
       features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
       buttonColor: "#EA4335",
       buttonText: "Register Now"
     },
     {
       title: "Student Pass",
-      price: "₹499",
+      price: "₹XXX",
       features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
       buttonColor: "#4285F4",
       buttonText: "Register Now"
     },
     {
       title: "VIP Pass",
-      price: "₹1499",
+      price: "₹XXXX",
       features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
       buttonColor: "#EA4335",
       buttonText: "Register Now"
     },
     {
       title: "Group Pass",
-      price: "₹2999",
+      price: "₹XXXX",
       features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
       buttonColor: "#34A853",
       buttonText: "Register Now"
