@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 export default function HeroBanner({ scrollToView, ticketSectionRef }) {
     const sectionRef = useRef(null);
@@ -9,7 +9,13 @@ export default function HeroBanner({ scrollToView, ticketSectionRef }) {
         target: sectionRef,
         offset: ["start end", "end start"],
     });
-    const taxiX = useTransform(scrollYProgress, [0, 1], ["-100vw", "100vw"]);
+    const taxiXRaw = useTransform(scrollYProgress, [0, 1], ["-100vw", "100vw"]);
+
+    const taxiX = useSpring(taxiXRaw, {
+        stiffness: 80,   // Lower = smoother, slower
+        damping: 20,     // Higher = less bounce
+        mass: 0.5,       // Lower = lighter, more responsive
+    });
 
     return (
         <div

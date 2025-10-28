@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import {
-    User,
     onAuthStateChanged,
     signInWithPopup,
     signOut,
@@ -26,7 +25,8 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user ? user : null);
+            setUser(user);
+            localStorage.setItem("profilePic", user ? user.photoURL : "");
             setLoading(false);
         });
         return unsubscribe;
