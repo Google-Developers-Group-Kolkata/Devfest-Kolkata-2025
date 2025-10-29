@@ -2,10 +2,9 @@
     "teamMembers": [
         {
             "id": 1,
-            "name": "Organiser 1",
-            "role": "ORGANISER",
-            "image": "/team/rahul1.png",
-            "bgColor": "#FBBC04",
+            "name": "Rahul Pal",
+            "role": "Web Dev",
+            "image": "/team/rahul.png",
             "socialLinks": {
                 "twitter": "https://x.com/Rahul___Pal",
                 "linkedin": "https://www.linkedin.com/in/rahul---pal",
@@ -13,11 +12,10 @@
             }
         },
         {
-            "id": 2,
-            "name": "Organiser 2",
-            "role": "ORGANISER",
-            "image": "/team/rahul1.png",
-            "bgColor": "#4285F4",
+            "id": 12,
+            "name": "Shromana Majumder",
+            "role": "Emcee",
+            "image": "/team/Shromana Majumder.png",
             "socialLinks": {
                 "twitter": "https://twitter.com",
                 "linkedin": "https://linkedin.com",
@@ -26,10 +24,20 @@
         },
         {
             "id": 3,
-            "name": "Organiser 3",
-            "role": "ORGANISER",
-            "image": "/team/rahul1.png",
-            "bgColor": "#34A853",
+            "name": "Akash Kumar Majumder",
+            "role": "Core ORGANISER",
+            "image": "/team/Akash.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 2,
+            "name": "Udity Banerjee",
+            "role": "Graphics",
+            "image": "/team/Udity.png",
             "socialLinks": {
                 "twitter": "https://twitter.com",
                 "linkedin": "https://linkedin.com",
@@ -38,10 +46,9 @@
         },
         {
             "id": 4,
-            "name": "Organiser 4",
-            "role": "ORGANISER",
-            "image": "/team/rahul1.png",
-            "bgColor": "#4285F4",
+            "name": "Ankan Saha",
+            "role": "Web Dev",
+            "image": "/team/Ankan Saha.png",
             "socialLinks": {
                 "twitter": "https://twitter.com",
                 "linkedin": "https://linkedin.com",
@@ -50,10 +57,9 @@
         },
         {
             "id": 5,
-            "name": "Organiser 5",
-            "role": "ORGANISER",
-            "image": "/team/rahul1.png",
-            "bgColor": "#FF5757",
+            "name": "Aditya Ghosh",
+            "role": "PR and Outreach",
+            "image": "/team/Aditya Ghosh.png",
             "socialLinks": {
                 "twitter": "https://twitter.com",
                 "linkedin": "https://linkedin.com",
@@ -62,15 +68,221 @@
         },
         {
             "id": 6,
-            "name": "Organiser 6",
-            "role": "ORGANISER",
-            "image": "/team/rahul1.png",
-            "bgColor": "#EA4335",
+            "name": "Gurdil Singh",
+            "role": "Photography / Videography",
+            "image": "/team/Gurdil Singh.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 7,
+            "name": "Pawan Sharma",
+            "role": "Photography / Videography",
+            "image": "/team/Pawan.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 9,
+            "name": "Protyoy Bhandary",
+            "role": "PR and Outreach",
+            "image": "/team/Protyoy.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 10,
+            "name": "Rahul Khandait",
+            "role": "PR and Outreach",
+            "image": "/team/Rahul Khandait.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 11,
+            "name": "Saptak Biswas",
+            "role": "PR and Outreach",
+            "image": "/team/Saptak Biswas.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 13,
+            "name": "Simran Sharma",
+            "role": "Emcee",
+            "image": "/team/Simran Sharma.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 14,
+            "name": "Srija Ray",
+            "role": "PR and Outreach",
+            "image": "/team/Srija Ray.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 15,
+            "name": "Soumyadeep Halder",
+            "role": "Photography / Videography",
+            "image": "/team/Soumyadeep Halder.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 16,
+            "name": "Subhadip Saha",
+            "role": "Web Dev",
+            "image": "/team/Subhadip Saha.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 17,
+            "name": "Subinoy Biswas",
+            "role": "Web Dev",
+            "image": "/team/Subinoy Biswas.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 18,
+            "name": "Suchinta Chanda",
+            "role": "Emcee",
+            "image": "/team/Suchinta Chanda.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 19,
+            "name": "Sweety Jha",
+            "role": "Social Media",
+            "image": "/team/Sweety Jha.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 20,
+            "name": "Titash Shil",
+            "role": "PR and Outreach",
+            "image": "/team/Titash Shil.png",
+            "socialLinks": {
+                "twitter": "https://twitter.com",
+                "linkedin": "https://linkedin.com",
+                "instagram": "https://instagram.com"
+            }
+        },
+        {
+            "id": 21,
+            "name": "Sayantika Dey",
+            "role": "PR and Outreach",
+            "image": "/team/Sayantika Dey.png",
             "socialLinks": {
                 "twitter": "https://twitter.com",
                 "linkedin": "https://linkedin.com",
                 "instagram": "https://instagram.com"
             }
         }
+    ],
+    "blobColors": [
+        "#FF6F61",
+        "#4DA8DA",
+        "#7FFFD4",
+        "#FFC300",
+        "#FFB6C1",
+        "#0077B6",
+        "#B5E550",
+        "#FF9E80",
+        "#B39DDB",
+        "#40E0D0",
+        "#FF8C42",
+        "#6A1B9A",
+        "#56CFE1",
+        "#FFCA3A",
+        "#A2D2FF",
+        "#F4A7B9",
+        "#C3F584",
+        "#0096C7",
+        "#FFC75F",
+        "#FF7F7F",
+        "#2ECC71",
+        "#FF8A80",
+        "#3A86FF",
+        "#FFF275",
+        "#DA70D6",
+        "#7FE7CC",
+        "#FF924C",
+        "#006D77",
+        "#FF4FA3",
+        "#FFF3B0"
+    ],
+    "blobShapes": [
+        "rounded-[60%_40%_30%_70%_/_60%_30%_70%_40%]",
+        "rounded-[40%_60%_70%_30%_/_50%_60%_40%_50%]",
+        "rounded-[55%_45%_60%_40%_/_40%_70%_30%_60%]",
+        "rounded-[65%_35%_45%_55%_/_55%_45%_65%_35%]",
+        "rounded-[30%_70%_60%_40%_/_50%_60%_40%_70%]",
+        "rounded-[70%_40%_60%_30%_/_60%_30%_70%_40%]",
+        "rounded-[50%_60%_40%_70%_/_60%_40%_70%_50%]",
+        "rounded-[45%_55%_35%_65%_/_65%_35%_55%_45%]",
+        "rounded-[35%_65%_55%_45%_/_70%_40%_60%_30%]",
+        "rounded-[70%_30%_50%_60%_/_60%_50%_30%_70%]",
+        "rounded-[65%_35%_70%_30%_/_50%_70%_30%_50%]",
+        "rounded-[60%_40%_70%_50%_/_40%_60%_70%_50%]",
+        "rounded-[55%_45%_65%_35%_/_65%_35%_55%_45%]",
+        "rounded-[40%_70%_50%_60%_/_70%_40%_60%_30%]",
+        "rounded-[50%_70%_30%_60%_/_40%_60%_50%_70%]",
+        "rounded-[30%_70%_50%_60%_/_60%_40%_70%_50%]",
+        "rounded-[70%_50%_60%_40%_/_40%_60%_50%_70%]",
+        "rounded-[60%_30%_70%_40%_/_70%_40%_50%_60%]",
+        "rounded-[55%_65%_45%_35%_/_60%_30%_70%_40%]",
+        "rounded-[45%_35%_70%_55%_/_70%_40%_60%_30%]",
+        "rounded-[65%_45%_50%_35%_/_55%_65%_35%_60%]",
+        "rounded-[35%_70%_45%_65%_/_60%_50%_40%_70%]",
+        "rounded-[50%_40%_60%_50%_/_50%_70%_40%_60%]",
+        "rounded-[40%_60%_50%_70%_/_70%_40%_60%_30%]",
+        "rounded-[60%_50%_70%_30%_/_40%_70%_50%_60%]",
+        "rounded-[70%_60%_40%_50%_/_60%_30%_50%_70%]",
+        "rounded-[55%_70%_35%_60%_/_50%_40%_70%_60%]",
+        "rounded-[30%_60%_70%_40%_/_60%_40%_70%_50%]",
+        "rounded-[65%_35%_70%_50%_/_50%_70%_30%_60%]",
+        "rounded-[70%_50%_40%_60%_/_60%_40%_70%_30%]"
     ]
 }
