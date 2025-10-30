@@ -241,6 +241,17 @@
                 "linkedin": "https://linkedin.com/in/tarun-binay-das-6758aa1b8",
                 "instagram": "https://instagram.com/tarun_maybe_idk"
             }
+        },
+        {
+            "id": 23,
+            "name": "Subhadip Das",
+            "role": "Web Dev",
+            "image": "/team/Subhadip Das.png",
+            "socialLinks": {
+                "twitter": "https://x.com/dasjay420",
+                "linkedin": "https://www.linkedin.com/in/subhadip-das-66b01b159",
+                "instagram": "https://www.instagram.com/subhadip_529"
+            }
         }
     ],
     "blobColors": [
