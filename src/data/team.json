@@ -7,30 +7,8 @@
             "image": "/team/rahul.png",
             "socialLinks": {
                 "twitter": "https://x.com/Rahul___Pal",
-                "linkedin": "https://www.linkedin.com/in/rahul---pal",
-                "instagram": "https://www.instagram.com/radiating_rahul_007"
-            }
-        },
-        {
-            "id": 12,
-            "name": "Shromana Majumder",
-            "role": "Emcee",
-            "image": "/team/Shromana Majumder.png",
-            "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
-            }
-        },
-        {
-            "id": 3,
-            "name": "Akash Kumar Majumder",
-            "role": "Core ORGANISER",
-            "image": "/team/Akash.png",
-            "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "linkedin": "https://linkedin.com/in/rahul---pal",
+                "instagram": "https://instagram.com/radiating_rahul_007"
             }
         },
         {
@@ -39,9 +17,20 @@
             "role": "Graphics",
             "image": "/team/Udity.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/udity-banerjee1211",
+                "instagram": "https://instagram.com/_udity_"
+            }
+        },
+        {
+            "id": 3,
+            "name": "Akash Kumar Majumder",
+            "role": "Core ORGANISER",
+            "image": "/team/Akash.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/akash-kumar-majumder-62b384196",
+                "instagram": "https://instagram.com/ak_maj"
             }
         },
         {
@@ -50,9 +39,9 @@
             "role": "Web Dev",
             "image": "/team/Ankan Saha.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com/theankansaha",
+                "linkedin": "https://linkedin.com/in/theankansaha",
+                "instagram": "https://instagram.com/theankansaha"
             }
         },
         {
@@ -61,9 +50,9 @@
             "role": "PR and Outreach",
             "image": "/team/Aditya Ghosh.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/adityaghosh2992",
+                "instagram": "https://instagram.com/__.aditya_ghosh.__"
             }
         },
         {
@@ -72,9 +61,9 @@
             "role": "Photography / Videography",
             "image": "/team/Gurdil Singh.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/gurdil-singh-05124b339",
+                "instagram": "https://instagram.com/photographicgurdil_68"
             }
         },
         {
@@ -83,9 +72,9 @@
             "role": "Photography / Videography",
             "image": "/team/Pawan.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/pawan-sharma-243a82249",
+                "instagram": "https://instagram.com/_pawa.n_"
             }
         },
         {
@@ -94,9 +83,9 @@
             "role": "Social Media",
             "image": "/team/Prativa Dhar.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/prativa-dhar-707389304",
+                "instagram": "https://instagram.com/prativa_sparkwr"
             }
         },
         {
@@ -105,9 +94,9 @@
             "role": "PR and Outreach",
             "image": "/team/Protyoy.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/protyoy-bhandary",
+                "instagram": "https://instagram.com/_.pro.__"
             }
         },
         {
@@ -116,9 +105,9 @@
             "role": "PR and Outreach",
             "image": "/team/Rahul Khandait.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/rahulkhandait",
+                "instagram": "https://instagram.com/rahulkhandait_sde"
             }
         },
         {
@@ -127,9 +116,20 @@
             "role": "PR and Outreach",
             "image": "/team/Saptak Biswas.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/saptak-biswas-50a834323",
+                "instagram": "https://instagram.com/itz_not_what_u_think"
+            }
+        },
+        {
+            "id": 12,
+            "name": "Shromana Majumder",
+            "role": "Emcee",
+            "image": "/team/Shromana Majumder.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/shromana-majumder-8a427b211",
+                "instagram": "https://instagram.com/the__mysterious_soul._"
             }
         },
         {
@@ -138,9 +138,9 @@
             "role": "Emcee",
             "image": "/team/Simran Sharma.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/simran-sharma-ss",
+                "instagram": "https://instagram.com/simmi.rann"
             }
         },
         {
@@ -149,9 +149,9 @@
             "role": "PR and Outreach",
             "image": "/team/Srija Ray.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/srija-ray-8b852928a",
+                "instagram": "https://instagram.com/_srijaray"
             }
         },
         {
@@ -160,9 +160,9 @@
             "role": "Photography / Videography",
             "image": "/team/Soumyadeep Halder.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "http://linkedin.com/in/soumyadeeph2310",
+                "instagram": "https://instagram.com/smydppp"
             }
         },
         {
@@ -171,9 +171,9 @@
             "role": "Web Dev",
             "image": "/team/Subhadip Saha.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/subhadipsahaofficial",
+                "instagram": "https://instagram.com/subh05sus_"
             }
         },
         {
@@ -182,9 +182,9 @@
             "role": "Web Dev",
             "image": "/team/Subinoy Biswas.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/heysubinoy",
+                "instagram": "https://instagram.com/biswas.subinoy"
             }
         },
         {
@@ -193,9 +193,9 @@
             "role": "Emcee",
             "image": "/team/Suchinta Chanda.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/suchinta-chanda",
+                "instagram": "https://instagram.com/raj_.suchinta_"
             }
         },
         {
@@ -204,9 +204,9 @@
             "role": "Social Media",
             "image": "/team/Sweety Jha.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/sweety-jha-339116201",
+                "instagram": "https://instagram.com/__.armor"
             }
         },
         {
@@ -215,9 +215,9 @@
             "role": "PR and Outreach",
             "image": "/team/Titash Shil.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/titash-shil-844857292",
+                "instagram": "https://instagram.com/its_me_titash"
             }
         },
         {
@@ -226,9 +226,20 @@
             "role": "PR and Outreach",
             "image": "/team/Sayantika Dey.png",
             "socialLinks": {
-                "twitter": "https://twitter.com",
-                "linkedin": "https://linkedin.com",
-                "instagram": "https://instagram.com"
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/sayantika-dey-232b80271",
+                "instagram": "https://instagram.com/sayantika_dey"
+            }
+        },
+        {
+            "id": 22,
+            "name": "Tarun Binay Das",
+            "role": "Graphics",
+            "image": "/team/Tarun Binay Das.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/tarun-binay-das-6758aa1b8",
+                "instagram": "https://instagram.com/tarun_maybe_idk"
             }
         }
     ],
