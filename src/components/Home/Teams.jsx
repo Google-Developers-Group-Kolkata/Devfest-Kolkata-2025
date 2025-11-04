@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import useEmblaCarousel from "embla-carousel-react";
 import teams from '@/data/team.json';
+import Image from "next/image";
 
 const TeamCardSkeleton = ({ isCenter = true }) => {
     return (
@@ -132,7 +133,7 @@ const TeamCard = ({ name, role, image, socialLinks, isCenter }) => {
 
                 {/* Social Icons */}
                 <div className="flex gap-2 sm:gap-3">
-                    {socialLinks.twitter && (
+                    {/* {socialLinks.twitter && (
                         <Link
                             href={socialLinks.twitter}
                             target="_blank"
@@ -141,7 +142,7 @@ const TeamCard = ({ name, role, image, socialLinks, isCenter }) => {
                         >
                             <FaXTwitter className="text-white text-[10px] sm:text-xs" />
                         </Link>
-                    )}
+                    )} */}
                     {socialLinks.linkedin && (
                         <Link
                             href={socialLinks.linkedin}
@@ -299,19 +300,19 @@ export default function Teams() {
                             {/* Left Navigation Button */}
                             <button
                                 onClick={scrollPrev}
-                                className="z-20 bg-[#D9D9D933] hover:bg-[#D9D9D980] text-white p-2 sm:p-3 rounded-full transition-colors flex-shrink-0 absolute left-5 md:left-20 lg:left-50  xl:left-90 top-40 cursor-pointer"
+                                className="z-20 bg-[#D9D9D933] hover:bg-[#D9D9D950] p-2 sm:p-3 rounded-full transition-colors flex-shrink-0 absolute left-5 md:left-20 lg:left-50  xl:left-90 top-40 cursor-pointer"
                                 aria-label="Previous"
                             >
-                                <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                                <Image src="/left-arrow.svg" alt="left-arrow" height={20} width={20} className="w-4 h-4 sm:w-5 sm:h-5 md:w-7 md:h-6"/>
                             </button>
 
                             {/* Right Navigation Button */}
                             <button
                                 onClick={scrollNext}
-                                className="z-20 bg-[#D9D9D933] hover:bg-[#D9D9D980] text-white p-2 sm:p-3 rounded-full transition-colors flex-shrink-0 absolute right-5 md:right-20 lg:right-50 xl:right-90 top-40 cursor-pointer"
+                                className="z-20 bg-[#D9D9D933] hover:bg-[#D9D9D950] p-2 sm:p-3 rounded-full transition-colors flex-shrink-0 absolute right-5 md:right-20 lg:right-50 xl:right-90 top-40 cursor-pointer"
                                 aria-label="Next"
                             >
-                                <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                                <Image src="/right-arrow.svg" alt="right-arrow" height={20} width={20} className="w-4 h-4 sm:w-5 sm:h-5 md:w-7 md:h-6" />
                             </button>
 
                             {/* Embla Carousel */}
