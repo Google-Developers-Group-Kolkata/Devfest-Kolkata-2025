@@ -89,7 +89,7 @@ const TeamCard = ({ name, role, image, socialLinks, isCenter }) => {
                 isCenter 
                     ? 'w-[220px] h-[220px] sm:w-[280px] sm:h-[280px] md:w-[320px] md:h-[320px]' 
                     : 'w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[220px] md:h-[220px]'
-            }`}>
+            } pt-10`}>
                 {/* Colored Blob Background */}
                 <div
                     className={`absolute left-1/2 -translate-x-1/2 top-[35px] transition-all duration-500 ease-out group-hover:scale-105 group-hover:rotate-6 ${blobShape} ${
@@ -103,7 +103,7 @@ const TeamCard = ({ name, role, image, socialLinks, isCenter }) => {
                 />
 
                 {/* Team Member Image */}
-                <div className="relative w-full h-full z-10 flex items-start justify-center">
+                <div className="relative w-full h-full z-10 flex items-start justify-center ">
                     <img
                         src={image}
                         alt={name}
@@ -245,7 +245,7 @@ export default function Teams() {
         <div className="bg-[#1E1E1E] py-10 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8">
             <div className="max-w-full mx-auto">
                 {/* Section Heading */}
-                <div className="text-center mb-12 sm:mb-16 md:mb-20">
+                <div className="text-center mb-12 sm:mb-16 md:mb-10">
                     <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mb-3 sm:mb-4 tracking-wider albert_sans font-bold">
                         The TEAM
                     </h2>
@@ -295,18 +295,27 @@ export default function Teams() {
                         </div>
                     ) : (
                         // Actual Carousel with Fixed Height
-                        <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto min-h-[500px] sm:min-h-[600px] md:min-h-[550px]">
+                        <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto min-h-[500px] sm:min-h-[600px] md:min-h-[550px] relative">
                             {/* Left Navigation Button */}
                             <button
                                 onClick={scrollPrev}
-                                className="z-20 bg-gray-800 hover:bg-gray-700 text-white p-2 sm:p-3 rounded-full transition-colors flex-shrink-0"
+                                className="z-20 bg-[#D9D9D933] hover:bg-[#D9D9D980] text-white p-2 sm:p-3 rounded-full transition-colors flex-shrink-0 absolute left-5 md:left-20 lg:left-50  xl:left-90 top-40 cursor-pointer"
                                 aria-label="Previous"
                             >
                                 <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                             </button>
 
+                            {/* Right Navigation Button */}
+                            <button
+                                onClick={scrollNext}
+                                className="z-20 bg-[#D9D9D933] hover:bg-[#D9D9D980] text-white p-2 sm:p-3 rounded-full transition-colors flex-shrink-0 absolute right-5 md:right-20 lg:right-50 xl:right-90 top-40 cursor-pointer"
+                                aria-label="Next"
+                            >
+                                <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                            </button>
+
                             {/* Embla Carousel */}
-                            <div className="overflow-hidden flex-1 max-w-5xl" ref={emblaRef}>
+                            <div className="overflow-hidden flex-1 max-w-6xl" ref={emblaRef}>
                                 <div className="flex items-start">
                                     {shuffledMembers && shuffledMembers.map((member, index) => (
                                         <div
@@ -326,15 +335,6 @@ export default function Teams() {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Right Navigation Button */}
-                            <button
-                                onClick={scrollNext}
-                                className="z-20 bg-gray-800 hover:bg-gray-700 text-white p-2 sm:p-3 rounded-full transition-colors flex-shrink-0"
-                                aria-label="Next"
-                            >
-                                <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                            </button>
                         </div>
                     )}
                 </div>
