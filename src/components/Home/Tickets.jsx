@@ -81,7 +81,7 @@ export default function Tickets() {
 
   const fetchTickets = async () => {
     try {
-      const ticketCollection = collection(db, "ticket");
+      const ticketCollection = collection(db, "devfest-tickets");
       const ticketSnapshot = await getDocs(ticketCollection);
       const ticketList = ticketSnapshot.docs.map((doc) => ({
         id: doc.id,
