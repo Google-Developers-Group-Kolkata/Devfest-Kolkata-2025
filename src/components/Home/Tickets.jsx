@@ -33,7 +33,7 @@ const TicketCard = ({ title, price, features, buttonColor, url, isActive }) => {
         </div>
       </div>
     )}
-    <div className={`p-8 rounded-2xl ${!isActive ? 'bg-black/40' : ''}`}>
+    <div className={`p-8 h-full flex flex-col rounded-2xl ${!isActive ? 'bg-black/40' : ''}`}>
       {/* Star Icon */}
       <div className="absolute top-6 right-6">
         <Image 

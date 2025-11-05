@@ -108,11 +108,11 @@ export default function Venue() {
                         {PLACE_NAME}
                     </motion.h1>
                     <motion.div variants={itemVariants}>
-                        <motion.p
+                        {/* <motion.p
                             className="text-[#FFF3D2] text-center sm:text-left text-sm 2xl:text-lg" 
                         >
                             {ADDRESS1}
-                        </motion.p>
+                        </motion.p> */}
                         <motion.p
                             className="text-[#FFF3D2] text-center sm:text-left text-sm 2xl:text-lg"
                         >

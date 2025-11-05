@@ -45,6 +45,17 @@
             }
         },
         {
+            "id": 30,
+            "name": "Kunal Ghosh",
+            "role": "Event ORGANISER",
+            "image": "/team/Kunal Ghosh.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://www.linkedin.com/in/kunalghosh-li",
+                "instagram": "https://www.instagram.com/kunalghosh.ig"
+            }
+        },
+        {
             "id": 5,
             "name": "Rahul Pal",
             "role": "Web Dev",
