@@ -15,7 +15,7 @@
             "id": 2,
             "name": "Sumantro Mukherjee ",
             "role": "ORGANISER",
-            "image": "/team/Subhadip Das.png",
+            "image": "/team/sh.png",
             "socialLinks": {
                 "twitter": "https://x.com",
                 "linkedin": "https://www.linkedin.com/in/sumantrom",
@@ -25,7 +25,7 @@
         {
             "id": 3,
             "name": "Akash Kumar Majumder",
-            "role": "Core ORGANISER",
+            "role": "Event ORGANISER",
             "image": "/team/Akash.png",
             "socialLinks": {
                 "twitter": "https://x.com",
@@ -36,7 +36,7 @@
         {
             "id": 4,
             "name": "Sarmistha Ghosh",
-            "role": "Core ORGANISER",
+            "role": "Event ORGANISER",
             "image": "/team/Sarmistha Ghosh.png",
             "socialLinks": {
                 "twitter": "https://x.com",
