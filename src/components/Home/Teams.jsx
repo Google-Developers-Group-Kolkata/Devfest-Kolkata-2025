@@ -1,5 +1,5 @@
 "use client";
-import { FaXTwitter, FaLinkedinIn, FaInstagram } from "react-icons/fa6";
+import { FaLinkedinIn, FaInstagram } from "react-icons/fa6";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -182,12 +182,20 @@ export default function Teams() {
         dragFree: false,
     });
 
-    // Shuffle team members on mount
+    // Shuffle team members on mount - keep first 5 fixed, shuffle the rest
     useEffect(() => {
-        const shuffled = [...teams.teamMembers].sort(() => Math.random() - 0.5);
-        setShuffledMembers(shuffled);
-        // Add a small delay to show the skeleton (optional)
-        setTimeout(() => setIsLoading(false), 300);
+        const fixed = teams.teamMembers.slice(0, 5);
+        const rest = teams.teamMembers.slice(5);
+
+        // Fisher-Yates shuffle for the rest
+        const shuffledRest = [...rest];
+        for (let i = shuffledRest.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledRest[i], shuffledRest[j]] = [shuffledRest[j], shuffledRest[i]];
+        }
+
+        setShuffledMembers([...fixed, ...shuffledRest]);
+        setIsLoading(false);
     }, []);
 
     // Update items per view based on screen size
