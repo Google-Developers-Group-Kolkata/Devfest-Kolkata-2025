@@ -1,83 +1,105 @@
 "use client";
 
-const TicketCard = ({ title, price, features, buttonColor, buttonText }) => (
-  <div className="relative bg-[#FBFBFB] rounded-xl p-6 w-full max-w-[360px] min-h-[320px] border border-[#F0F0F0] shadow-lg">
-    {/* Title */}
-    <h3 className="text-[#0B0B0B] text-lg font-semibold mb-4">{title}</h3>
+import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import Image from "next/image";
 
-    {/* Features */}
-    <div className="space-y-2 mb-6">
-      {features.map((feature, index) => (
-        <div key={index} className="flex items-start gap-2 text-[#666]">
-          <span className="text-xs text-green-500">✓</span>
-          <span className="text-xs">{feature}</span>
+const TicketCard = ({ title, price, features, buttonColor, url, isActive }) => {
+  let star;
+
+  switch (buttonColor) {
+    case "#377ABB":
+      star = "/blue-star.svg";
+      break;
+    case "#EA4335":
+      star = "/red-star.svg";
+      break;
+    case "#4DAB49":
+      star = "/green-star.svg";
+      break;
+
+    default:
+      star = "/blue-star.svg";
+      break;
+  }
+  return (
+  <div className="relative bg-[#F5E6D3] rounded-2xl w-full max-w-[360px] min-h-[400px] shadow-xl aldrich">
+    {/* Sold Out Banner */}
+    {!isActive && (
+      <div className="absolute -left-3 -right-3 top-1/2 -translate-y-1/2 z-10">
+        <div className="bg-white py-4 text-center shadow-lg border-2 border-black">
+          <span className="text-black text-2xl font-bold albert_sans">Sold Out</span>
         </div>
-      ))}
-    </div>
+      </div>
+    )}
+    <div className={`p-8 rounded-2xl ${!isActive ? 'bg-black/40' : ''}`}>
+      {/* Star Icon */}
+      <div className="absolute top-6 right-6">
+        <Image 
+          src={star} 
+          alt="star" 
+          height={30} 
+          width={30} 
+        />
+      </div>
 
-    {/* Price */}
-    <div className="mb-4 mt-auto">
-      <span className="text-[#0B0B0B] text-2xl font-bold">{price}</span>
-    </div>
+      {/* Title */}
+      <h3 className="text-[#0B0B0B] text-3xl font-bold mb-8">{title}</h3>
 
-    {/* Button */}
-    <button
-      className="w-full py-2.5 rounded-lg font-semibold text-white text-sm"
-      style={{ backgroundColor: buttonColor }}
-    >
-      {buttonText}
-    </button>
+      {/* Features */}
+      <div className="space-y-4 mb-8">
+        {features.map((feature, index) => (
+          <div key={index} className="flex items-center gap-3 text-[#4A4A4A]">
+            <Image src="/tick.svg" alt="tick" height={20} width={20} className="w-7 h-7"/>
+            <span className="text-base font-medium">{feature}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Price */}
+      <div className="mb-6 mt-auto">
+        <span className="text-[#0B0B0B] text-5xl font-bold">{price}</span>
+        <span className="text-[#666] text-lg ml-2">/person</span>
+      </div>
+
+      {/* Button */}
+      <button
+        onClick={() => window.open(url)}
+        className="w-full py-2 rounded-xl font-bold border-3 border-black text-black text-xl cursor-pointer transition-all hover:opacity-90 disabled:cursor-not-allowed"
+        style={{ backgroundColor: buttonColor }}
+        disabled={!isActive}
+      >
+        Buy Ticket
+      </button>
+    </div>
   </div>
-);
+)};
 
 export default function Tickets() {
-  const tickets = [
-    {
-      title: "Community Pass",
-      price: "₹XXX",
-      features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
-      buttonColor: "#34A853",
-      buttonText: "Register Now"
-    },
-    {
-      title: "Early Bird",
-      price: "₹XXX",
-      features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
-      buttonColor: "#FBBC04",
-      buttonText: "Register Now"
-    },
-    {
-      title: "Regular Pass",
-      price: "₹XXX",
-      features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
-      buttonColor: "#EA4335",
-      buttonText: "Register Now"
-    },
-    {
-      title: "Student Pass",
-      price: "₹XXX",
-      features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
-      buttonColor: "#4285F4",
-      buttonText: "Register Now"
-    },
-    {
-      title: "VIP Pass",
-      price: "₹XXXX",
-      features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
-      buttonColor: "#EA4335",
-      buttonText: "Register Now"
-    },
-    {
-      title: "Group Pass",
-      price: "₹XXXX",
-      features: ["Access to all sessions", "Lunch included", "Swag kit", "Networking"],
-      buttonColor: "#34A853",
-      buttonText: "Register Now"
+  const [ticketData, setTicketData] = useState([]);
+
+  const fetchTickets = async () => {
+    try {
+      const ticketCollection = collection(db, "ticket");
+      const ticketSnapshot = await getDocs(ticketCollection);
+      const ticketList = ticketSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setTicketData(ticketList.sort((a, b) => a.price - b.price));
+    } catch (error) {
+      console.error("Error fetching tickets:", error);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
 
   return (
-    <section className="relative bg-[#0A0A0A] py-20 px-0 overflow-hidden w-full">
+    <section className="relative bg-dark py-20 px-0 overflow-hidden w-full">
       {/* full-bleed section — inner wrapper keeps content centered */}
       <div className="w-full">
         {/* Heading */}
@@ -85,16 +107,14 @@ export default function Tickets() {
           <h2 className="text-5xl md:text-6xl font-bold text-white mb-3">
             Grab your Tickets
           </h2>
-          <p className="text-[#888] text-lg">
-            A Stacked Day, Dont miss out.
-          </p>
+          <p className="text-[#888] text-lg">A Stacked Day, Dont miss out.</p>
         </div>
 
-        {/* Tickets Grid - Blurred */}
+        {/* Tickets Grid - no blur */}
         <div className="relative">
           <div className="w-full max-w-[1400px] mx-auto px-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-8 blur-md opacity-60 justify-items-center">
-              {tickets.map((ticket, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-8 justify-items-center">
+              {ticketData.map((ticket, index) => (
                 <div key={index} className="flex justify-center w-full">
                   <TicketCard {...ticket} />
                 </div>
@@ -102,51 +122,7 @@ export default function Tickets() {
             </div>
           </div>
 
-          {/* Coming Soon Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-[#2C2C2C] rounded-[32px] px-12 py-10 max-w-md shadow-2xl">
-              {/* Clock Icon */}
-              <div className="flex justify-center mb-6">
-                <div className="bg-[#404040] rounded-[20px] p-5 inline-block">
-                  <svg
-                    width="56"
-                    height="56"
-                    viewBox="0 0 56 56"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
-                      stroke="white"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M28 14V28L38 38"
-                      stroke="white"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Coming Soon Text */}
-              <h3 className="text-white text-4xl font-bold text-center mb-4">
-                Coming soon
-              </h3>
-
-              {/* Description */}
-              <p className="text-[#AAAAAA] text-center text-base leading-relaxed">
-                We&apos;re crafting an amazing agenda for you.
-                <br />
-                Stay tuned for updates!
-              </p>
-            </div>
-          </div>
+          {/* overlay removed */}
         </div>
       </div>
     </section>
