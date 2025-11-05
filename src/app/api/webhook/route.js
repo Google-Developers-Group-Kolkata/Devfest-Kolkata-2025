@@ -28,9 +28,23 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
+// Ensure collection exists (creates a sentinel doc only if empty)
+async function ensureCollectionExists(collectionName) {
+    const snap = await db.collection(collectionName).limit(1).get();
+    if (snap.empty) {
+        await db.collection(collectionName).doc("_init").set({
+            type: "init",
+            initializedAt: admin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
+    }
+}
+
 export async function POST(request) {
     try {
         const ticketData = await request.json();
+
+        // Make sure the collection exists
+        await ensureCollectionExists("attendees");
 
         // Store complete ticket data in Firestore (all fields dynamically)
         const docRef = await db.collection("attendees").add({
@@ -41,6 +55,9 @@ export async function POST(request) {
             data: ticketData.Data,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
+
+        // Cleanup sentinel if it was created (no-op if it doesn't exist)
+        await db.collection("attendees").doc("_init").delete();
 
         return NextResponse.json(
             {
