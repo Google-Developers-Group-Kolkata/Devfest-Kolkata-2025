@@ -4,13 +4,16 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
 
-export default function Navbar() {
+export default function Navbar({ scrollToView, refs }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, loading, signInWithGoogle, signOutUser } = useAuth();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+
+  const profilePic = typeof window !== 'undefined' ? localStorage.getItem("profilePic") : null;
 
   // States for scroll animation
   const [showNav, setShowNav] = useState(true);
@@ -137,7 +140,7 @@ export default function Navbar() {
             <div className="md:hidden">
               <motion.button
                 onClick={toggleMenu}
-                className="text-white focus:outline-none p-2"
+                className="text-white focus:outline-none p-2 pr-0"
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.1 }}
               >
@@ -184,11 +187,11 @@ export default function Navbar() {
 
           {/* Navigation links - Desktop */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Home</Link>
+            <span onClick={() => scrollToView(refs.homeRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">Home</span>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Schedule</Link>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Tracks</Link>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Socials</Link>
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">FAQ</Link>
+            <span onClick={() => scrollToView(refs.faqRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">FAQ</span>
           </div>
 
           {/* Login button - Desktop */}
@@ -203,17 +206,14 @@ export default function Navbar() {
                   onClick={() => setIsProfileDrawerOpen(!isProfileDrawerOpen)}
                   className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-white/20 transition-all duration-200 cursor-pointer"
                 >
-                  <img
-                    key={user.photoURL || user.uid}
+                  <Image
+                    key={user.uid}
                     className="w-full h-full object-cover"
-                    src={user.photoURL || "/default-avatar.png"}
+                    src={user ? user.photoURL : profilePic}
                     alt={user.displayName || "User Profile"}
                     loading="lazy"
-                    onError={(e) => {
-                      // fallback to a local default image when remote fails
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = "/default-avatar.png";
-                    }}
+                    width={40}
+                    height={40}
                   />
                 </button>
 
@@ -229,16 +229,14 @@ export default function Navbar() {
                     >
                       <div className="p-4">
                         <div className="flex items-center gap-3 mb-4">
-                          <img 
-                            key={user.photoURL || user.uid + "-drawer"}
-                            src={user.photoURL || "/default-avatar.png"} 
+                          <Image 
+                            key={user.uid + "-drawer"}
+                            src={user ? user.photoURL : profilePic}
                             alt={user.displayName || "Profile"} 
                             className="w-12 h-12 rounded-full object-cover"
                             loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = "/default-avatar.png";
-                            }}
+                            width={48}
+                            height={48}
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold truncate albert_sans">

@@ -1,0 +1,61 @@
+{
+    "tickets": [
+        {
+            "id": 1,
+            "name": "Early Bird Ticket",
+            "title": "Early Bird Ticket",
+            "description": "I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community.",
+            "features": [
+                "Entry to DevFest",
+                "Full-access to conference",
+                "Breakfast & Lunch",
+                "Hi-Tea",
+                "Keynotes, Panels",
+                "Exclusive Discussion Session"
+            ],
+            "price": 799,
+            "priceInPaise": 79900,
+            "color": "blue",
+            "available": true,
+            "slug": "early-bird"
+        },
+        {
+            "id": 2,
+            "name": "Community Fans",
+            "title": "Community Fans",
+            "description": "I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community.",
+            "features": [
+                "Entry to DevFest",
+                "Full-access to conference",
+                "Breakfast & Lunch",
+                "Hi-Tea",
+                "Keynotes, Panels",
+                "Exclusive Discussion Session"
+            ],
+            "price": 599,
+            "priceInPaise": 59900,
+            "color": "red",
+            "available": true,
+            "slug": "community-fans"
+        },
+        {
+            "id": 3,
+            "name": "Regular Ticket",
+            "title": "Regular Ticket",
+            "description": "I know you missed community Faris ticket. This ticket for all our valuable early people who constantly support us and create a vibrant community.",
+            "features": [
+                "Entry to DevFest",
+                "Full-access to conference",
+                "Breakfast & Lunch",
+                "Hi-Tea",
+                "Keynotes, Panels",
+                "Exclusive Discussion Session"
+            ],
+            "price": 999,
+            "priceInPaise": 99900,
+            "color": "green",
+            "available": true,
+            "slug": "regular-ticket"
+        }
+    ]
+}

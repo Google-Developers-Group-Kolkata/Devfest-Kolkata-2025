@@ -14,12 +14,14 @@ import Teams from "@/components/Home/Teams";
 
 const DevFest2025 = () => {
     const ticketSectionRef = useRef(null);
+    const faqRef = useRef(null);
+    const homeRef = useRef(null);
 
-    const scrollToTickets = () => {
-        if (ticketSectionRef.current) {
-            ticketSectionRef.current.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
+    const scrollToView = (ref) => {
+        if (ref.current) {
+            ref.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
             });
         }
     };
@@ -28,14 +30,14 @@ const DevFest2025 = () => {
         <div className="min-h-screen bg-[#1e1e1e] overflow-x-hidden">
             {/* Navbar */}
             <header className="fixed top-0 left-0 right-0 z-50">
-                <Navbar />
+                <Navbar scrollToView={scrollToView} refs={{ faqRef, homeRef }} />
             </header>
 
             {/* Main Content */}
             <main>
                 {/* Hero Banner Section */}
-                <section className="pb-8 md:pb-8">
-                    <HeroBanner scrollToTickets={scrollToTickets} />
+                <section ref={homeRef} className="pb-8 md:pb-8">
+                    <HeroBanner scrollToView={scrollToView} ticketSectionRef={ticketSectionRef} />
                 </section>
 
                 {/* Google Play Section */}
@@ -67,7 +69,7 @@ const DevFest2025 = () => {
                     <Teams />
                 </section>
 
-                <section className="py-16 px-4 open_sans">
+                <section ref={faqRef} className="py-16 px-4 open_sans">
                     <FAQ />
                 </section>
             </main>

@@ -1,15 +1,21 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
-export default function HeroBanner({ scrollToTickets }) {
+export default function HeroBanner({ scrollToView, ticketSectionRef }) {
     const sectionRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: sectionRef,
         offset: ["start end", "end start"],
     });
-    const taxiX = useTransform(scrollYProgress, [0, 1], ["-100vw", "100vw"]);
+    const taxiXRaw = useTransform(scrollYProgress, [0, 1], ["-100vw", "100vw"]);
+
+    const taxiX = useSpring(taxiXRaw, {
+        stiffness: 80,   // Lower = smoother, slower
+        damping: 20,     // Higher = less bounce
+        mass: 0.5,       // Lower = lighter, more responsive
+    });
 
     return (
         <div
@@ -79,7 +85,7 @@ export default function HeroBanner({ scrollToTickets }) {
                     }}
                 >
                     <button
-                        onClick={scrollToTickets}
+                        onClick={() => scrollToView(ticketSectionRef)}
                         className="relative px-6 py-1.5 md:py-2 2xl:py-3 text-xl font-semibold text-white rounded-full hover:scale-105 transition-transform duration-300 group google-gradient-border cursor-pointer bg-[#1E1E1E]"
                     >
                         <div className="flex items-center relative z-[2]">
