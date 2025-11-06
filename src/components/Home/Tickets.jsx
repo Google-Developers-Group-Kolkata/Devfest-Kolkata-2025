@@ -88,7 +88,10 @@ export default function Tickets() {
         ...doc.data(),
       }));
 
-      setTicketData(ticketList.sort((a, b) => a.price - b.price));
+      // sort: active tickets first (ascending price), then inactive (ascending price)
+      const active = ticketList.filter(t => t.isActive).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      const inactive = ticketList.filter(t => !t.isActive).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      setTicketData([...active, ...inactive]);
     } catch (error) {
       console.error("Error fetching tickets:", error);
     }
