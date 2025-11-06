@@ -129,13 +129,13 @@ export default function Navbar({ scrollToView, refs }) {
                 alt="DevFest Logo"
                 className="h-12 w-auto mr-2"
               />
-              {/* <span className="font-semibold text-3xl text-white albert_sans">GDG Kolkata</span> */}
+              <span className="font-semibold text-xl text-white albert_sans md:hidden">GDG Kolkata</span>
             </div>
 
             <div className="flex items-center md:hidden">
-            {!user && (<button onClick={handleGoogleSignIn} disabled={isSigningIn} className="relative text-black font-semibold py-1 px-4 rounded-[42px] bg-[#FFF3D2] cursor-pointer albert_sans">
+            {/* {!user && (<button onClick={handleGoogleSignIn} disabled={isSigningIn} className="relative text-black font-semibold py-1 px-4 rounded-[42px] bg-[#FFF3D2] cursor-pointer albert_sans">
               Log In
-              </button>)}
+              </button>)} */}
             {/* Mobile menu button with animation */}
             <div className="md:hidden">
               <motion.button
@@ -186,7 +186,7 @@ export default function Navbar({ scrollToView, refs }) {
           </div>
 
           {/* Navigation links - Desktop */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center justify-evenly w-[70%] space-x-8">
             <span onClick={() => scrollToView(refs.homeRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">Home</span>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Schedule</Link>
             <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Tracks</Link>
@@ -195,7 +195,7 @@ export default function Navbar({ scrollToView, refs }) {
           </div>
 
           {/* Login button - Desktop */}
-          <div className="hidden md:block mr-1">
+          {/* <div className="hidden md:block mr-1">
             {!user && (<button onClick={handleGoogleSignIn} disabled={isSigningIn} className="relative text-black font-semibold py-2 px-6 rounded-[42px] hover:scale-105 transition-transform duration-300 bg-[#FFF3D2] cursor-pointer">
               <span className="relative z-[2] albert_sans">Log In</span>
             </button>)}
@@ -261,7 +261,7 @@ export default function Navbar({ scrollToView, refs }) {
                 </AnimatePresence>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* Mobile menu with animation */}

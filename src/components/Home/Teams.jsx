@@ -174,16 +174,19 @@ export default function Teams() {
     const [isLoading, setIsLoading] = useState(true);
     const [itemsPerView, setItemsPerView] = useState(3);
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [startIndex, setStartIndex] = useState(1);
+    const [isMobile, setIsMobile] = useState(false);
     
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: 'center',
         skipSnaps: false,
         dragFree: false,
-        startIndex: 1,
+        startIndex: startIndex,
     });
 
     // Shuffle team members on mount - keep first 5 fixed, shuffle the rest
+    // Swap first 2 members for mobile
     useEffect(() => {
         const fixed = teams.teamMembers.slice(0, 5);
         const rest = teams.teamMembers.slice(5);
@@ -195,17 +198,28 @@ export default function Teams() {
             [shuffledRest[i], shuffledRest[j]] = [shuffledRest[j], shuffledRest[i]];
         }
 
-        setShuffledMembers([...fixed, ...shuffledRest]);
-        setIsLoading(false);
-    }, []);
+        let finalMembers = [...fixed, ...shuffledRest];
+        
+        // Swap first 2 members if mobile
+        if (isMobile && finalMembers.length >= 2) {
+            [finalMembers[0], finalMembers[1]] = [finalMembers[1], finalMembers[0]];
+        }
 
-    // Update items per view based on screen size
+        setShuffledMembers(finalMembers);
+        setIsLoading(false);
+    }, [isMobile]);
+
+    // Update items per view and start index based on screen size
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 640) {
                 setItemsPerView(1);
+                setStartIndex(0);
+                setIsMobile(true);
             } else {
                 setItemsPerView(3);
+                setStartIndex(1);
+                setIsMobile(false);
             }
         };
 
@@ -213,6 +227,19 @@ export default function Teams() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Reinitialize embla when startIndex changes
+    useEffect(() => {
+        if (emblaApi) {
+            emblaApi.reInit({
+                loop: true,
+                align: 'center',
+                skipSnaps: false,
+                dragFree: false,
+                startIndex: startIndex,
+            });
+        }
+    }, [emblaApi, startIndex]);
 
     const onSelect = useCallback(() => {
         if (!emblaApi) return;
