@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
-const TicketCard = ({ title, price, features, buttonColor, url, isActive }) => {
+const TicketCard = ({ title, price, features, buttonColor, url, isActive, isComingSoon }) => {
   let star;
 
   switch (buttonColor) {
@@ -33,7 +33,14 @@ const TicketCard = ({ title, price, features, buttonColor, url, isActive }) => {
         </div>
       </div>
     )}
-    <div className={`p-8 h-full flex flex-col rounded-2xl ${!isActive ? 'bg-black/40' : ''}`}>
+    {isComingSoon && (
+      <div className="absolute -left-3 -right-3 top-1/2 -translate-y-1/2 z-10">
+        <div className="bg-white py-4 text-center shadow-lg border-2 border-black">
+          <span className="text-black text-2xl font-bold albert_sans">Coming Soon</span>
+        </div>
+      </div>
+    )}
+    <div className={`p-8 h-full flex flex-col rounded-2xl ${!isActive || isComingSoon ? 'bg-black/40' : ''}`}>
       {/* Star Icon */}
       <div className="absolute top-6 right-6">
         <Image 
@@ -68,7 +75,7 @@ const TicketCard = ({ title, price, features, buttonColor, url, isActive }) => {
         onClick={() => window.open(url)}
         className="w-full py-2 rounded-xl font-bold border-3 border-black text-black text-xl cursor-pointer transition-all hover:opacity-90 disabled:cursor-not-allowed"
         style={{ backgroundColor: buttonColor }}
-        disabled={!isActive}
+        disabled={!isActive || isComingSoon}
       >
         Buy Ticket
       </button>
