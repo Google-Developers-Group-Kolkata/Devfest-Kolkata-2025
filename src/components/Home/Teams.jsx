@@ -180,6 +180,7 @@ export default function Teams() {
         align: 'center',
         skipSnaps: false,
         dragFree: false,
+        startIndex: 1,
     });
 
     // Shuffle team members on mount - keep first 5 fixed, shuffle the rest

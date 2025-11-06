@@ -2,6 +2,17 @@
     "teamMembers": [
         {
             "id": 1,
+            "name": "Sumantro Mukherjee",
+            "role": "ORGANISER",
+            "image": "/team/Sumantro Mukherjee.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://www.linkedin.com/in/sumantrom",
+                "instagram": "https://www.instagram.com/that_community_guy"
+            }
+        },
+        {
+            "id": 2,
             "name": "Atri Das",
             "role": "ORGANISER",
             "image": "/team/Atri Das.png",
@@ -12,29 +23,7 @@
             }
         },
         {
-            "id": 2,
-            "name": "Sumantro Mukherjee ",
-            "role": "ORGANISER",
-            "image": "/team/sh.png",
-            "socialLinks": {
-                "twitter": "https://x.com",
-                "linkedin": "https://www.linkedin.com/in/sumantrom",
-                "instagram": "https://www.instagram.com/that_community_guy"
-            }
-        },
-        {
             "id": 3,
-            "name": "Akash Kumar Majumder",
-            "role": "Event ORGANISER",
-            "image": "/team/Akash.png",
-            "socialLinks": {
-                "twitter": "https://x.com",
-                "linkedin": "https://linkedin.com/in/akash-kumar-majumder-62b384196",
-                "instagram": "https://instagram.com/ak_maj"
-            }
-        },
-        {
-            "id": 4,
             "name": "Sarmistha Ghosh",
             "role": "Event ORGANISER",
             "image": "/team/Sarmistha Ghosh.png",
@@ -45,7 +34,18 @@
             }
         },
         {
-            "id": 30,
+            "id": 4,
+            "name": "Akash Kumar Majumder",
+            "role": "Event ORGANISER",
+            "image": "/team/Akash.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://linkedin.com/in/akash-kumar-majumder-62b384196",
+                "instagram": "https://instagram.com/ak_maj"
+            }
+        },
+        {
+            "id": 5,
             "name": "Kunal Ghosh",
             "role": "Event ORGANISER",
             "image": "/team/Kunal Ghosh.png",
@@ -56,7 +56,7 @@
             }
         },
         {
-            "id": 5,
+            "id": 6,
             "name": "Rahul Pal",
             "role": "Web Dev",
             "image": "/team/rahul.png",
@@ -67,7 +67,7 @@
             }
         },
         {
-            "id": 6,
+            "id": 7,
             "name": "Ankan Saha",
             "role": "Web Dev",
             "image": "/team/Ankan Saha.png",
@@ -78,7 +78,7 @@
             }
         },
         {
-            "id": 7,
+            "id": 8,
             "name": "Subhadip Saha",
             "role": "Web Dev",
             "image": "/team/Subhadip Saha.png",
@@ -89,7 +89,7 @@
             }
         },
         {
-            "id": 8,
+            "id": 9,
             "name": "Subinoy Biswas",
             "role": "Web Dev",
             "image": "/team/Subinoy Biswas.png",
@@ -100,7 +100,7 @@
             }
         },
         {
-            "id": 9,
+            "id": 10,
             "name": "Subhadip Das",
             "role": "Web Dev",
             "image": "/team/Subhadip Das.png",
@@ -111,7 +111,7 @@
             }
         },
         {
-            "id": 10,
+            "id": 11,
             "name": "Udity Banerjee",
             "role": "Graphics",
             "image": "/team/Udity.png",
@@ -122,7 +122,7 @@
             }
         },
         {
-            "id": 11,
+            "id": 12,
             "name": "Tarun Binay Das",
             "role": "Graphics",
             "image": "/team/Tarun Binay Das.png",
@@ -133,7 +133,7 @@
             }
         },
         {
-            "id": 12,
+            "id": 13,
             "name": "Aditya Ghosh",
             "role": "PR and Outreach",
             "image": "/team/Aditya Ghosh.png",
@@ -144,7 +144,7 @@
             }
         },
         {
-            "id": 13,
+            "id": 14,
             "name": "Protyoy Bhandary",
             "role": "PR and Outreach",
             "image": "/team/Protyoy.png",
@@ -155,7 +155,7 @@
             }
         },
         {
-            "id": 14,
+            "id": 15,
             "name": "Rahul Khandait",
             "role": "PR and Outreach",
             "image": "/team/Rahul Khandait.png",
@@ -166,7 +166,7 @@
             }
         },
         {
-            "id": 15,
+            "id": 16,
             "name": "Saptak Biswas",
             "role": "PR and Outreach",
             "image": "/team/Saptak Biswas.png",
@@ -177,7 +177,7 @@
             }
         },
         {
-            "id": 16,
+            "id": 17,
             "name": "Srija Ray",
             "role": "PR and Outreach",
             "image": "/team/Srija Ray.png",
@@ -188,7 +188,7 @@
             }
         },
         {
-            "id": 17,
+            "id": 18,
             "name": "Titash Shil",
             "role": "PR and Outreach",
             "image": "/team/Titash Shil.png",
@@ -199,7 +199,7 @@
             }
         },
         {
-            "id": 18,
+            "id": 19,
             "name": "Sayantika Dey",
             "role": "PR and Outreach",
             "image": "/team/Sayantika Dey.png",
@@ -210,7 +210,7 @@
             }
         },
         {
-            "id": 19,
+            "id": 20,
             "name": "Gurdil Singh",
             "role": "Photography / Videography",
             "image": "/team/Gurdil Singh.png",
@@ -221,7 +221,7 @@
             }
         },
         {
-            "id": 20,
+            "id": 21,
             "name": "Pawan Sharma",
             "role": "Photography / Videography",
             "image": "/team/Pawan.png",
@@ -232,7 +232,7 @@
             }
         },
         {
-            "id": 21,
+            "id": 22,
             "name": "Soumyadeep Halder",
             "role": "Photography / Videography",
             "image": "/team/Soumyadeep Halder.png",
@@ -243,7 +243,7 @@
             }
         },
         {
-            "id": 22,
+            "id": 23,
             "name": "Prativa Dhar",
             "role": "Social Media",
             "image": "/team/Prativa Dhar.png",
@@ -254,7 +254,7 @@
             }
         },
         {
-            "id": 23,
+            "id": 24,
             "name": "Sweety Jha",
             "role": "Social Media",
             "image": "/team/Sweety Jha.png",
@@ -265,7 +265,7 @@
             }
         },
         {
-            "id": 24,
+            "id": 25,
             "name": "Shromana Majumder",
             "role": "Emcee",
             "image": "/team/Shromana Majumder.png",
@@ -276,7 +276,7 @@
             }
         },
         {
-            "id": 25,
+            "id": 26,
             "name": "Simran Sharma",
             "role": "Emcee",
             "image": "/team/Simran Sharma.png",
@@ -287,7 +287,7 @@
             }
         },
         {
-            "id": 26,
+            "id": 27,
             "name": "Suchinta Chanda",
             "role": "Emcee",
             "image": "/team/Suchinta Chanda.png",
