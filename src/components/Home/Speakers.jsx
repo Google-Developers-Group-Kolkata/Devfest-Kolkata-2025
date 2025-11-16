@@ -129,7 +129,7 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
                             Stay Tuned!
                         </p>
                         <div className="flex gap-3 justify-center">
-                            <a
+                            {/* <a
                                 href="https://instagram.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -140,7 +140,7 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
                                     alt="instagram-icon"
                                     className="h-10 w-10"
                                 />
-                            </a>
+                            </a> */}
                             <a
                                 href="https://linkedin.com"
                                 target="_blank"
@@ -246,7 +246,7 @@ export default function Speakers() {
 
     const fetchSpeakers = async () => {
         try {
-            const speakerCollection = collection(db, "speaker");
+            const speakerCollection = collection(db, "released-speakers");
             const speakerSnapshot = await getDocs(speakerCollection);
             const speakerList = speakerSnapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -270,13 +270,14 @@ export default function Speakers() {
             id: s.id || idx + 1,
             name,
             role: s["TagLine"] || "Speaker",
-            image: s["Profile Picture"] || "/speaker/1.svg",
+            image: s["Profile Picture"] || "",
             bgShape: SHAPES[idx % SHAPES.length],
             socialLinks: {
-                twitter: s["X (Twitter)"] || "",
-                linkedin: s["LinkedIn"] || "",
+                twitter: s["X (Twitter)"] || "https://x.com",
+                linkedin: s["LinkedIn"] || "https://linkedin.com",
                 instagram: s["Instagram"] || "",
             },
+            isComingSoon: s["isComingSoon"] || false,
         };
     });
 
