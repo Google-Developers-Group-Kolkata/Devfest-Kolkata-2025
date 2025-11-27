@@ -36,6 +36,7 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
         () => getDeterministicColor(name + role),
         [name, role]
     );
+    const [imgLoaded, setImgLoaded] = useState(false);
 
     return (
         <div className="flex flex-col items-center group w-full max-w-[300px] md:max-w-[350px] h-full">
@@ -44,15 +45,23 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
                 <div className="relative w-full pb-32">
                     {/* Consistent aspect ratio wrapper */}
                     <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden">
+                        {!imgLoaded && (
+                            <div className="absolute inset-0">
+                                <div className="h-full w-full animate-pulse bg-zinc-800/70" />
+                            </div>
+                        )}
                         <img
                             src={imgSrc}
                             alt={name}
-                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                            onLoad={() => setImgLoaded(true)}
+                            onError={() => setImgLoaded(true)}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
                         />
                     </div>
                     {/* Info Card Overlay */}
                     <div
-                        className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full px-6 py-8 rounded-3xl shadow-lg product_sans"
+                        className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full px-6 py-8 rounded-3xl shadow-lg product_sans h-[45%] flex flex-col justify-between"
                         style={{ backgroundColor: randomBg }}
                     >
                         <h3 className="text-black text-xl sm:text-2xl font-bold mb-2 text-center">
@@ -119,7 +128,7 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
                     </div>
                     {/* Info Card Overlay */}
                     <div
-                        className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full px-6 py-8 rounded-3xl shadow-lg product_sans"
+                        className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full px-6 py-8 rounded-3xl shadow-lg product_sans h-[45%] flex flex-col justify-between"
                         style={{ backgroundColor: "var(--google-yellow)" }}
                     >
                         <h3 className="text-black text-xl sm:text-2xl font-bold mb-2 text-center">
@@ -129,18 +138,6 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
                             Stay Tuned!
                         </p>
                         <div className="flex gap-3 justify-center">
-                            {/* <a
-                                href="https://instagram.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-10 h-10 rounded flex items-center justify-center transition-colors"
-                            >
-                                <img
-                                    src="/icons/insta.svg"
-                                    alt="instagram-icon"
-                                    className="h-10 w-10"
-                                />
-                            </a> */}
                             <a
                                 href="https://linkedin.com"
                                 target="_blank"
