@@ -166,17 +166,6 @@
             }
         },
         {
-            "id": 16,
-            "name": "Saptak Biswas",
-            "role": "PR and Outreach",
-            "image": "/team/Saptak Biswas.png",
-            "socialLinks": {
-                "twitter": "https://x.com",
-                "linkedin": "https://linkedin.com/in/saptak-biswas-50a834323",
-                "instagram": "https://instagram.com/itz_not_what_u_think"
-            }
-        },
-        {
             "id": 17,
             "name": "Srija Ray",
             "role": "PR and Outreach",
@@ -201,7 +190,7 @@
         {
             "id": 19,
             "name": "Sayantika Dey",
-            "role": "PR and Outreach",
+            "role": "Emcee",
             "image": "/team/Sayantika Dey.png",
             "socialLinks": {
                 "twitter": "https://x.com",

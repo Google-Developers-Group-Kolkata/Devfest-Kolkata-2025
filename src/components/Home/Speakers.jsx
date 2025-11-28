@@ -1,167 +1,292 @@
 "use client";
-import { FaXTwitter, FaLinkedinIn, FaInstagram } from "react-icons/fa6";
-import ComingSoon from "@/components/common/ComingSoon";
+import React, { useMemo, useState, useEffect } from "react";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    useCarousel,
+} from "@/components/ui/carousel";
+import Image from "next/image";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import Autoplay from "embla-carousel-autoplay";
 
-const SpeakerCard = ({ name, role, image, bgColor, bgShape, socialLinks }) => {
+// Use one of these four colors randomly per card (stable for the card's lifetime)
+const CARD_COLORS = [
+    "var(--google-yellow)",
+    "var(--google-red)",
+    "var(--google-blue)",
+    "var(--google-green)",
+];
+
+// Stable hash -> index
+function getDeterministicColor(key) {
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+        hash = (hash << 5) - hash + key.charCodeAt(i);
+        hash |= 0; // keep 32-bit
+    }
+    const idx = Math.abs(hash) % CARD_COLORS.length;
+    return CARD_COLORS[idx];
+}
+
+const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
+    const imgSrc = image || "https://placehold.co/400x600/png?text=Speaker";
+    const randomBg = useMemo(
+        () => getDeterministicColor(name + role),
+        [name, role]
+    );
+    const [imgLoaded, setImgLoaded] = useState(false);
+
     return (
-        <div className="flex flex-col items-center group">
-            {/* Image Container with Colored Background Shape */}
-            <div className="relative w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] mb-6 overflow-visible">
-                {/* Colored Background Shape - positioned behind */}
-                {bgShape === "rounded-rect" && (
+        <div className="flex flex-col items-center group w-full max-w-[300px] md:max-w-[350px] h-full">
+            {/* Card Container */}
+            {!isComingSoon && (
+                <div className="relative w-full pb-32">
+                    {/* Consistent aspect ratio wrapper */}
+                    <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden">
+                        {!imgLoaded && (
+                            <div className="absolute inset-0">
+                                <div className="h-full w-full animate-pulse bg-zinc-800/70" />
+                            </div>
+                        )}
+                        <img
+                            src={imgSrc}
+                            alt={name}
+                            loading="lazy"
+                            onLoad={() => setImgLoaded(true)}
+                            onError={() => setImgLoaded(true)}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                        />
+                    </div>
+                    {/* Info Card Overlay */}
                     <div
-                        className="absolute left-0 top-[30px] w-[200px] h-[180px] sm:w-[240px] sm:h-[200px] rounded-[50px] transition-transform duration-300 group-hover:scale-105"
-                        style={{ backgroundColor: bgColor }}
-                    />
-                )}
-                {bgShape === "circle" && (
-                    <div
-                        className="absolute left-1/2 -translate-x-1/2 top-[30px] w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] rounded-full transition-transform duration-300 group-hover:scale-105"
-                        style={{ backgroundColor: bgColor }}
-                    />
-                )}
-                {bgShape === "triangle" && (
-                    <div
-                        className="absolute left-1/2 -translate-x-1/2 top-[40px] w-0 h-0 transition-transform duration-300 group-hover:scale-105"
-                        style={{
-                            borderLeft: "120px solid transparent",
-                            borderRight: "120px solid transparent",
-                            borderBottom: `200px solid ${bgColor}`,
-                        }}
-                    />
-                )}
-
-                {/* Speaker Image - Full color, positioned on top */}
-                <div className="relative w-full h-full z-10 flex items-start justify-center">
-                    {/* <img
-                        src={image}
-                        alt={name}
-                        className="w-[200px] h-[220px] sm:w-[240px] sm:h-[260px] object-cover object-top"
-                    /> */}
+                        className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full px-6 py-8 rounded-3xl shadow-lg product_sans h-[45%] flex flex-col justify-between"
+                        style={{ backgroundColor: randomBg }}
+                    >
+                        <h3 className="text-black text-xl sm:text-2xl font-bold mb-2 text-center">
+                            {name}
+                        </h3>
+                        <p className="text-black text-sm sm:text-base mb-6 text-center opacity-80">
+                            {role}
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                            {socialLinks.instagram && (
+                                <a
+                                    href={socialLinks.instagram}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded flex items-center justify-center transition-colors"
+                                >
+                                    <img
+                                        src="/icons/insta.svg"
+                                        alt="instagram-icon"
+                                        className="h-10 w-10"
+                                    />
+                                </a>
+                            )}
+                            {socialLinks.linkedin && (
+                                <a
+                                    href={socialLinks.linkedin}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded flex items-center justify-center transition-colors"
+                                >
+                                    <img
+                                        src="/icons/linkedin.svg"
+                                        alt="linkedin-icon"
+                                        className="h-10 w-10"
+                                    />
+                                </a>
+                            )}
+                            {socialLinks.twitter && (
+                                <a
+                                    href={socialLinks.twitter}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded flex items-center justify-center transition-colors"
+                                >
+                                    <img
+                                        src="/icons/x.svg"
+                                        alt="x-icon"
+                                        className="h-9 w-9"
+                                    />
+                                </a>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            {/* Role */}
-            <h3 className="text-white text-sm sm:text-base tracking-[0.3em] mb-2 aldrich uppercase">
-                {role}
-            </h3>
-
-            {/* Name */}
-            <p className="text-white text-base sm:text-lg mb-4 tracking-wider aldrich border-b border-white pb-1 uppercase">
-                {name}
-            </p>
-
-            {/* Social Icons */}
-            <div className="flex gap-3">
-                {socialLinks.twitter && (
-                    <a
-                        href={socialLinks.twitter}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-7 h-7 bg-[#3A3A3A] rounded flex items-center justify-center hover:bg-[#4A4A4A] transition-colors"
+            )}
+            {isComingSoon && (
+                <div className="relative w-full pb-32">
+                    <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden">
+                        <img
+                            src="https://placehold.co/400x600/png?text=More+Speakers+will+release+soon!"
+                            alt="Upcoming Speaker"
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
+                    </div>
+                    {/* Info Card Overlay */}
+                    <div
+                        className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full px-6 py-8 rounded-3xl shadow-lg product_sans h-[45%] flex flex-col justify-between"
+                        style={{ backgroundColor: "var(--google-yellow)" }}
                     >
-                        <FaXTwitter className="text-white text-xs" />
-                    </a>
-                )}
-                {socialLinks.linkedin && (
-                    <a
-                        href={socialLinks.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-7 h-7 bg-[#3A3A3A] rounded flex items-center justify-center hover:bg-[#4A4A4A] transition-colors"
-                    >
-                        <FaLinkedinIn className="text-white text-xs" />
-                    </a>
-                )}
-                {socialLinks.instagram && (
-                    <a
-                        href={socialLinks.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-7 h-7 bg-[#3A3A3A] rounded flex items-center justify-center hover:bg-[#4A4A4A] transition-colors"
-                    >
-                        <FaInstagram className="text-white text-xs" />
-                    </a>
-                )}
-            </div>
+                        <h3 className="text-black text-xl sm:text-2xl font-bold mb-2 text-center">
+                            Upcoming Speaker
+                        </h3>
+                        <p className="text-black text-sm sm:text-base mb-6 text-center opacity-80">
+                            Stay Tuned!
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                            <a
+                                href="https://linkedin.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-10 h-10 rounded flex items-center justify-center transition-colors"
+                            >
+                                <img
+                                    src="/icons/linkedin.svg"
+                                    alt="linkedin-icon"
+                                    className="h-10 w-10"
+                                />
+                            </a>
+                            <a
+                                href="https://x.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-10 h-10 rounded flex items-center justify-center transition-colors"
+                            >
+                                <img
+                                    src="/icons/x.svg"
+                                    alt="x-icon"
+                                    className="h-9 w-9"
+                                />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
+// CarouselDots with a combined control bar
+function CarouselControls() {
+    const { api } = useCarousel();
+    const [count, setCount] = useState(0);
+    const [current, setCurrent] = useState(0);
+
+    useEffect(() => {
+        if (!api) return;
+        const onSelect = () => setCurrent(api.selectedScrollSnap());
+        setCount(api.scrollSnapList().length);
+        setCurrent(api.selectedScrollSnap());
+        api.on("select", onSelect);
+        return () => api.off("select", onSelect);
+    }, [api]);
+
+    if (!count) return null;
+
+    return (
+        <div className="mt-6 flex items-center justify-center gap-8 md:gap-10">
+            <button
+                type="button"
+                aria-label="Previous slide"
+                onClick={() => api?.scrollPrev()}
+                className="size-10 md:size-14 rounded-full bg-white/10 border border-white/10 text-white flex items-center justify-center hover:bg-white/20 cursor-pointer"
+            >
+                <Image
+                    src="/left-arrow.svg"
+                    alt="Previous"
+                    width={20}
+                    height={20}
+                    className="md:w-8 md:h-8"
+                />
+            </button>
+
+            <div className="flex items-center justify-center gap-2">
+                {Array.from({ length: count }).map((_, i) => (
+                    <button
+                        key={i}
+                        type="button"
+                        aria-label={`Go to slide ${i + 1}`}
+                        onClick={() => api?.scrollTo(i)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                            current === i
+                                ? "w-5 bg-[#F5E6D3]"
+                                : "w-2 bg-zinc-500/70"
+                        }`}
+                    />
+                ))}
+            </div>
+
+            <button
+                type="button"
+                aria-label="Next slide"
+                onClick={() => api?.scrollNext()}
+                className="size-10 md:size-14 rounded-full bg-white/10 border border-white/10 text-white flex items-center justify-center hover:bg-white/20 cursor-pointer"
+            >
+                <Image
+                    src="/right-arrow.svg"
+                    alt="Next"
+                    width={20}
+                    height={20}
+                    className="md:w-8 md:h-8"
+                />
+            </button>
+        </div>
+    );
+}
+
 export default function Speakers() {
-    const speakers = [
-        {
-            id: 1,
-            name: "Speaker 1",
-            role: "SPEAKER",
-            image: "https://placehold.co/240x260/png?text=Speaker+1",
-            bgColor: "#FF5757",
-            bgShape: "rounded-rect",
+    const [speakerData, setSpeakerData] = useState([]);
+
+    const fetchSpeakers = async () => {
+        try {
+            const speakerCollection = collection(db, "released-speakers");
+            const speakerSnapshot = await getDocs(speakerCollection);
+            const speakerList = speakerSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setSpeakerData(speakerList);
+        } catch (error) {
+            console.error("Error fetching speakers:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSpeakers();
+    }, []);
+
+    // Map firestore data -> UI format
+    const SHAPES = ["circle", "triangle", "rounded-rect"];
+    const formattedSpeakers = speakerData.map((s, idx) => {
+        const name = s.Owner || s.FirstName || `Speaker ${idx + 1}`;
+        return {
+            id: s.id || idx + 1,
+            name,
+            role: s["TagLine"] || "Speaker",
+            image: s["Profile Picture"] || "",
+            bgShape: SHAPES[idx % SHAPES.length],
             socialLinks: {
-                twitter: "https://twitter.com",
-                linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com",
+                twitter: s["X (Twitter)"] || "https://x.com",
+                linkedin: s["LinkedIn"] || "https://linkedin.com",
+                instagram: s["Instagram"] || "",
             },
-        },
-        {
-            id: 2,
-            name: "Speaker 2",
-            role: "SPEAKER",
-            image: "https://placehold.co/240x260/png?text=Speaker+2",
-            bgColor: "#FBBC04",
-            bgShape: "circle",
-            socialLinks: {
-                twitter: "https://twitter.com",
-                linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com",
-            },
-        },
-        {
-            id: 3,
-            name: "Speaker 3",
-            role: "SPEAKER",
-            image: "https://placehold.co/240x260/png?text=Speaker+3",
-            bgColor: "#34A853",
-            bgShape: "rounded-rect",
-            socialLinks: {
-                twitter: "https://twitter.com",
-                linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com",
-            },
-        },
-        {
-            id: 4,
-            name: "Speaker 4",
-            role: "ORGANISER",
-            image: "https://placehold.co/240x260/png?text=Speaker+4",
-            bgColor: "#4285F4",
-            bgShape: "triangle",
-            socialLinks: {
-                twitter: "https://twitter.com",
-                linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com",
-            },
-        },
-        {
-            id: 5,
-            name: "Speaker 5",
-            role: "ORGANISER",
-            image: "https://placehold.co/240x260/png?text=Speaker+5",
-            bgColor: "#EA4335",
-            bgShape: "rounded-rect",
-            socialLinks: {
-                twitter: "https://twitter.com",
-                linkedin: "https://linkedin.com",
-                instagram: "https://instagram.com",
-            },
-        },
-    ];
+            isComingSoon: s["isComingSoon"] || false,
+        };
+    });
+
+    // Use formattedSpeakers if available else fallback static list
+    const displaySpeakers = formattedSpeakers.length ? formattedSpeakers : [];
+
+    const centerTwo = displaySpeakers.length < 3;
 
     return (
         <div className="bg-[#1E1E1E] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">
-            {/* <div className="max-w-7xl mx-auto"> */}
-            <div className="mx-auto">
-                {/* Section Heading */}
+            <div className="max-w-7xl mx-auto">
+                {/* Heading */}
                 <div className="text-center mb-16 sm:mb-20">
                     <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white mb-4 tracking-wider albert_sans font-bold">
                         The SPEAKERS
@@ -171,25 +296,31 @@ export default function Speakers() {
                     </p>
                 </div>
 
-                <div className="relative ">
-                    {/* Speakers Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-16 place-items-center">
-                        {/* First Row - 3 speakers */}
-                        {speakers.slice(0, 3).map((speaker) => (
-                            <SpeakerCard key={speaker.id} {...speaker} />
+                <Carousel
+                    opts={{ align: "center", containScroll: "trimSnaps" }}
+                    className="w-full"
+                    plugins={[
+                        Autoplay({
+                            delay: 3000,
+                        })
+                    ]}
+                >
+                    <CarouselContent
+                        className={`overflow-visible ${
+                            centerTwo ? "md:justify-center ml-0" : ""
+                        }`}
+                    >
+                        {displaySpeakers.map((speaker) => (
+                            <CarouselItem
+                                key={speaker.id}
+                                className="flex justify-center basis-[100%] md:basis-1/2 lg:basis-1/3 overflow-visible"
+                            >
+                                <SpeakerCard {...speaker} />
+                            </CarouselItem>
                         ))}
-                    </div>
-
-                    {/* Second Row - 2 speakers centered */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 sm:gap-16 place-items-center mt-12 sm:mt-16 max-w-3xl mx-auto">
-                        {speakers.slice(3, 5).map((speaker) => (
-                            <SpeakerCard key={speaker.id} {...speaker} />
-                        ))}
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center w-full h-full backdrop-blur-2xl">
-                        <ComingSoon description="We're working hard to bring you an amazing lineup of speakers." />
-                    </div>
-                </div>
+                    </CarouselContent>
+                    <CarouselControls />
+                </Carousel>
             </div>
         </div>
     );
