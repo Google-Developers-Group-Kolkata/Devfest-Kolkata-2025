@@ -11,6 +11,7 @@ import GooglePlay from "@/components/Home/GooglePlay";
 import FAQ from "@/components/Home/FAQ";
 import Speakers from "@/components/Home/Speakers";
 import Teams from "@/components/Home/Teams";
+import Sponsors from "@/components/Home/Sponsors";
 
 const DevFest2025 = () => {
     const ticketSectionRef = useRef(null);
@@ -62,6 +63,11 @@ const DevFest2025 = () => {
                 {/* Speakers Section */}
                 <section>
                     <Speakers />
+                </section>
+
+                {/* Sponsors Section */}
+                <section className="py-16 px-4">
+                    <Sponsors />
                 </section>
 
                 {/* Teams Section */}

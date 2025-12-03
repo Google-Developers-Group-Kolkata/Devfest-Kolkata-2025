@@ -42,7 +42,7 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
         <div className="flex flex-col items-center group w-full max-w-[300px] md:max-w-[350px] h-full">
             {/* Card Container */}
             {!isComingSoon && (
-                <div className="relative w-full pb-32">
+                <div className="relative w-full pb-32 overflow-hidden">
                     {/* Consistent aspect ratio wrapper */}
                     <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden">
                         {!imgLoaded && (
@@ -56,7 +56,7 @@ const SpeakerCard = ({ name, role, image, socialLinks, isComingSoon }) => {
                             loading="lazy"
                             onLoad={() => setImgLoaded(true)}
                             onError={() => setImgLoaded(true)}
-                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                            className={`absolute inset-0 w-full h-full object-contain object-top transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"} hover:scale-[1.10] transition-transform duration-300 overflow-hidden rounded-3xl`}
                         />
                     </div>
                     {/* Info Card Overlay */}
@@ -270,8 +270,8 @@ export default function Speakers() {
             image: s["Profile Picture"] || "",
             bgShape: SHAPES[idx % SHAPES.length],
             socialLinks: {
-                twitter: s["X (Twitter)"] || "https://x.com",
-                linkedin: s["LinkedIn"] || "https://linkedin.com",
+                twitter: s["X (Twitter)"] || "",
+                linkedin: s["LinkedIn"] || "",
                 instagram: s["Instagram"] || "",
             },
             isComingSoon: s["isComingSoon"] || false,
@@ -306,14 +306,14 @@ export default function Speakers() {
                     ]}
                 >
                     <CarouselContent
-                        className={`overflow-visible ${
+                        className={`${
                             centerTwo ? "md:justify-center ml-0" : ""
                         }`}
                     >
                         {displaySpeakers.map((speaker) => (
                             <CarouselItem
                                 key={speaker.id}
-                                className="flex justify-center basis-[100%] md:basis-1/2 lg:basis-1/3 overflow-visible"
+                                className="flex justify-center basis-[100%] md:basis-1/2 lg:basis-1/3"
                             >
                                 <SpeakerCard {...speaker} />
                             </CarouselItem>
