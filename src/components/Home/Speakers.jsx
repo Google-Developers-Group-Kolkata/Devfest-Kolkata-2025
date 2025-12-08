@@ -278,8 +278,14 @@ export default function Speakers() {
         };
     });
 
-    // Use formattedSpeakers if available else fallback static list
-    const displaySpeakers = formattedSpeakers.length ? formattedSpeakers : [];
+    // Sort speakers: regular speakers first, then "coming soon" speakers
+    const sortedSpeakers = formattedSpeakers.sort((a, b) => {
+        if (a.isComingSoon === b.isComingSoon) return 0;
+        return a.isComingSoon ? 1 : -1;
+    });
+
+    // Use sortedSpeakers if available else fallback static list
+    const displaySpeakers = sortedSpeakers.length ? sortedSpeakers : [];
 
     const centerTwo = displaySpeakers.length < 3;
 
