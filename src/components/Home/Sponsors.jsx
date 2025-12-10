@@ -29,6 +29,9 @@ const sponsorTiers = {
     communityGrowth: [
         { name: "Indiminds", logo: "/sponsors/indiminds.png" },
     ],
+    newsChannel: [
+        { name: "KOLKATA TV", logo: "/sponsors/kolkata-tv.png" },
+    ],
 };
 
 export default function Sponsors() {
@@ -142,6 +145,7 @@ export default function Sponsors() {
                 <SponsorTier title="Media Partner" sponsors={sponsorTiers.media} />
                 <SponsorTier title="Hospitality Partner" sponsors={sponsorTiers.hospitality} />
                 <SponsorTier title="Community Growth Partner" sponsors={sponsorTiers.communityGrowth} />
+                <SponsorTier title="News Channel Partner" sponsors={sponsorTiers.newsChannel} />
             </motion.div>
         </section>
     );
