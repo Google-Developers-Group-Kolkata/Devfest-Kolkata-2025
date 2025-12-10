@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 
 const sponsorTiers = {
     diamond: [
-        { name: "Google Developers", logo: "/sponsors/google-developers.png" },
+        { name: "Google Developers", logo: "/sponsors/google-for-developers.svg" },
+    ],
+    gold: [
         { name: "CAST AI", logo: "/sponsors/cast-ai.png" },
     ],
     association: [
@@ -17,7 +19,7 @@ const sponsorTiers = {
         { name: "Kolkatar Somikaronn", logo: "/sponsors/kolkatar-somikaronn.png" },
     ],
     media: [
-        { name: "Pratidin.in", logo: "/sponsors/pratidin.in2.jpg" },
+        { name: "Pratidin.in", logo: "/sponsors/pratidin.in.jpg" },
         { name: "THE WALL", logo: "/sponsors/the-wall.png" },
         { name: "WIKI KOLKATA", logo: "/sponsors/wiki-kolkata.png" },
     ],
@@ -134,6 +136,7 @@ export default function Sponsors() {
 
                 {/* Sponsor Tiers */}
                 <SponsorTier title="Diamond Sponsor" sponsors={sponsorTiers.diamond} divider="w-[40%]" />
+                <SponsorTier title="Gold Sponsor" sponsors={sponsorTiers.gold} />
                 <SponsorTier title="In Association With" sponsors={sponsorTiers.association} />
                 <SponsorTier title="Social Media Partner" sponsors={sponsorTiers.socialMedia} />
                 <SponsorTier title="Media Partner" sponsors={sponsorTiers.media} />
