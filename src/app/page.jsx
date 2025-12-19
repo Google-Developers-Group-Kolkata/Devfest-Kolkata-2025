@@ -17,6 +17,9 @@ const DevFest2025 = () => {
     const ticketSectionRef = useRef(null);
     const faqRef = useRef(null);
     const homeRef = useRef(null);
+    const venueRef = useRef(null);
+    const speakersRef = useRef(null);
+    const aboutRef = useRef(null);
 
     const scrollToView = (ref) => {
         if (ref.current) {
@@ -31,7 +34,7 @@ const DevFest2025 = () => {
         <div className="min-h-screen bg-[#1e1e1e] overflow-x-hidden">
             {/* Navbar */}
             <header className="fixed top-0 left-0 right-0 z-50">
-                <Navbar scrollToView={scrollToView} refs={{ faqRef, homeRef }} />
+                <Navbar scrollToView={scrollToView} refs={{ faqRef, homeRef, venueRef, speakersRef, aboutRef }} />
             </header>
 
             {/* Main Content */}
@@ -52,16 +55,16 @@ const DevFest2025 = () => {
                 </section>
 
                 {/* About Section */}
-                <section className="py-16 px-8 open_sans">
+                <section ref={venueRef} className="py-16 px-8 open_sans">
                     <Venue />
                 </section>
 
-                <section className="py-16 px-4 open_sans">
+                <section ref={aboutRef} className="py-16 px-4 open_sans">
                     <About />
                 </section>
 
                 {/* Speakers Section */}
-                <section>
+                <section ref={speakersRef}>
                     <Speakers />
                 </section>
 
