@@ -188,9 +188,9 @@ export default function Navbar({ scrollToView, refs }) {
           {/* Navigation links - Desktop */}
           <div className="hidden md:flex items-center justify-evenly w-[70%] space-x-8">
             <span onClick={() => scrollToView(refs.homeRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">Home</span>
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Schedule</Link>
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Tracks</Link>
-            <Link href="#" className="text-white hover:text-gray-300 text-xl font-medium albert_sans">Socials</Link>
+            <span onClick={() => scrollToView(refs.venueRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">Venue</span>
+            <span onClick={() => scrollToView(refs.speakersRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">Speakers</span>
+            <span onClick={() => scrollToView(refs.aboutRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">About</span>
             <span onClick={() => scrollToView(refs.faqRef)} className="text-white hover:text-gray-300 text-xl font-medium albert_sans cursor-pointer">FAQ</span>
           </div>
 
@@ -301,7 +301,7 @@ export default function Navbar({ scrollToView, refs }) {
                   }
                 }}
               >
-                {["Home", "Schedule", "Tracks", "Socials", "FAQ"].map((item, index) => (
+                {["Home", "Venue", "Speakers", "About", "FAQ"].map((item, index) => (
                   <motion.div
                     key={item}
                     variants={{
@@ -323,9 +323,9 @@ export default function Navbar({ scrollToView, refs }) {
                       }
                     }}
                   >
-                    <Link href="#" className="text-white hover:text-gray-300 text-xl albert_sans">
+                    <span onClick={() => {scrollToView(refs[item.toLowerCase() + "Ref"]); toggleMenu();}} className="text-white hover:text-gray-300 text-xl albert_sans cursor-pointer">
                       {item}
-                    </Link>
+                    </span>
                   </motion.div>
                 ))}
                 
