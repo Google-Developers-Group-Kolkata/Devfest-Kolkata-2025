@@ -45,17 +45,6 @@
             }
         },
         {
-            "id": 5,
-            "name": "Kunal Ghosh",
-            "role": "Event ORGANISER",
-            "image": "/team/Kunal Ghosh.png",
-            "socialLinks": {
-                "twitter": "https://x.com",
-                "linkedin": "https://www.linkedin.com/in/kunalghosh-li",
-                "instagram": "https://www.instagram.com/kunalghosh.ig"
-            }
-        },
-        {
             "id": 6,
             "name": "Rahul Pal",
             "role": "Web Dev",
@@ -133,17 +122,6 @@
             }
         },
         {
-            "id": 13,
-            "name": "Aditya Ghosh",
-            "role": "PR and Outreach",
-            "image": "/team/Aditya Ghosh.png",
-            "socialLinks": {
-                "twitter": "https://x.com",
-                "linkedin": "https://linkedin.com/in/adityaghosh2992",
-                "instagram": "https://instagram.com/__.aditya_ghosh.__"
-            }
-        },
-        {
             "id": 14,
             "name": "Protyoy Bhandary",
             "role": "Graphics",
@@ -163,17 +141,6 @@
                 "twitter": "https://x.com",
                 "linkedin": "https://linkedin.com/in/rahulkhandait",
                 "instagram": "https://instagram.com/rahulkhandait_sde"
-            }
-        },
-        {
-            "id": 17,
-            "name": "Srija Ray",
-            "role": "PR and Outreach",
-            "image": "/team/Srija Ray.png",
-            "socialLinks": {
-                "twitter": "https://x.com",
-                "linkedin": "https://linkedin.com/in/srija-ray-8b852928a",
-                "instagram": "https://instagram.com/_srijaray"
             }
         },
         {
@@ -284,6 +251,17 @@
                 "twitter": "https://x.com",
                 "linkedin": "https://linkedin.com/in/suchinta-chanda",
                 "instagram": "https://instagram.com/raj_.suchinta_"
+            }
+        },
+        {
+            "id": 28,
+            "name": "Ananya Chatterjee",
+            "role": "Emcee",
+            "image": "/team/Ananya Chatterjee.png",
+            "socialLinks": {
+                "twitter": "https://x.com",
+                "linkedin": "https://www.linkedin.com/in/ananyachatterjee012",
+                "instagram": "https://instagram.com/ananya_titli",
             }
         }
     ],
