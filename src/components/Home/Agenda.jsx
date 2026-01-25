@@ -57,11 +57,6 @@ const AgendaCard = ({ title, speaker, startTime, endTime, hall, description }) =
                     {formatTime(startTime)} - {formatTime(endTime)}
                 </span>
             </div>
-            {description && (
-                <p className="text-gray-400 text-sm sm:text-base mt-auto albert_sans line-clamp-3">
-                    {description}
-                </p>
-            )}
         </div>
     );
 };
