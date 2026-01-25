@@ -21,6 +21,7 @@ const DevFest2025 = () => {
     const venueRef = useRef(null);
     const speakersRef = useRef(null);
     const aboutRef = useRef(null);
+    const agendaRef = useRef(null);
 
     const scrollToView = (ref) => {
         if (ref.current) {
@@ -42,7 +43,7 @@ const DevFest2025 = () => {
             <main>
                 {/* Hero Banner Section */}
                 <section ref={homeRef} className="pb-8 md:pb-8">
-                    <HeroBanner scrollToView={scrollToView} ticketSectionRef={ticketSectionRef} />
+                    <HeroBanner scrollToView={scrollToView} agendaRef={agendaRef} />
                 </section>
 
                 {/* Google Play Section */}
@@ -70,7 +71,7 @@ const DevFest2025 = () => {
                 </section>
 
                 {/* Agenda Section */}
-                <section>
+                <section ref={agendaRef}>
                     <Agenda />
                 </section>
 
