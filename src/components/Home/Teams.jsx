@@ -185,12 +185,11 @@ export default function Teams() {
         startIndex: startIndex,
     });
 
-    // Shuffle team members on mount - keep first 5 fixed, shuffle the rest
+    // Shuffle team members on mount - keep first 6 fixed, shuffle the rest
     // Swap first 2 members for mobile
     useEffect(() => {
-        const fixed = teams.teamMembers.slice(0, 5);
-        const rest = teams.teamMembers.slice(5);
-
+        const fixed = teams.teamMembers.slice(0, 6);
+        const rest = teams.teamMembers.slice(6);
         // Fisher-Yates shuffle for the rest
         const shuffledRest = [...rest];
         for (let i = shuffledRest.length - 1; i > 0; i--) {
