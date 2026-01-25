@@ -12,6 +12,7 @@ import FAQ from "@/components/Home/FAQ";
 import Speakers from "@/components/Home/Speakers";
 import Teams from "@/components/Home/Teams";
 import Sponsors from "@/components/Home/Sponsors";
+import Agenda from "@/components/Home/Agenda";
 
 const DevFest2025 = () => {
     const ticketSectionRef = useRef(null);
@@ -66,6 +67,11 @@ const DevFest2025 = () => {
                 {/* Speakers Section */}
                 <section ref={speakersRef}>
                     <Speakers />
+                </section>
+
+                {/* Agenda Section */}
+                <section>
+                    <Agenda />
                 </section>
 
                 {/* Sponsors Section */}
