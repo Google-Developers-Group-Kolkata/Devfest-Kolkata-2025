@@ -51,6 +51,19 @@ export default function LandingReveal() {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
+      /* ── Intro choreography ────────────────────────────────────────────────
+         Act 1  The curtain already fills the screen on first paint; the
+                moments stack up at the top-left on top of it.
+         Act 2  The curtain slides down out of frame in step with the counter,
+                so the number climbing to 100 is what drives the reveal.
+         Act 3  Once it lands on 100 the counter retires and the stack flies
+                to the corner widget.
+         The counter roll and the slide share these constants so the two can
+         never drift apart. */
+      const LOAD_IN = 1.0; // curtain holds while the moments stack up
+      const COUNT_SPAN = 2.3; // 000 → 100
+      const SLIDE_SPAN = COUNT_SPAN + 0.35; // lands just after 100 does
+
       // 1. Setup Counter Digits
       if (counter1Ref.current && counter2Ref.current && counter3Ref.current) {
         counter1Ref.current.innerHTML = `
@@ -76,20 +89,25 @@ export default function LandingReveal() {
         const c2Height = (counter2Ref.current.children.length - 1) * 120;
         const c3Height = (counter3Ref.current.children.length - 1) * 120;
 
+        /* Columns settle ones → tens → hundreds, so the leading "1" snaps
+           in last and the roll lands on 100 at LOAD_IN + COUNT_SPAN, exactly
+           where the curtain's slide is winding up. */
         gsap.to(counter3Ref.current, {
           y: -c3Height,
-          duration: 2.3,
+          duration: COUNT_SPAN * 0.77,
+          delay: LOAD_IN,
           ease: "power2.inOut",
         });
         gsap.to(counter2Ref.current, {
           y: -c2Height,
-          duration: 2.7,
+          duration: COUNT_SPAN * 0.9,
+          delay: LOAD_IN,
           ease: "power2.inOut",
         });
         gsap.to(counter1Ref.current, {
           y: -c1Height,
-          duration: 1.8,
-          delay: 1.2,
+          duration: COUNT_SPAN * 0.6,
+          delay: LOAD_IN + COUNT_SPAN * 0.4,
           ease: "power2.inOut",
         });
       }
@@ -162,54 +180,51 @@ export default function LandingReveal() {
 
       const mainTl = gsap.timeline();
 
-      // 1. Background curtain wipe up
-      mainTl.to(".reveal-hero-bg", {
-        scaleY: "100%",
-        duration: 2.5,
-        ease: "power2.inOut",
-        delay: 0.2,
-      });
-
-      // 2. All images pop in and stack up at top-left
+      // Act 1 — moments pop in and stack up at top-left, on the white curtain.
+      //         Tightened so the stack is complete about when the slide starts.
       mainTl.to(
         validCards,
         {
           scale: 1,
           opacity: 1,
-          duration: 0.9,
-          stagger: 0.08,
+          duration: 0.75,
+          stagger: 0.05,
           ease: "power3.out",
         },
-        "<"
+        0
       );
 
-      // 3. Counter fades away & triggers the stack flight directly into corner slot
-      mainTl.to(".reveal-counter", {
-        opacity: 0,
-        duration: 0.35,
-        ease: "power2.out",
-        delay: 0.25,
-        onStart: () => {
-          flyCardsIntoWidget();
-        },
-      });
-
-      // 4. Fade out background curtain to reveal white Hero36 underneath.
-      //    The curtain keeps pointer-events while it is up so nothing can be
-      //    clicked through mid-intro; once faded it must stop swallowing
-      //    clicks, or it sits invisible over the hero CTAs forever.
+      // Act 2 — the curtain slides straight down out of frame, uncovering the
+      //         hero from the top as the counter climbs. It keeps pointer
+      //         events while it is up so nothing can be clicked through
+      //         mid-intro, and gives them up once it is clear, or it would
+      //         sit off-screen still swallowing clicks on the hero CTAs.
       mainTl.to(
         ".reveal-hero-bg",
         {
-          opacity: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          delay: 1.6,
+          yPercent: 100,
+          duration: SLIDE_SPAN,
+          ease: "power2.inOut",
           onComplete: () => {
             gsap.set(".reveal-hero-bg", { pointerEvents: "none" });
           },
-        }
+        },
+        LOAD_IN
       );
+
+      // Act 3 — 100 has landed: the counter fades out over the last of the
+      //         white, and the stack flies to the corner widget.
+      mainTl.to(
+        ".reveal-counter",
+        {
+          opacity: 0,
+          duration: SLIDE_SPAN - COUNT_SPAN,
+          ease: "power2.out",
+        },
+        LOAD_IN + COUNT_SPAN
+      );
+
+      mainTl.call(flyCardsIntoWidget, undefined, LOAD_IN + SLIDE_SPAN);
     }, containerRef);
 
     return () => ctx.revert();
@@ -218,15 +233,14 @@ export default function LandingReveal() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-40 w-full h-[100svh] pointer-events-none overflow-hidden select-none"
+      /* Above the fixed navbar (z-50): the loading screen should read as a
+         clean white field, not as white with the hero's dark-theme nav
+         floating on it. The nav is uncovered as the curtain slides away. */
+      className="absolute inset-0 z-[60] w-full h-[100svh] pointer-events-none overflow-hidden select-none"
     >
-      {/* Background loader curtain wipe */}
-      <div
-        className="reveal-hero-bg absolute inset-0 w-full h-full origin-bottom bg-[#faf9f7] pointer-events-auto"
-        style={{
-          transform: "scaleY(0%)",
-        }}
-      />
+      {/* Loader curtain: covers the hero on first paint, then slides down
+          out of frame in step with the counter. */}
+      <div className="reveal-hero-bg absolute inset-0 w-full h-full bg-[#faf9f7] pointer-events-auto" />
 
       {/* 0-100% Numerical Counter during initial load */}
       <div
