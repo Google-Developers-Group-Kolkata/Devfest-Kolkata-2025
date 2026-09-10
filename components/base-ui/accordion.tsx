@@ -21,7 +21,7 @@ export interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
   collapsible?: boolean;
   defaultValue?: string;
   value?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (value: string | null) => void;
   children: React.ReactNode;
 }
 
@@ -50,9 +50,7 @@ export function Accordion({
     if (!isControlled) {
       setInternalValue(nextValue);
     }
-    if (onValueChange && nextValue !== null) {
-      onValueChange(nextValue);
-    }
+    onValueChange?.(nextValue);
   };
 
   return (
@@ -146,15 +144,22 @@ export function AccordionContent({
 
   const { isOpen } = itemContext;
 
-  if (!isOpen) return null;
-
+  /* Height is animated with the grid-template-rows 0fr -> 1fr technique, so
+     the panel eases open at its natural height without measuring anything.
+     The panel stays mounted (hidden from AT while collapsed) so the
+     transition has something to animate. */
   return (
     <div
       data-state={isOpen ? "open" : "closed"}
-      className={cn("overflow-hidden transition-all animate-in fade-in-50 duration-200", className)}
-      {...props}
+      aria-hidden={!isOpen}
+      className={cn(
+        "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      )}
     >
-      {children}
+      <div className={cn("overflow-hidden", className)} {...props}>
+        {children}
+      </div>
     </div>
   );
 }

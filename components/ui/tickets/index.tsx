@@ -2,6 +2,8 @@
 
 import React from "react";
 import { FaTicketSimple } from "react-icons/fa6";
+import SectionPattern from "@/components/ui/section-pattern";
+import GoogleDots from "@/components/ui/google-dots";
 
 const GDG_CARD_BGS = [
   { tint: "#E8F0FE", text: "#4285F4" },
@@ -11,14 +13,21 @@ const GDG_CARD_BGS = [
 
 export default function TicketsSection() {
   return (
-    <section id="tickets" className="relative w-full bg-white py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-7xl px-6 md:px-10">
+    <section
+      id="tickets"
+      className="relative w-full overflow-hidden bg-white py-20 sm:py-28"
+    >
+      <SectionPattern
+        variant="arcs"
+        arcOrigin="bottom-left"
+        arcColor="#34A853"
+        glow={0.12}
+      />
+
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 md:px-10">
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
           <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400">
-            <span className="size-1.5 rounded-full bg-[#4285F4]" />
-            <span className="size-1.5 rounded-full bg-[#EA4335]" />
-            <span className="size-1.5 rounded-full bg-[#FBBC05]" />
-            <span className="size-1.5 rounded-full bg-[#34A853]" />
+            <GoogleDots variant="pulse" />
             <span className="ml-1 text-zinc-500">DevFest Passes</span>
           </span>
           <h2 className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">

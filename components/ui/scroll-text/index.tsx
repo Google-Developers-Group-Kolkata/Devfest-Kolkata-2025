@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import SectionPattern from "@/components/ui/section-pattern";
 
 // Exactly 4 key highlights matching the 4 GDG colors
 const GDG_KEYWORDS: Record<string, { color: string; bg: string }> = {
@@ -111,7 +112,9 @@ export default function ScrollTextSection() {
       ref={sectionRef}
       className="relative w-full min-h-[90svh] bg-[#E8F0FE] text-zinc-900 flex items-center justify-center px-6 sm:px-12 md:px-16 overflow-hidden select-none"
     >
-      <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
+      <SectionPattern variant="dots-grid" glow={0.15} gridSize={80} />
+
+      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
         {TOKENS.map((words, pi) => (
           <p
             key={pi}

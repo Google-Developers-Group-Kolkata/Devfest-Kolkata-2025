@@ -194,7 +194,10 @@ export default function LandingReveal() {
         },
       });
 
-      // 4. Fade out background curtain to reveal white Hero36 underneath
+      // 4. Fade out background curtain to reveal white Hero36 underneath.
+      //    The curtain keeps pointer-events while it is up so nothing can be
+      //    clicked through mid-intro; once faded it must stop swallowing
+      //    clicks, or it sits invisible over the hero CTAs forever.
       mainTl.to(
         ".reveal-hero-bg",
         {
@@ -202,6 +205,9 @@ export default function LandingReveal() {
           duration: 0.8,
           ease: "power2.out",
           delay: 1.6,
+          onComplete: () => {
+            gsap.set(".reveal-hero-bg", { pointerEvents: "none" });
+          },
         }
       );
     }, containerRef);

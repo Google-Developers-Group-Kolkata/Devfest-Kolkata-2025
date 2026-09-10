@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import TeamSection from "@/components/ui/team-section";
 import { Footer15 } from "@/components/ui/footer-15";
+import SmoothScrollProvider from "@/components/providers/smooth-scroll";
 import { FaArrowLeft } from "react-icons/fa6";
 
 export const metadata = {
@@ -11,7 +12,8 @@ export const metadata = {
 
 export default function TeamPage() {
   return (
-    <div className="relative min-h-screen w-full flex flex-col justify-between bg-white text-zinc-900">
+    <SmoothScrollProvider>
+      <div className="relative min-h-screen w-full flex flex-col justify-between bg-white text-zinc-900">
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-zinc-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -52,6 +54,7 @@ export default function TeamPage() {
 
       {/* Footer */}
       <Footer15 />
-    </div>
+      </div>
+    </SmoothScrollProvider>
   );
 }

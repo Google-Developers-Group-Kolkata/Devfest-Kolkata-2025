@@ -7,11 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaXmark, FaArrowRight } from "react-icons/fa6";
 
 const NAV_LINKS = [
-  { name: "Overview", href: "/#overview" },
-  { name: "Speakers", href: "/#speakers" },
-  { name: "Highlights", href: "/#highlights" },
-  { name: "Team", href: "/#team" },
-  { name: "FAQ", href: "/#faq" },
+  { name: "Overview", id: "overview", accent: "#4285F4" },
+  { name: "Speakers", id: "speakers", accent: "#EA4335" },
+  { name: "Highlights", id: "highlights", accent: "#FBBC05" },
+  { name: "Team", id: "team", accent: "#34A853" },
+  { name: "FAQ", id: "faq", accent: "#4285F4" },
 ];
 
 const MARQUEE_ITEMS = [
@@ -29,6 +29,8 @@ const MARQUEE_ITEMS = [
 export default function DevFestHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeId, setActiveId] = useState("overview");
+  const [footerTakeover, setFooterTakeover] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +40,45 @@ export default function DevFestHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  /* Which tab is lit: the section currently crossing the middle of the
+     viewport. Squeezing the observer root down to a thin band at 50% height
+     means exactly one section qualifies at a time. */
+  useEffect(() => {
+    const sections = NAV_LINKS.map((link) =>
+      document.getElementById(link.id)
+    ).filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const crossing = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (crossing.length > 0) setActiveId(crossing[0].target.id);
+      },
+      { threshold: 0, rootMargin: "-45% 0px -45% 0px" }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  /* The footer is a full-height panel. Once it has claimed ~40% of the
+     viewport it owns the screen, so the navbar slides away off the top. */
+  useEffect(() => {
+    const footer = document.getElementById("site-footer");
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterTakeover(entry.isIntersecting),
+      { threshold: 0, rootMargin: "0px 0px -40% 0px" }
+    );
+
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <header
       className="relative w-full h-[100svh] min-h-[580px] max-h-[1100px] overflow-hidden bg-[#090a0f] text-white flex flex-col justify-between"
@@ -45,9 +86,13 @@ export default function DevFestHeader() {
     >
       {/* ── 1. STICKY / FLOATING RESPONSIVE NAVBAR ───────────────────────── */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+        aria-hidden={footerTakeover}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${scrolled
           ? "bg-black/80 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] border-b border-white/10 py-2.5 sm:py-3"
           : "bg-transparent border-b border-transparent shadow-none py-4 sm:py-5"
+          } ${footerTakeover
+            ? "-translate-y-full opacity-0 pointer-events-none"
+            : "translate-y-0 opacity-100"
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -77,26 +122,41 @@ export default function DevFestHeader() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-1 lg:gap-2">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-3.5 py-1.5 rounded-full text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-150"
-              >
-                {link.name}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = activeId === link.id;
+              return (
+                <button
+                  key={link.name}
+                  type="button"
+                  data-scroll-to={link.id}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`relative cursor-pointer px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${isActive
+                    ? "text-white bg-white/10"
+                    : "text-zinc-300 hover:text-white hover:bg-white/10"
+                    }`}
+                >
+                  {link.name}
+                  {/* Google-coloured underline that grows in on the live tab */}
+                  <span
+                    className={`pointer-events-none absolute bottom-0 left-1/2 h-[3px] -translate-x-1/2 rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${isActive ? "w-4 opacity-100" : "w-0 opacity-0"
+                      }`}
+                    style={{ backgroundColor: link.accent }}
+                  />
+                </button>
+              );
+            })}
           </div>
 
           {/* Action Button & Mobile Toggle */}
           <div className="flex items-center gap-3">
-            <a
-              href="#tickets"
-              className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[#ea4335] px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#d9382b] hover:shadow-[0_0_20px_rgba(234,67,53,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+            <button
+              type="button"
+              data-scroll-to="tickets"
+              className="hidden sm:inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#ea4335] px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#d9382b] hover:shadow-[0_0_20px_rgba(234,67,53,0.4)] hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Get Tickets</span>
               <FaArrowRight className="text-xs transition-transform group-hover:translate-x-0.5" />
-            </a>
+            </button>
 
             {/* Mobile Hamburger Button */}
             <button
@@ -113,7 +173,8 @@ export default function DevFestHeader() {
 
         {/* Mobile Dropdown Drawer */}
         <AnimatePresence>
-          {mobileMenuOpen && (
+          {/* Never left hanging open behind a retracted navbar */}
+          {mobileMenuOpen && !footerTakeover && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
@@ -122,25 +183,41 @@ export default function DevFestHeader() {
               className="md:hidden bg-zinc-950/95 backdrop-blur-xl border-b border-white/10 px-6 py-5 shadow-2xl text-white"
             >
               <div className="flex flex-col gap-3">
-                {NAV_LINKS.map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-3 py-2 rounded-lg text-base font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
-                  >
-                    {link.name}
-                  </a>
-                ))}
+                {NAV_LINKS.map((link) => {
+                  const isActive = activeId === link.id;
+                  return (
+                    <button
+                      key={link.name}
+                      type="button"
+                      data-scroll-to={link.id}
+                      onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive ? "true" : undefined}
+                      className={`flex w-full cursor-pointer items-center gap-2.5 px-3 py-2 rounded-lg text-base font-medium transition-colors ${isActive
+                        ? "bg-white/10 text-white"
+                        : "text-zinc-300 hover:bg-white/10 hover:text-white"
+                        }`}
+                    >
+                      <span
+                        className="size-1.5 shrink-0 rounded-full transition-opacity duration-200"
+                        style={{
+                          backgroundColor: link.accent,
+                          opacity: isActive ? 1 : 0.3,
+                        }}
+                      />
+                      {link.name}
+                    </button>
+                  );
+                })}
                 <div className="pt-3 border-t border-white/10">
-                  <a
-                    href="#tickets"
+                  <button
+                    type="button"
+                    data-scroll-to="tickets"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-[#ea4335] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#d9382b] transition-colors"
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#ea4335] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#d9382b] transition-colors"
                   >
                     <span>Get Tickets</span>
                     <FaArrowRight className="text-xs" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -166,6 +243,19 @@ export default function DevFestHeader() {
           {/* Dark gradient scrims & vignettes for contrast and readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#090a0f]/85 via-black/55 to-[#090a0f]/95" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(9,10,15,0.7)_100%)]" />
+
+          {/* Google dot matrix, so the hero reads as part of the same system */}
+          <div
+            className="gdg-layer gdg-dots"
+            style={
+              {
+                "--gdg-dot-color": "rgba(255,255,255,0.11)",
+                "--gdg-dot-size": "26px",
+                "--gdg-dot-mask":
+                  "radial-gradient(100% 65% at 50% 28%, #000 0%, transparent 78%)",
+              } as React.CSSProperties
+            }
+          />
         </div>
 
         {/* Hero Content Center (True Middle Centering: absolute centered in viewport, accounted for fixed nav and bottom tram) */}
@@ -206,21 +296,23 @@ export default function DevFestHeader() {
             className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center gap-3 sm:gap-4 pointer-events-auto z-20"
           >
             {/* Primary CTA: Explore Tickets */}
-            <a
-              href="#tickets"
-              className="group inline-flex items-center gap-2.5 rounded-full bg-[#ea4335] px-6 sm:px-7 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-[#d9382b] hover:shadow-[0_0_30px_rgba(234,67,53,0.5)] hover:scale-[1.03] active:scale-[0.98]"
+            <button
+              type="button"
+              data-scroll-to="tickets"
+              className="group inline-flex cursor-pointer items-center gap-2.5 rounded-full bg-[#ea4335] px-6 sm:px-7 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-[#d9382b] hover:shadow-[0_0_30px_rgba(234,67,53,0.5)] hover:scale-[1.03] active:scale-[0.98]"
             >
               <span>Explore Tickets</span>
               <FaArrowRight className="text-xs transition-transform duration-200 group-hover:translate-x-1" />
-            </a>
+            </button>
 
             {/* Secondary CTA: Explore Speakers */}
-            <a
-              href="#speakers"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-6 sm:px-7 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-xs transition-all duration-200 hover:bg-white/20 hover:border-white/40 hover:scale-[1.03] active:scale-[0.98]"
+            <button
+              type="button"
+              data-scroll-to="speakers"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-6 sm:px-7 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-xs transition-all duration-200 hover:bg-white/20 hover:border-white/40 hover:scale-[1.03] active:scale-[0.98]"
             >
               <span>Explore Speakers</span>
-            </a>
+            </button>
           </motion.div>
         </div>
 

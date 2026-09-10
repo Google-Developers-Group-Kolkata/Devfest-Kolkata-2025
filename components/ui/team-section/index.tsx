@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import { Marquee } from "@/demos/ui/marquee";
+import SectionPattern from "@/components/ui/section-pattern";
 
 const teamMembers = [
   {
@@ -156,6 +157,7 @@ export default function TeamSection() {
 
   return (
     <section id="team" className="relative w-full bg-[#E6F4EA] py-12 md:py-24 dark:bg-background overflow-visible">
+      <SectionPattern variant="dots" glow={0.15} brackets />
 
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mx-auto mb-16 flex max-w-5xl flex-col items-center px-6 text-center lg:px-0">

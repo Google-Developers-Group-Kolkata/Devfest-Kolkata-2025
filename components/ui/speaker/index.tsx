@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SectionPattern from "@/components/ui/section-pattern";
+import GoogleDots from "@/components/ui/google-dots";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -274,17 +276,14 @@ export default function SpeakerSection() {
       id="speakers"
       className="relative w-full min-h-[100svh] lg:h-[100svh] bg-[#FCE8E6] text-zinc-900 px-4 sm:px-6 lg:px-8 py-12 sm:py-14 lg:py-6 flex flex-col justify-center items-center overflow-hidden select-none"
     >
-      <div className="w-full max-w-7xl flex flex-col lg:h-full lg:max-h-[560px] justify-between">
+      <SectionPattern variant="dots" glow={0.16} brackets />
+
+      <div className="relative z-10 w-full max-w-7xl flex flex-col lg:h-full lg:max-h-[560px] justify-between">
         {/* Top Header */}
         <div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-zinc-100/80 shrink-0">
           <div className="flex flex-col gap-2">
             <div className="inline-flex items-center gap-2.5 self-start rounded-full border border-zinc-200/80 bg-zinc-50/80 backdrop-blur-sm px-3.5 py-1 text-xs font-medium text-zinc-700 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-              <span className="flex items-center gap-1">
-                <span className="size-1.5 rounded-full bg-[#4285F4]" />
-                <span className="size-1.5 rounded-full bg-[#EA4335]" />
-                <span className="size-1.5 rounded-full bg-[#FBBC05]" />
-                <span className="size-1.5 rounded-full bg-[#34A853]" />
-              </span>
+              <GoogleDots variant="wave" />
               <span className="tracking-wide">DevFest Speakers &apos;26</span>
             </div>
             <h2

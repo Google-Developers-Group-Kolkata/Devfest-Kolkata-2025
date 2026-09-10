@@ -2,6 +2,8 @@
 
 import React, { useRef } from "react";
 import { Marquee } from "@/components/ui/marquee";
+import SectionPattern from "@/components/ui/section-pattern";
+import GoogleDots from "@/components/ui/google-dots";
 
 interface Quote {
   body: string;
@@ -116,14 +118,16 @@ export default function TestimonialSection() {
   };
 
   return (
-    <section className="relative w-full overflow-visible bg-[#FEF7E0] py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-7xl px-6 md:px-10">
+    <section
+      id="highlights"
+      className="relative w-full overflow-visible bg-[#FEF7E0] py-20 sm:py-28"
+    >
+      <SectionPattern variant="dots-grid" glow={0.17} gridSize={88} dotSize={24} />
+
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 md:px-10">
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center">
           <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400">
-            <span className="size-1.5 rounded-full bg-[#4285F4]" />
-            <span className="size-1.5 rounded-full bg-[#EA4335]" />
-            <span className="size-1.5 rounded-full bg-[#FBBC05]" />
-            <span className="size-1.5 rounded-full bg-[#34A853]" />
+            <GoogleDots variant="typing" />
             <span className="ml-1 text-zinc-500">Testimonials</span>
           </span>
           <h2 className="whitespace-nowrap font-medium text-2xl leading-tight tracking-tight text-zinc-900 sm:text-4xl md:text-5xl">
