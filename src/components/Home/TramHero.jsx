@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AboutSection from "./AboutSection";
+import TicketsSection from "./TicketsSection";
 
 // Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
 // Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
@@ -436,6 +437,7 @@ const TramHero = () => {
             )}
         </div>
         {d4 && <AboutSection />}
+        {d4 && <TicketsSection />}
         </>
     );
 };
