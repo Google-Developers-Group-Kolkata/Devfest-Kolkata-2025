@@ -87,6 +87,7 @@ export default function Tickets() {
   const [ticketData, setTicketData] = useState([]);
 
   const fetchTickets = async () => {
+    if (!db) return;
     try {
       const ticketCollection = collection(db, "devfest-tickets");
       const ticketSnapshot = await getDocs(ticketCollection);

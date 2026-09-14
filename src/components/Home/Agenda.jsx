@@ -95,6 +95,7 @@ export default function Agenda() {
     const [selectedDay, setSelectedDay] = useState("day2");
 
     const fetchAgenda = async () => {
+        if (!db) return;
         try {
             setLoading(true);
             const agendaCollection = collection(db, "agenda");

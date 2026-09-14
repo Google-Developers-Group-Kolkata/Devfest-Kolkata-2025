@@ -242,6 +242,27 @@
   }
 }
 
+@keyframes tram-slide {
+  0% {
+    transform: translateX(-25vw);
+  }
+
+  100% {
+    transform: translateX(72.57vw);
+  }
+}
+
+.tram-slide {
+  animation: tram-slide 8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tram-slide {
+    animation: none;
+    transform: translateX(72.57vw);
+  }
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

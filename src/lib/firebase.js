@@ -1,27 +1,34 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+// TEMP DISABLED — Firebase initialization commented out to avoid the
+// "auth/invalid-api-key" crash while keys are missing. Restore by uncommenting below.
+// import { initializeApp } from "firebase/app";
+// import { getAuth, GoogleAuthProvider } from "firebase/auth";
+// import { getFirestore } from "firebase/firestore";
 
-//Safe to expose these keys on the client side
-const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-};
+// //Safe to expose these keys on the client side
+// const firebaseConfig = {
+//     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+//     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+//     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+//     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+//     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+//     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+//     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+// };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
+// const app = initializeApp(firebaseConfig);
+// export const auth = getAuth(app);
+// export const googleProvider = new GoogleAuthProvider();
 
-export const db = getFirestore(app);
+// export const db = getFirestore(app);
 
-// Configure Google provider
-googleProvider.setCustomParameters({
-    prompt: "select_account",
-});
+// // Configure Google provider
+// googleProvider.setCustomParameters({
+//     prompt: "select_account",
+// });
 
-export default app;
+// TEMP DISABLED — inert stubs so existing imports keep compiling.
+export const auth = null;
+export const googleProvider = null;
+export const db = null;
+
+export default null;
