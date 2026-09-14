@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AboutSection from "./AboutSection";
 
 // Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
 // Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
@@ -97,6 +98,7 @@ const TramHero = () => {
     };
 
     return (
+        <>
         <div
             className="relative h-screen supports-[height:100dvh]:h-dvh w-full overflow-hidden select-none"
             style={{ backgroundColor: "#ffffff" }}
@@ -207,7 +209,7 @@ const TramHero = () => {
                         key="d4-tram"
                         className="tram-slide absolute left-0 will-change-transform pointer-events-none"
                         style={{
-                            width: isMobile ? "105vw" : "42vw",
+                            width: isMobile ? "120vw" : "42vw",
                             bottom: isMobile ? "-1.5vw" : "-0.85vw",
                         }}
                     >
@@ -293,7 +295,7 @@ const TramHero = () => {
                         className="absolute product_sans pointer-events-none"
                         style={{
                             left: isMobile ? "50%" : "30%",
-                            top: isMobile ? "26%" : "20.4%",
+                            top: isMobile ? "22%" : "20.4%",
                             transform: isMobile ? "translateX(-50%)" : undefined,
                             fontSize: isMobile
                                 ? "clamp(30px, 12vw, 64px)"
@@ -314,7 +316,7 @@ const TramHero = () => {
                         className="absolute product_sans pointer-events-none"
                         style={{
                             left: isMobile ? "50%" : "31%",
-                            top: isMobile ? "38%" : "37.3%",
+                            top: isMobile ? "33%" : "37.3%",
                             transform: isMobile ? "translateX(-50%)" : undefined,
                             fontSize: isMobile
                                 ? "clamp(24px, 10vw, 52px)"
@@ -335,7 +337,7 @@ const TramHero = () => {
                         className="absolute product_sans pointer-events-none"
                         style={{
                             left: isMobile ? "50%" : "33%",
-                            top: isMobile ? "48%" : "54.79%",
+                            top: isMobile ? "42%" : "54.79%",
                             transform: isMobile ? "translateX(-50%)" : undefined,
                             fontSize: isMobile
                                 ? "clamp(12px, 4vw, 20px)"
@@ -356,7 +358,7 @@ const TramHero = () => {
                         className="absolute product_sans flex items-center justify-center cursor-pointer select-none"
                         style={{
                             left: isMobile ? "50%" : "41.74%",
-                            top: isMobile ? "57%" : "66.8%",
+                            top: isMobile ? "62%" : "68%",
                             transform: isMobile ? "translateX(-50%)" : undefined,
                             padding: isMobile ? "0 26px" : "0 42px",
                             height: isMobile ? "52px" : "68px",
@@ -433,6 +435,8 @@ const TramHero = () => {
                 </>
             )}
         </div>
+        {d4 && <AboutSection />}
+        </>
     );
 };
 
