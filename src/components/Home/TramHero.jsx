@@ -22,18 +22,17 @@ const TramHero = () => {
     const [tilesIn, setTilesIn] = useState(false);
     const [scatter, setScatter] = useState(false);
 
-    // Once "Start the experience" is clicked, animate the collage tiles in
-    // from the left, one by one (same easing as the tram).
+    // On "Start the experience", reveal the collage tiles one by one.
     useEffect(() => {
         if (!started) return;
         const raf = requestAnimationFrame(() => setTilesIn(true));
         return () => cancelAnimationFrame(raf);
     }, [started]);
 
-    // After the last tile has landed (~2.56s in), scatter all tiles away.
+    // After the last tile has appeared (~2.9s in), scatter all tiles away.
     useEffect(() => {
         if (!tilesIn) return;
-        const t = setTimeout(() => setScatter(true), 2650);
+        const t = setTimeout(() => setScatter(true), 2900);
         return () => clearTimeout(t);
     }, [tilesIn]);
 
@@ -96,12 +95,12 @@ const TramHero = () => {
                 />
             </div>
 
-            {/* Desktop 3 collage — tiles slide in from the left, one by one */}
+            {/* Desktop 3 collage — tiles pop in one by one, then scatter away together */}
             {started &&
                 TILES.map((t, i) => (
                     <div
                         key={t.src}
-                        className="absolute pointer-events-none overflow-hidden rounded-[10px]"
+                        className="absolute pointer-events-none"
                         style={{
                             left: `${t.left}%`,
                             top: `${t.top}%`,
@@ -109,13 +108,11 @@ const TramHero = () => {
                             height: `${t.h}%`,
                             transform: scatter
                                 ? `translate(${t.dx}vw, ${t.dy}vh) rotate(${t.rot}deg) scale(0.7)`
-                                : tilesIn
-                                  ? "translateX(0)"
-                                  : "translateX(-110vw)",
-                            opacity: scatter ? 0 : 1,
+                                : "none",
+                            opacity: scatter ? 0 : tilesIn ? 1 : 0,
                             transition: scatter
                                 ? "transform 900ms cubic-bezier(.5,0,.75,.4), opacity 900ms cubic-bezier(.5,0,.75,.4)"
-                                : `transform 800ms cubic-bezier(.33,0,.2,1) ${i * 220}ms, opacity 800ms cubic-bezier(.33,0,.2,1) ${i * 220}ms`,
+                                : `opacity 400ms ease ${i * 250}ms`,
                             zIndex: 1,
                         }}
                     >
@@ -146,14 +143,14 @@ const TramHero = () => {
             >
                 <span
                     className="product_sans font-medium text-black whitespace-nowrap leading-none tracking-normal"
-                    style={{ fontSize: "clamp(13px, 1.5vw, 20px)" }}
+                    style={{ fontSize: "17px" }}
                 >
                     Start the experience
                 </span>
                 <svg
                     viewBox="0 0 49 25"
                     className="text-black transition-transform duration-200 group-hover:translate-x-1.5"
-                    style={{ width: "clamp(17px, 1.9vw, 26px)", height: "auto" }}
+                    style={{ width: "22px", height: "auto" }}
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
