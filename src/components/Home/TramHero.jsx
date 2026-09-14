@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import FaqSection from "./FaqSection";
+import FooterSection from "./FooterSection";
 
 // Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
 // Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
@@ -448,6 +449,7 @@ const TramHero = () => {
         {d4 && <AboutSection />}
         {d4 && <TicketsSection />}
         {d4 && <FaqSection />}
+        {d4 && <FooterSection />}
         </>
     );
 };
