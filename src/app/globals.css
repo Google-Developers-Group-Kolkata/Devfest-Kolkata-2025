@@ -248,18 +248,18 @@
   }
 
   100% {
-    transform: translateX(72.57vw);
+    transform: translateX(100vw);
   }
 }
 
 .tram-slide {
-  animation: tram-slide 8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  animation: tram-slide 5s cubic-bezier(0.33, 0, 0.2, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .tram-slide {
     animation: none;
-    transform: translateX(72.57vw);
+    transform: translateX(100vw);
   }
 }
 
