@@ -193,11 +193,11 @@ const FaqSection = () => {
                                     }}
                                 >
                                     <div
+                                        className="product_sans"
                                         style={{
                                             padding: isMobile
                                                 ? "0 16px 20px"
                                                 : "0 40px 24px",
-                                            paddingTop: 0,
                                             fontSize: isMobile
                                                 ? "clamp(13px, 4vw, 16px)"
                                                 : "clamp(15px, 1.4vw, 18px)",
