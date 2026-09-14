@@ -84,6 +84,19 @@ const TramHero = () => {
         return () => clearTimeout(t);
     }, []);
 
+    // Enter or Space starts the experience while the intro is on screen.
+    useEffect(() => {
+        if (started) return;
+        const onKey = (e) => {
+            if (e.code === "Enter" || e.code === "Space") {
+                e.preventDefault();
+                setStarted(true);
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [started]);
+
     // Big centered logo -> Desktop 3 style small top-left logo (54,32 / 266x47)
     const logoStyle = {
         left: started ? "3.75%" : "50%",
@@ -165,7 +178,7 @@ const TramHero = () => {
             {/* Start the experience button — fades in, fades out on click */}
             <button
                 type="button"
-                className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-[clamp(5px,0.6vw,10px)] cursor-pointer bg-transparent border-0 p-0 transition-all duration-500 ease-out motion-reduce:transition-none group ${
+                className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-[clamp(5px,0.6vw,10px)] cursor-pointer bg-transparent border-0 p-3 -m-3 rounded-full transition-all duration-500 ease-out motion-reduce:transition-none group ${
                     started
                         ? "opacity-0 -translate-y-3 pointer-events-none"
                         : show
