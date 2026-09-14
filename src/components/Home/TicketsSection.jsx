@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const LEFT_DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const RIGHT_DIGITS = ["5", "3", "8", "5", "9", "12", "1", "9"];
 
-const TicketCard = ({ isMobile }) => (
+const TicketCard = ({ isMobile, reveal, revealRef }) => (
     <div
+        ref={revealRef}
         className="relative bg-white border-2 border-solid border-black overflow-hidden"
         style={{
             aspectRatio: "369 / 443",
@@ -14,6 +15,10 @@ const TicketCard = ({ isMobile }) => (
             flex: isMobile ? "0 0 auto" : "1 1 0",
             width: isMobile ? "min(86vw, 420px)" : "100%",
             maxWidth: isMobile ? "420px" : "min(32vw, 520px)",
+            opacity: reveal.opacity,
+            transform: reveal.transform,
+            transformOrigin: "center",
+            transition: "opacity 150ms linear, transform 150ms linear",
         }}
     >
         {/* TRAM — top center of stub */}
@@ -138,8 +143,8 @@ const TicketCard = ({ isMobile }) => (
                 color: "#000000",
             }}
         >
-            {LEFT_DIGITS.map((d) => (
-                <span key={d}>{d}</span>
+            {LEFT_DIGITS.map((d, i) => (
+                <span key={i}>{d}</span>
             ))}
         </div>
         <div
@@ -156,8 +161,8 @@ const TicketCard = ({ isMobile }) => (
                 color: "#000000",
             }}
         >
-            {RIGHT_DIGITS.map((d) => (
-                <span key={d}>{d}</span>
+            {RIGHT_DIGITS.map((d, i) => (
+                <span key={i}>{d}</span>
             ))}
         </div>
 
@@ -213,6 +218,10 @@ const TicketCard = ({ isMobile }) => (
 
 const TicketsSection = () => {
     const [isMobile, setIsMobile] = useState(false);
+    const [headingP, setHeadingP] = useState(0);
+    const [cardP, setCardP] = useState(() => [0, 0, 0]);
+    const headingRef = useRef(null);
+    const cardRefs = useRef([]);
 
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 768px)");
@@ -222,8 +231,54 @@ const TicketsSection = () => {
         return () => mq.removeEventListener?.("change", onChange);
     }, []);
 
+    // Scroll-driven reveal (bi-directional): fade in while scrolling down,
+    // wrap back up while scrolling up.
+    useEffect(() => {
+        let raf;
+        const update = () => {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                const vh = window.innerHeight;
+
+                const h = headingRef.current;
+                if (h) {
+                    const r = h.getBoundingClientRect();
+                    const s = vh * 0.9;
+                    const e = vh * 0.55;
+                    setHeadingP(
+                        Math.min(1, Math.max(0, 1 - (r.top - e) / (s - e)))
+                    );
+                }
+
+                cardRefs.current.forEach((c, i) => {
+                    if (!c) return;
+                    const r = c.getBoundingClientRect();
+                    const s = vh;
+                    const e = vh * 0.55;
+                    setCardP((prev) => {
+                        if (prev[i] === void 0) return prev;
+                        const next = [...prev];
+                        next[i] = 1 - Math.min(1, Math.max(0, (r.top - e) / (s - e)));
+                        return next;
+                    });
+                });
+            });
+        };
+        update();
+        window.addEventListener("scroll", update, { passive: true });
+        window.addEventListener("resize", update);
+        return () => {
+            window.removeEventListener("scroll", update);
+            window.removeEventListener("resize", update);
+            cancelAnimationFrame(raf);
+        };
+    }, []);
+
     return (
-        <section className="relative w-full bg-white select-none">
+        <section
+            id="tickets"
+            className="relative w-full bg-white select-none"
+        >
             <div
                 className="relative w-full"
                 style={{
@@ -232,6 +287,7 @@ const TicketsSection = () => {
             >
                 {/* Heading */}
                 <h2
+                    ref={headingRef}
                     className="product_sans w-full"
                     style={{
                         textAlign: "center",
@@ -242,6 +298,10 @@ const TicketsSection = () => {
                         lineHeight: 0.95,
                         color: "#000000",
                         paddingTop: isMobile ? "8vw" : "clamp(40px, 6vw, 90px)",
+                        opacity: headingP,
+                        transform: `translateY(${(1 - headingP) * 26}px)`,
+                        transition:
+                            "opacity 150ms linear, transform 150ms linear",
                     }}
                 >
                     Grab your Tickets
@@ -259,7 +319,17 @@ const TicketsSection = () => {
                     }}
                 >
                     {[0, 1, 2].map((key) => (
-                        <TicketCard key={key} isMobile={isMobile} />
+                        <TicketCard
+                            key={key}
+                            isMobile={isMobile}
+                            reveal={{
+                                opacity: cardP[key],
+                                transform: `translateY(${(1 - cardP[key]) * 22}px) scale(${0.85 + cardP[key] * 0.15})`,
+                            }}
+                            revealRef={(el) => {
+                                cardRefs.current[key] = el;
+                            }}
+                        />
                     ))}
                 </div>
 

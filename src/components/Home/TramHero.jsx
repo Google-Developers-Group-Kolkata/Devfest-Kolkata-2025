@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
+import FaqSection from "./FaqSection";
 
 // Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
 // Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
@@ -256,13 +257,12 @@ const TramHero = () => {
                             transition: "opacity 900ms ease 700ms",
                         }}
                     >
-                        {[
-                            ["Home", "#4787ea", "home", "scroll"],
-                            ["About", "#000000", "about", "soon"],
+                        {[["Home", "#4787ea", "home", "scroll"],
+                            ["About", "#000000", "about", "section"],
                             ["Speaker", "#000000", "speakers", "soon"],
-                            ["Tickets", "#000000", "tickets", "ticket"],
+                            ["Tickets", "#000000", "tickets", "section"],
                             ["Agenda", "#000000", "agenda", "soon"],
-                            ["FAQs", "#000000", "faqs", "soon"],
+                            ["FAQs", "#000000", "faqs", "section"],
                         ].map(([label, color, id, kind]) => (
                             <a
                                 key={label}
@@ -270,12 +270,21 @@ const TramHero = () => {
                                 onClick={(e) => {
                                     if (kind === "ticket") return;
                                     e.preventDefault();
+                                    if (kind === "soon") {
+                                        setComingSoonItem(label);
+                                        return;
+                                    }
+                                    setComingSoonItem(null);
                                     if (kind === "scroll") {
-                                        setComingSoonItem(null);
                                         window.scrollTo({ top: 0, behavior: "smooth" });
                                         return;
                                     }
-                                    setComingSoonItem(label);
+                                    document
+                                        .getElementById(id)
+                                        ?.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "start",
+                                        });
                                 }}
                                 className="whitespace-nowrap leading-none cursor-pointer hover:opacity-60 transition-opacity"
                                 style={{
@@ -438,6 +447,7 @@ const TramHero = () => {
         </div>
         {d4 && <AboutSection />}
         {d4 && <TicketsSection />}
+        {d4 && <FaqSection />}
         </>
     );
 };

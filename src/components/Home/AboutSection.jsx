@@ -119,6 +119,7 @@ const AboutSection = () => {
     if (isMobile) {
         return (
             <section
+                id="about"
                 className="relative w-full bg-white select-none"
                 style={{ padding: "6vw 6vw calc(6vw + 36px)" }}
             >
@@ -172,6 +173,7 @@ const AboutSection = () => {
 
     return (
         <section
+            id="about"
             className="relative w-full bg-white"
             style={{ paddingBottom: "clamp(24px, 4vw, 64px)" }}
         >
