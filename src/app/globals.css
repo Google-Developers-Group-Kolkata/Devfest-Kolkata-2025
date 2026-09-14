@@ -253,7 +253,7 @@
 }
 
 .tram-slide {
-  animation: tram-slide 5s cubic-bezier(0.33, 0, 0.2, 1) forwards;
+  animation: tram-slide 6.5s cubic-bezier(0.33, 0, 0.2, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

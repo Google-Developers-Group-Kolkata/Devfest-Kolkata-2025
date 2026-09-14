@@ -2,9 +2,40 @@
 
 import { useEffect, useState } from "react";
 
+// Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
+// Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
+const TILES = [
+    { src: "/desktop3/kolkata-1.webp", left: 7.85, top: 38.9, w: 19.86, h: 27.9, dx: -18, dy: -18, rot: -12 },
+    { src: "/desktop3/interior.webp", left: 27.7, top: 30.0, w: 15.97, h: 22.07, dx: 0, dy: -24, rot: 8 },
+    { src: "/desktop3/kalighat.webp", left: 27.7, top: 52.05, w: 15.97, h: 22.46, dx: -24, dy: 4, rot: -8 },
+    { src: "/desktop3/dl29.webp", left: 43.68, top: 17.38, w: 14.24, h: 21.48, dx: 18, dy: -18, rot: 14 },
+    { src: "/desktop3/victoria.webp", left: 43.68, top: 38.38, w: 14.44, h: 20.8, dx: 26, dy: -2, rot: -10 },
+    { src: "/desktop3/dl30.webp", left: 43.68, top: 58.79, w: 14.24, h: 23.83, dx: -16, dy: 22, rot: 10 },
+    { src: "/desktop3/stpauls.webp", left: 57.92, top: 30.0, w: 14.86, h: 22.56, dx: 10, dy: -26, rot: -6 },
+    { src: "/desktop3/indian-museum.webp", left: 57.85, top: 52.44, w: 15.0, h: 21.97, dx: 22, dy: 24, rot: 12 },
+    { src: "/desktop3/calcutta.webp", left: 72.78, top: 41.31, w: 19.31, h: 28.42, dx: 28, dy: 14, rot: -14 },
+];
+
 const TramHero = () => {
     const [show, setShow] = useState(false);
     const [started, setStarted] = useState(false);
+    const [tilesIn, setTilesIn] = useState(false);
+    const [scatter, setScatter] = useState(false);
+
+    // Once "Start the experience" is clicked, animate the collage tiles in
+    // from the left, one by one (same easing as the tram).
+    useEffect(() => {
+        if (!started) return;
+        const raf = requestAnimationFrame(() => setTilesIn(true));
+        return () => cancelAnimationFrame(raf);
+    }, [started]);
+
+    // After the last tile has landed (~2.56s in), scatter all tiles away.
+    useEffect(() => {
+        if (!tilesIn) return;
+        const t = setTimeout(() => setScatter(true), 2650);
+        return () => clearTimeout(t);
+    }, [tilesIn]);
 
     useEffect(() => {
         // If the user prefers reduced motion the tram sits at its final
@@ -15,8 +46,8 @@ const TramHero = () => {
         }
 
         // Fire the logo/button entrance when the tram's body reaches the
-        // middle of the right side (~halfway through the 5s run).
-        const t = setTimeout(() => setShow(true), 2500);
+        // middle of the right side (~halfway through the 6.5s run).
+        const t = setTimeout(() => setShow(true), 3250);
         return () => clearTimeout(t);
     }, []);
 
@@ -33,7 +64,7 @@ const TramHero = () => {
         opacity: show ? 1 : 0,
         pointerEvents: "none",
         transition:
-            "left 900ms cubic-bezier(.33,0,.2,1), top 900ms cubic-bezier(.33,0,.2,1), width 900ms cubic-bezier(.33,0,.2,1), transform 900ms cubic-bezier(.33,0,.2,1), opacity 600ms ease",
+            "left 900ms cubic-bezier(.33,0,.2,1), top 900ms cubic-bezier(.33,0,.2,1), width 900ms cubic-bezier(.33,0,.2,1), transform 900ms cubic-bezier(.33,0,.2,1), opacity 900ms ease",
     };
 
     return (
@@ -58,12 +89,44 @@ const TramHero = () => {
                 to the small Desktop 3 top-left position */}
             <div className="absolute" style={logoStyle}>
                 <img
-                    src="/gdg-kolkata-logo.png"
+                    src="/gdg-kolkata-logo.webp"
                     alt="GDG Kolkata"
                     draggable={false}
                     className="block w-full h-auto"
                 />
             </div>
+
+            {/* Desktop 3 collage — tiles slide in from the left, one by one */}
+            {started &&
+                TILES.map((t, i) => (
+                    <div
+                        key={t.src}
+                        className="absolute pointer-events-none overflow-hidden rounded-[10px]"
+                        style={{
+                            left: `${t.left}%`,
+                            top: `${t.top}%`,
+                            width: `${t.w}%`,
+                            height: `${t.h}%`,
+                            transform: scatter
+                                ? `translate(${t.dx}vw, ${t.dy}vh) rotate(${t.rot}deg) scale(0.7)`
+                                : tilesIn
+                                  ? "translateX(0)"
+                                  : "translateX(-110vw)",
+                            opacity: scatter ? 0 : 1,
+                            transition: scatter
+                                ? "transform 900ms cubic-bezier(.5,0,.75,.4), opacity 900ms cubic-bezier(.5,0,.75,.4)"
+                                : `transform 800ms cubic-bezier(.33,0,.2,1) ${i * 220}ms, opacity 800ms cubic-bezier(.33,0,.2,1) ${i * 220}ms`,
+                            zIndex: 1,
+                        }}
+                    >
+                        <img
+                            src={t.src}
+                            alt=""
+                            draggable={false}
+                            className="block w-full h-full object-cover"
+                        />
+                    </div>
+                ))}
 
             {/* Start the experience button — fades in, fades out on click */}
             <button
