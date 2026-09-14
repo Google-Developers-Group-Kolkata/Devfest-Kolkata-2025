@@ -21,6 +21,21 @@ const TramHero = () => {
     const [started, setStarted] = useState(false);
     const [tilesIn, setTilesIn] = useState(false);
     const [scatter, setScatter] = useState(false);
+    const [d4, setD4] = useState(false);
+    const [d4In, setD4In] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Desktop 4 hero is positioned for a wide canvas; on narrow screens the
+    // content is centered vertically instead. Match the breakpoint via JS so
+    // the desktop layout stays pixel-identical.
+    useEffect(() => {
+        const mq = window.matchMedia?.("(max-width: 768px)");
+        if (!mq) return;
+        const on = () => setIsMobile(mq.matches);
+        on();
+        mq.addEventListener?.("change", on);
+        return () => mq.removeEventListener?.("change", on);
+    }, []);
 
     // On "Start the experience", reveal the collage tiles one by one.
     useEffect(() => {
@@ -35,6 +50,20 @@ const TramHero = () => {
         const t = setTimeout(() => setScatter(true), 2900);
         return () => clearTimeout(t);
     }, [tilesIn]);
+
+    // Once the scatter plays out, move on to Desktop 4's hero.
+    useEffect(() => {
+        if (!scatter) return;
+        const t = setTimeout(() => setD4(true), 1100);
+        return () => clearTimeout(t);
+    }, [scatter]);
+
+    // Fade in all Desktop 4 hero content (not the tram — it slides itself).
+    useEffect(() => {
+        if (!d4) return;
+        const raf = requestAnimationFrame(() => setD4In(true));
+        return () => cancelAnimationFrame(raf);
+    }, [d4]);
 
     useEffect(() => {
         // If the user prefers reduced motion the tram sits at its final
@@ -71,6 +100,8 @@ const TramHero = () => {
             className="relative h-screen supports-[height:100dvh]:h-dvh w-full overflow-hidden select-none"
             style={{ backgroundColor: "#ffffff" }}
         >
+            {!d4 && (
+            <>
             {/* Tram sliding left -> right, exits fully off the right */}
             <div
                 className="tram-slide absolute left-0 will-change-transform pointer-events-none"
@@ -163,6 +194,189 @@ const TramHero = () => {
                     />
                 </svg>
             </button>
+            </>
+            )}
+
+            {/* ===== Desktop 4 hero — everything fades in except the tram,
+                  which slides in from the left -> right (same animation) ===== */}
+            {d4 && (
+                <>
+                    {/* Tram re-runs its left->right slide */}
+                    <div
+                        key="d4-tram"
+                        className="tram-slide absolute left-0 will-change-transform pointer-events-none"
+                        style={{
+                            width: isMobile ? "125vw" : "50vw",
+                            bottom: isMobile ? "-1vw" : "-0.85vw",
+                        }}
+                    >
+                        <img
+                            src="/hero-tram/tram.webp"
+                            alt=""
+                            draggable={false}
+                            className="block w-full h-auto"
+                        />
+                    </div>
+
+                    {/* GDG logo — top left */}
+                    <div
+                        className="absolute pointer-events-none"
+                        style={{
+                            left: "4.79%",
+                            top: isMobile ? "2.5%" : "6.64%",
+                            width: isMobile ? "min(32vw, 130px)" : "min(22vw, 323px)",
+                            opacity: d4In ? 1 : 0,
+                            transition: "opacity 900ms ease 0ms",
+                        }}
+                    >
+                        <img
+                            src="/gdg-kolkata-logo.webp"
+                            alt="GDG Kolkata"
+                            draggable={false}
+                            className="block w-full h-auto"
+                        />
+                    </div>
+
+                    {/* Nav — right edge (upper area) */}
+                    <div
+                        className={`absolute product_sans ${
+                            isMobile
+                                ? "flex flex-row items-center justify-center gap-[8px]"
+                                : "flex flex-col items-end gap-[8px]"
+                        }`}
+                        style={{
+                            ...(isMobile
+                                ? { left: 0, right: 0, top: "9.5%", width: "100%" }
+                                : { right: "1.5%", top: "6.64%" }),
+                            opacity: d4In ? 1 : 0,
+                            transition: "opacity 900ms ease 700ms",
+                        }}
+                    >
+                        {[
+                            ["Home", "#4787ea", "home"],
+                            ["About", "#000000", "about"],
+                            ["Speaker", "#000000", "speakers"],
+                            ["Tickets", "#000000", "tickets"],
+                            ["Agenda", "#000000", "agenda"],
+                            ["FAQs", "#000000", "faqs"],
+                        ].map(([label, color, id]) => (
+                            <a
+                                key={label}
+                                href={`#${id}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    const el = document.getElementById(id);
+                                    if (el) {
+                                        el.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "start",
+                                        });
+                                    }
+                                }}
+                                className="whitespace-nowrap leading-none cursor-pointer hover:opacity-60 transition-opacity"
+                                style={{
+                                    fontSize: isMobile
+                                        ? "clamp(9px, 2.8vw, 13px)"
+                                        : "min(2.08vw, 30px)",
+                                    color,
+                                    textDecoration: "none",
+                                }}
+                            >
+                                {label}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* DevFest headline */}
+                    <div
+                        className="absolute product_sans pointer-events-none"
+                        style={{
+                            left: isMobile ? "50%" : "30%",
+                            top: isMobile ? "26%" : "20.4%",
+                            transform: isMobile ? "translateX(-50%)" : undefined,
+                            fontSize: isMobile
+                                ? "clamp(30px, 12vw, 64px)"
+                                : "min(12.5vw, 180px)",
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: "#000000",
+                            whiteSpace: "nowrap",
+                            opacity: d4In ? 1 : 0,
+                            transition: "opacity 900ms ease 150ms",
+                        }}
+                    >
+                        DevFest
+                    </div>
+
+                    {/* Kolkata'26 */}
+                    <div
+                        className="absolute product_sans pointer-events-none"
+                        style={{
+                            left: isMobile ? "50%" : "31%",
+                            top: isMobile ? "38%" : "37.3%",
+                            transform: isMobile ? "translateX(-50%)" : undefined,
+                            fontSize: isMobile
+                                ? "clamp(24px, 10vw, 52px)"
+                                : "min(10.42vw, 150px)",
+                            fontWeight: 500,
+                            lineHeight: 1,
+                            color: "#4285f4",
+                            whiteSpace: "nowrap",
+                            opacity: d4In ? 1 : 0,
+                            transition: "opacity 900ms ease 300ms",
+                        }}
+                    >
+                        Kolkata&rsquo;26
+                    </div>
+
+                    {/* Bengali tagline */}
+                    <div
+                        className="absolute product_sans pointer-events-none"
+                        style={{
+                            left: isMobile ? "50%" : "33%",
+                            top: isMobile ? "48%" : "54.79%",
+                            transform: isMobile ? "translateX(-50%)" : undefined,
+                            fontSize: isMobile
+                                ? "clamp(12px, 4vw, 20px)"
+                                : "min(2.99vw, 43px)",
+                            lineHeight: 1,
+                            color: "#000000",
+                            whiteSpace: "nowrap",
+                            opacity: d4In ? 1 : 0,
+                            transition: "opacity 900ms ease 450ms",
+                        }}
+                    >
+                        কলকাতার ছন্দে, DevFest-এর আনন্দে !
+                    </div>
+
+                    {/* Get Tickets button */}
+                    <a
+                        href="/ticket"
+                        className="absolute product_sans flex items-center justify-center cursor-pointer select-none"
+                        style={{
+                            left: isMobile ? "50%" : "41.74%",
+                            top: isMobile ? "57%" : "66.8%",
+                            transform: isMobile ? "translateX(-50%)" : undefined,
+                            padding: isMobile ? "0 26px" : "0 42px",
+                            height: isMobile ? "52px" : "68px",
+                            lineHeight: isMobile ? "1" : "58px",
+                            border: "5px solid transparent",
+                            borderRadius: "50px",
+                            background:
+                                "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(98deg, #F63130 0%, #4787EA 35%, #34A853 72%, #FBBC04 100%) border-box",
+                            color: "#000000",
+                            fontSize: isMobile
+                                ? "clamp(17px, 6.5vw, 30px)"
+                                : "min(2.43vw, 35px)",
+                            whiteSpace: "nowrap",
+                            opacity: d4In ? 1 : 0,
+                            transition: "opacity 900ms ease 600ms",
+                        }}
+                    >
+                        Get Tickets
+                    </a>
+                </>
+            )}
         </div>
     );
 };
