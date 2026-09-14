@@ -24,6 +24,7 @@ const TramHero = () => {
     const [d4, setD4] = useState(false);
     const [d4In, setD4In] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [comingSoonItem, setComingSoonItem] = useState(null);
 
     // Desktop 4 hero is positioned for a wide canvas; on narrow screens the
     // content is centered vertically instead. Match the breakpoint via JS so
@@ -206,8 +207,8 @@ const TramHero = () => {
                         key="d4-tram"
                         className="tram-slide absolute left-0 will-change-transform pointer-events-none"
                         style={{
-                            width: isMobile ? "125vw" : "50vw",
-                            bottom: isMobile ? "-1vw" : "-0.85vw",
+                            width: isMobile ? "105vw" : "42vw",
+                            bottom: isMobile ? "-1.5vw" : "-0.85vw",
                         }}
                     >
                         <img
@@ -253,25 +254,25 @@ const TramHero = () => {
                         }}
                     >
                         {[
-                            ["Home", "#4787ea", "home"],
-                            ["About", "#000000", "about"],
-                            ["Speaker", "#000000", "speakers"],
-                            ["Tickets", "#000000", "tickets"],
-                            ["Agenda", "#000000", "agenda"],
-                            ["FAQs", "#000000", "faqs"],
-                        ].map(([label, color, id]) => (
+                            ["Home", "#4787ea", "home", "scroll"],
+                            ["About", "#000000", "about", "soon"],
+                            ["Speaker", "#000000", "speakers", "soon"],
+                            ["Tickets", "#000000", "tickets", "ticket"],
+                            ["Agenda", "#000000", "agenda", "soon"],
+                            ["FAQs", "#000000", "faqs", "soon"],
+                        ].map(([label, color, id, kind]) => (
                             <a
                                 key={label}
-                                href={`#${id}`}
+                                href={kind === "ticket" ? "/ticket" : `#${id}`}
                                 onClick={(e) => {
+                                    if (kind === "ticket") return;
                                     e.preventDefault();
-                                    const el = document.getElementById(id);
-                                    if (el) {
-                                        el.scrollIntoView({
-                                            behavior: "smooth",
-                                            block: "start",
-                                        });
+                                    if (kind === "scroll") {
+                                        setComingSoonItem(null);
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                        return;
                                     }
+                                    setComingSoonItem(label);
                                 }}
                                 className="whitespace-nowrap leading-none cursor-pointer hover:opacity-60 transition-opacity"
                                 style={{
@@ -375,6 +376,60 @@ const TramHero = () => {
                     >
                         Get Tickets
                     </a>
+
+                    {/* Coming Soon overlay — blurs the whole screen until Home */}
+                    {comingSoonItem && (
+                        <div
+                            className="cs-overlay fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6"
+                            style={{
+                                background: "rgba(0,0,0,0.35)",
+                                backdropFilter: "blur(8px)",
+                                WebkitBackdropFilter: "blur(8px)",
+                            }}
+                        >
+                            <div className="product_sans text-center text-white cs-title-pop">
+                                <div
+                                    className="cs-float"
+                                    style={{
+                                        fontSize: "clamp(40px, 8vw, 90px)",
+                                        fontWeight: 700,
+                                        lineHeight: 1,
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    Coming Soon
+                                </div>
+                                <div
+                                    className="cs-subtitle-in"
+                                    style={{
+                                        marginTop: "12px",
+                                        fontSize: "clamp(16px, 3vw, 30px)",
+                                        color: "rgba(255,255,255,0.8)",
+                                    }}
+                                >
+                                    {comingSoonItem}
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setComingSoonItem(null);
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
+                                className="product_sans cs-btn-pop cursor-pointer transition-transform hover:scale-105"
+                                style={{
+                                    border: "3px solid #ffffff",
+                                    borderRadius: "50px",
+                                    color: "#ffffff",
+                                    background: "transparent",
+                                    padding: "10px 36px",
+                                    fontSize: "clamp(16px, 2.5vw, 24px)",
+                                }}
+                            >
+                                Home
+                            </button>
+                        </div>
+                    )}
                 </>
             )}
         </div>
