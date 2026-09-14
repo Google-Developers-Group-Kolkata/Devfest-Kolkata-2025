@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 const TramHero = () => {
     const [show, setShow] = useState(false);
+    const [started, setStarted] = useState(false);
 
     useEffect(() => {
         // If the user prefers reduced motion the tram sits at its final
@@ -19,12 +20,28 @@ const TramHero = () => {
         return () => clearTimeout(t);
     }, []);
 
+    // Big centered logo -> Desktop 3 style small top-left logo (54,32 / 266x47)
+    const logoStyle = {
+        left: started ? "3.75%" : "50%",
+        top: started ? "3.1%" : "38%",
+        width: started ? "min(18.5vw, 18.5vh)" : "min(92vw, 92vh)",
+        transform: !show
+            ? "translateX(-50%) scale(0.55)"
+            : started
+              ? "none"
+              : "translateX(-50%)",
+        opacity: show ? 1 : 0,
+        pointerEvents: "none",
+        transition:
+            "left 900ms cubic-bezier(.33,0,.2,1), top 900ms cubic-bezier(.33,0,.2,1), width 900ms cubic-bezier(.33,0,.2,1), transform 900ms cubic-bezier(.33,0,.2,1), opacity 600ms ease",
+    };
+
     return (
         <div
             className="relative h-screen supports-[height:100dvh]:h-dvh w-full overflow-hidden select-none"
             style={{ backgroundColor: "#ffffff" }}
         >
-            {/* Tram sliding left -> right, stops with its last portion on the right */}
+            {/* Tram sliding left -> right, exits fully off the right */}
             <div
                 className="tram-slide absolute left-0 will-change-transform pointer-events-none"
                 style={{ width: "50vw", bottom: "-0.85vw" }}
@@ -37,13 +54,9 @@ const TramHero = () => {
                 />
             </div>
 
-            {/* GDG Kolkata logo — fades in from small to normal once the tram arrives */}
-            <div
-                className={`absolute left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-1000 ease-out motion-reduce:transition-none ${
-                    show ? "opacity-100 scale-100" : "opacity-0 scale-[0.55]"
-                }`}
-                style={{ top: "30%", width: "min(86vw, 86vh)" }}
-            >
+            {/* GDG Kolkata logo — fades in centered, then on "Start" animates up
+                to the small Desktop 3 top-left position */}
+            <div className="absolute" style={logoStyle}>
                 <img
                     src="/gdg-kolkata-logo.png"
                     alt="GDG Kolkata"
@@ -52,25 +65,32 @@ const TramHero = () => {
                 />
             </div>
 
-            {/* Start the experience button — fades in right after the logo */}
+            {/* Start the experience button — fades in, fades out on click */}
             <button
                 type="button"
-                className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-[clamp(6px,0.8vw,12px)] cursor-pointer bg-transparent border-0 p-0 transition-all duration-700 ease-out motion-reduce:transition-none group ${
-                    show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-[clamp(5px,0.6vw,10px)] cursor-pointer bg-transparent border-0 p-0 transition-all duration-500 ease-out motion-reduce:transition-none group ${
+                    started
+                        ? "opacity-0 -translate-y-3 pointer-events-none"
+                        : show
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-4"
                 }`}
-                style={{ top: "53%", transitionDelay: show ? "180ms" : "0ms" }}
-                onClick={() => {}}
+                style={{
+                    top: "64%",
+                    transitionDelay: show && !started ? "180ms" : "0ms",
+                }}
+                onClick={() => setStarted(true)}
             >
                 <span
                     className="product_sans font-medium text-black whitespace-nowrap leading-none tracking-normal"
-                    style={{ fontSize: "clamp(16px, 1.9vw, 26px)" }}
+                    style={{ fontSize: "clamp(13px, 1.5vw, 20px)" }}
                 >
                     Start the experience
                 </span>
                 <svg
                     viewBox="0 0 49 25"
                     className="text-black transition-transform duration-200 group-hover:translate-x-1.5"
-                    style={{ width: "clamp(20px, 2.4vw, 34px)", height: "auto" }}
+                    style={{ width: "clamp(17px, 1.9vw, 26px)", height: "auto" }}
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
