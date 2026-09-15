@@ -124,6 +124,49 @@
   font-family: var(--font-google-sans), sans-serif;
 }
 
+/* D4 hero — small screens get small text; desktop keeps original size */
+.d4-devfest {
+  font-size: clamp(28px, 5vw, 60px);
+}
+.d4-kolkata {
+  font-size: clamp(22px, 4vw, 50px);
+}
+.d4-bengali {
+  font-size: clamp(10px, 2vw, 22px);
+}
+.d4-tickets {
+  font-size: clamp(14px, 2.5vw, 24px);
+}
+@media (min-width: 1024px) {
+  .d4-devfest {
+    font-size: min(12.5vw, 180px);
+  }
+  .d4-kolkata {
+    font-size: min(10.42vw, 150px);
+  }
+  .d4-bengali {
+    font-size: min(2.99vw, 43px);
+  }
+  .d4-tickets {
+    font-size: min(2.43vw, 40px);
+  }
+}
+/* Portrait phones: taller viewport stretches % gaps, so use wider vw type */
+@media (max-width: 1023px) and (orientation: portrait) {
+  .d4-devfest {
+    font-size: clamp(34px, 9vw, 60px);
+  }
+  .d4-kolkata {
+    font-size: clamp(28px, 7vw, 50px);
+  }
+  .d4-bengali {
+    font-size: clamp(12px, 3.2vw, 22px);
+  }
+  .d4-tickets {
+    font-size: clamp(15px, 4vw, 24px);
+  }
+}
+
 .open_sans {
   font-family: var(--font-open-sans), sans-serif;
 }
