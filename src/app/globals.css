@@ -120,6 +120,10 @@
   font-family: var(--font-product-sans), sans-serif;
 }
 
+.google_sans {
+  font-family: var(--font-google-sans), sans-serif;
+}
+
 .open_sans {
   font-family: var(--font-open-sans), sans-serif;
 }

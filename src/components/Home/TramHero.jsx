@@ -304,9 +304,9 @@ const TramHero = () => {
 
                     {/* DevFest headline */}
                     <div
-                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[30%] top-[17%] lg:top-[20.4%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
+                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[30%] top-[22%] lg:top-[20.4%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
                         style={{
-                            fontSize: "clamp(28px, 5.5vw, 180px)",
+                            fontSize: "min(12.5vw, 180px)",
                             fontWeight: 700,
                             lineHeight: 1,
                             color: "#000000",
@@ -319,9 +319,9 @@ const TramHero = () => {
 
                     {/* Kolkata'26 */}
                     <div
-                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[31%] top-[30%] lg:top-[37.3%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
+                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[31%] top-[33%] lg:top-[37.3%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
                         style={{
-                            fontSize: "clamp(22px, 4.5vw, 150px)",
+                            fontSize: "min(10.42vw, 150px)",
                             fontWeight: 500,
                             lineHeight: 1,
                             color: "#4285f4",
@@ -334,9 +334,9 @@ const TramHero = () => {
 
                     {/* Bengali tagline */}
                     <div
-                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[33%] top-[44%] lg:top-[54.79%] max-w-[90vw] lg:max-w-none text-center lg:text-left whitespace-normal lg:whitespace-nowrap"
+                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[33%] top-[42%] lg:top-[54.79%] max-w-[90vw] lg:max-w-none text-center lg:text-left whitespace-normal lg:whitespace-nowrap"
                         style={{
-                            fontSize: "clamp(10px, 2vw, 43px)",
+                            fontSize: "min(2.99vw, 43px)",
                             lineHeight: 1,
                             color: "#000000",
                             opacity: d4In ? 1 : 0,
@@ -351,15 +351,15 @@ const TramHero = () => {
                         href="#tickets"
                         className="absolute product_sans flex items-center justify-center cursor-pointer select-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[41.74%] top-[64%] lg:top-[68%] rounded-full whitespace-nowrap"
                         style={{
-                            padding: "0 20px",
-                            height: "48px",
+                            padding: "0 32px",
+                            height: "56px",
                             lineHeight: "1",
-                            border: "3px solid transparent",
+                            border: "4px solid transparent",
                             borderRadius: "50px",
                             background:
                                 "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(98deg, #F63130 0%, #4787EA 35%, #34A853 72%, #FBBC04 100%) border-box",
                             color: "#000000",
-                            fontSize: "clamp(14px, 2.8vw, 35px)",
+                            fontSize: "min(2.43vw, 40px)",
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 600ms",
                         }}
