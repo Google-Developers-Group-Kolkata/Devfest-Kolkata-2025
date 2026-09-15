@@ -5,20 +5,30 @@ import { useEffect, useRef, useState } from "react";
 const LEFT_DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const RIGHT_DIGITS = ["5", "3", "8", "5", "9", "12", "1", "9"];
 
-const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, index }) => (
+const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, index, ticket }) => {
+    const live = ticket?.live && ticket?.url;
+    const isDefault = ticket?.source !== "server";
+    const nameLen = (ticket?.name || "").length;
+    const nameSize = nameLen <= 12 ? "9cqw" : nameLen <= 22 ? "7cqw" : "5.5cqw";
+    return (
     <div
         ref={revealRef}
+        onClick={() => {
+            if (live) window.open(ticket.url, "_blank", "noopener,noreferrer");
+        }}
         className="relative bg-white border-2 border-solid border-black overflow-hidden"
         style={{
             aspectRatio: "369 / 443",
             borderRadius: "45px",
-            flex: isMobile ? "0 0 auto" : "1 1 0",
+            flex: isMobile ? "0 0 auto" : "0 1 400px",
             width: isMobile ? "min(86vw, 420px)" : "100%",
-            maxWidth: isMobile ? "420px" : "min(32vw, 520px)",
+            maxWidth: isMobile ? "420px" : "420px",
+            containerType: "inline-size",
             opacity: reveal.opacity,
             transform: reveal.transform,
             transformOrigin: "center",
             transition: "opacity 150ms linear, transform 150ms linear",
+            cursor: live ? "pointer" : "default",
         }}
     >
         {/* TRAM — top center of stub */}
@@ -28,9 +38,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                 left: "50%",
                 top: "1.5%",
                 transform: "translateX(-50%)",
-                fontSize: isMobile
-                    ? "clamp(24px, 7vw, 34px)"
-                    : "clamp(40px, 3.2vw, 50px)",
+                fontSize: "11cqw",
                 fontWeight: 500,
                 lineHeight: 1,
                 color: "#4787ea",
@@ -48,9 +56,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                 top: "1%",
                 transform: "rotate(-90deg)",
                 transformOrigin: "left top",
-                fontSize: isMobile
-                    ? "clamp(18px, 5.8vw, 30px)"
-                    : "clamp(30px, 2.6vw, 40px)",
+                fontSize: "9cqw",
                 fontWeight: 500,
                 lineHeight: 1,
                 color: "#000000",
@@ -65,9 +71,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                 top: "0.5%",
                 transform: "rotate(-90deg)",
                 transformOrigin: "left top",
-                fontSize: isMobile
-                    ? "clamp(10px, 2.8vw, 16px)"
-                    : "clamp(15px, 1.3vw, 20px)",
+                fontSize: "4.5cqw",
                 fontWeight: 500,
                 lineHeight: 1,
                 color: "#000000",
@@ -136,9 +140,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                 top: "9%",
                 bottom: "5%",
                 justifyContent: "space-between",
-                fontSize: isMobile
-                    ? "clamp(16px, 5vw, 26px)"
-                    : "clamp(28px, 2.4vw, 38px)",
+                fontSize: "8.5cqw",
                 lineHeight: 1,
                 color: "#000000",
             }}
@@ -154,9 +156,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                 top: "9%",
                 bottom: "5%",
                 justifyContent: "space-between",
-                fontSize: isMobile
-                    ? "clamp(16px, 5vw, 26px)"
-                    : "clamp(28px, 2.4vw, 38px)",
+                fontSize: "8.5cqw",
                 lineHeight: 1,
                 color: "#000000",
             }}
@@ -166,63 +166,80 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
             ))}
         </div>
 
-        {/* Ticket info */}
+        {/* Ticket info — shrinks with name length, clamps to 3 lines */}
         <div
             className="absolute product_sans pointer-events-none"
+            title={ticket?.name}
             style={{
                 left: "21%",
-                top: "20%",
-                fontSize: isMobile
-                    ? "clamp(18px, 5.2vw, 28px)"
-                    : "clamp(28px, 2.4vw, 37px)",
+                right: "14%",
+                top: "19%",
+                fontSize: nameSize,
                 fontWeight: 500,
-                lineHeight: 1.05,
+                lineHeight: 1.1,
                 color: "#000000",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                overflowWrap: "anywhere",
             }}
         >
-            <div>SUPER EARLY</div>
-            <div style={{ paddingLeft: "3.4em" }}>BIRD</div>
+            {ticket?.name || "SUPER EARLY BIRD"}
         </div>
         <div
             className="absolute product_sans pointer-events-none"
             style={{
                 left: "21%",
-                top: "78%",
-                fontSize: isMobile
-                    ? "clamp(24px, 8vw, 40px)"
-                    : "clamp(42px, 3.5vw, 55px)",
+                top: "76%",
+                fontSize: "10cqw",
                 fontWeight: 500,
                 lineHeight: 1,
                 color: "#000000",
+                whiteSpace: "nowrap",
             }}
         >
-            Rs 499
+            {ticket?.priceLabel || "Rs 499"}
         </div>
+        {(isDefault || live) && (
         <div
-            className="absolute product_sans pointer-events-none"
+            className="absolute product_sans"
             style={{
                 left: "21%",
-                top: "94%",
-                fontSize: isMobile
-                    ? "clamp(14px, 4.4vw, 24px)"
-                    : "clamp(22px, 1.9vw, 28px)",
+                top: "92%",
+                fontSize: "6.5cqw",
                 fontWeight: 500,
                 lineHeight: 1,
                 color: "#4787ea",
+                pointerEvents: live ? "auto" : "none",
             }}
         >
-            Purchase
+            {live ? (
+                <a
+                    href={ticket.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ color: "inherit", textDecoration: "none" }}
+                >
+                    Purchase
+                </a>
+            ) : (
+                <span className="pointer-events-none">Purchase</span>
+            )}
         </div>
+        )}
 
-        {/* Coming Soon full-cover stamp */}
+        {/* Full-cover stamp — Coming Soon on default cards, SOLD OUT on server sold-out cards */}
+        {!live && (
         <div
             className="absolute product_sans pointer-events-none flex items-center justify-center"
             style={{
                 inset: 0,
                 borderRadius: "45px",
-                background: "rgba(255,255,255,0.3)",
-                backdropFilter: "blur(18px)",
-                WebkitBackdropFilter: "blur(18px)",
+                background: isDefault ? "rgba(255,255,255,0.3)" : "transparent",
+                backdropFilter: isDefault ? "blur(18px)" : "none",
+                WebkitBackdropFilter: isDefault ? "blur(18px)" : "none",
             }}
         >
             <div
@@ -316,7 +333,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                         OFFICIAL
                     </text>
 
-                    {/* center "COMING SOON" rotated like a hand stamp */}
+                    {/* center stamp — COMING SOON on defaults, SOLD OUT on sold-out */}
                     <g transform="rotate(-18 184.5 221.5)">
                         <text
                             x="184.5"
@@ -327,7 +344,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                             fontWeight="900"
                             letterSpacing="4"
                         >
-                            COMING
+                            {isDefault ? "COMING" : "SOLD"}
                         </text>
                         <text
                             x="184.5"
@@ -338,7 +355,7 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                             fontWeight="900"
                             letterSpacing="4"
                         >
-                            SOON
+                            {isDefault ? "SOON" : "OUT"}
                         </text>
                         <text
                             x="184.5"
@@ -368,19 +385,71 @@ const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, inde
                 </svg>
             </div>
         </div>
+        )}
     </div>
-);
+    );
+};
+
+const DEFAULT_CARDS = [0, 1, 2].map((i) => ({
+    key: `default-${i}`,
+    name: "SUPER EARLY BIRD",
+    priceLabel: "Rs 499",
+    url: null,
+    live: false,
+    source: "default",
+}));
+
+// Server ticket (same shape as main branch) -> tram card model.
+// A card is live only when Firebase marks it available AND gives a purchase link.
+const toCard = (t, i) => {
+    const url = t.url || null;
+    return {
+        key: String(t.slug ?? t.id ?? i),
+        name: t.title || t.name || "Ticket",
+        priceLabel: t.price != null ? `Rs ${t.price}` : "Rs 499",
+        url,
+        live: (t.available ?? true) && !!url,
+        source: "server",
+    };
+};
 
 const TicketsSection = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [headingP, setHeadingP] = useState(0);
-    const [cardP, setCardP] = useState(() => [0, 0, 0]);
+    const [tickets, setTickets] = useState(DEFAULT_CARDS);
+    const [cardP, setCardP] = useState(() => DEFAULT_CARDS.map(() => 0));
     const [stampStarted, setStampStarted] = useState(false);
     const [stampTick, setStampTick] = useState(0);
     const headingRef = useRef(null);
     const cardRefs = useRef([]);
     const sectionRef = useRef(null);
     const inViewRef = useRef(false);
+
+    // Keep reveal progress in sync when the card count changes (4, 5, many...)
+    useEffect(() => {
+        setCardP((prev) => tickets.map((_, i) => prev[i] ?? 0));
+    }, [tickets.length]);
+
+    // No-auth load: Next.js server fetches Firebase, client just renders.
+    // Success -> show every server ticket (live ones buyable, rest SOLD OUT).
+    // Failure/empty -> keep the default 3 coming-soon cards.
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch("/api/tickets/view", { cache: "no-store" });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!Array.isArray(data.tickets) || data.tickets.length === 0) return;
+                if (!cancelled) setTickets(data.tickets.map(toCard));
+            } catch {
+                // keep DEFAULT_CARDS
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 768px)");
@@ -480,27 +549,28 @@ const TicketsSection = () => {
                     Grab your Tickets
                 </h2>
 
-                {/* Ticket cards */}
+                {/* Ticket cards — flexible: renders however many the server returns */}
                 <div
                     className="w-full flex"
                     style={{
-                        flexWrap: isMobile ? "wrap" : "nowrap",
+                        flexWrap: "wrap",
                         justifyContent: isMobile ? "center" : "center",
                         gap: isMobile ? "7vw" : "clamp(20px, 3.5vw, 56px)",
                         marginTop: isMobile ? "6vw" : "clamp(28px, 7vw, 92px)",
                         marginBottom: "clamp(16px, 3vw, 40px)",
                     }}
                 >
-                    {[0, 1, 2].map((key) => (
+                    {tickets.map((ticket, key) => (
                         <TicketCard
-                            key={key}
+                            key={ticket.key}
+                            ticket={ticket}
                             index={key}
                             isMobile={isMobile}
                             stampStarted={stampStarted}
                             stampTick={stampTick}
                             reveal={{
-                                opacity: cardP[key],
-                                transform: `translateY(${(1 - cardP[key]) * 22}px) scale(${0.85 + cardP[key] * 0.15})`,
+                                opacity: cardP[key] ?? 0,
+                                transform: `translateY(${(1 - (cardP[key] ?? 0)) * 22}px) scale(${0.85 + (cardP[key] ?? 0) * 0.15})`,
                             }}
                             revealRef={(el) => {
                                 cardRefs.current[key] = el;
