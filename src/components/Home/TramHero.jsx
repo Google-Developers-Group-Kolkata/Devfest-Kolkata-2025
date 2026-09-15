@@ -223,11 +223,7 @@ const TramHero = () => {
                     {/* Tram re-runs its left->right slide */}
                     <div
                         key="d4-tram"
-                        className="tram-slide absolute left-0 will-change-transform pointer-events-none"
-                        style={{
-                            width: isMobile ? "120vw" : "42vw",
-                            bottom: isMobile ? "-1.5vw" : "-0.85vw",
-                        }}
+                        className="tram-slide d4-tram absolute left-0 will-change-transform pointer-events-none"
                     >
                         <img
                             src="/hero-tram/tram.webp"

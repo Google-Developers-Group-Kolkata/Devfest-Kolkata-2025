@@ -34,24 +34,9 @@ const productSans = localFont({
   variable: "--font-product-sans",
   src: [
     {
-      path: "../fonts/PTSans-Regular.ttf",
-      weight: "400",
+      path: "../fonts/GoogleSans.ttf",
+      weight: "400 700",
       style: "normal",
-    },
-    {
-      path: "../fonts/PTSans-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../fonts/PTSans-Italic.ttf",
-      weight: "400",
-      style: "italic",
-    },
-    {
-      path: "../fonts/PTSans-BoldItalic.ttf",
-      weight: "700",
-      style: "italic",
     },
   ]
 })

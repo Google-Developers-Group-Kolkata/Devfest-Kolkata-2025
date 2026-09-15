@@ -113,11 +113,11 @@
 }
 
 .albert_sans {
-  font-family: var(--font-albert-sans), sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
 }
 
 .product_sans {
-  font-family: var(--font-product-sans), sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
 }
 
 .google_sans {
@@ -151,7 +151,24 @@
     font-size: min(2.43vw, 40px);
   }
 }
-/* Portrait phones: taller viewport stretches % gaps, so use wider vw type */
+/* D4 tram — portrait phones keep the big tram; short landscape gets a
+   small tram so it stays at the bottom instead of covering the text */
+.d4-tram {
+  width: 120vw;
+  bottom: -1.5vw;
+}
+@media (max-width: 1023px) and (orientation: landscape) {
+  .d4-tram {
+    width: 36vw;
+    bottom: -1vw;
+  }
+}
+@media (min-width: 1024px) {
+  .d4-tram {
+    width: 42vw;
+    bottom: -0.85vw;
+  }
+}
 @media (max-width: 1023px) and (orientation: portrait) {
   .d4-devfest {
     font-size: clamp(34px, 9vw, 60px);
@@ -168,11 +185,11 @@
 }
 
 .open_sans {
-  font-family: var(--font-open-sans), sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
 }
 
 .aldrich {
-  font-family: var(--font-aldrich), sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
 }
 
 .animate-fade-in {
@@ -431,6 +448,7 @@
 }
 
 @theme inline {
+  --font-sans: var(--font-google-sans), ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -511,5 +529,6 @@
   }
   body {
     @apply bg-background text-foreground overflow-x-hidden;
+    font-family: var(--font-google-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
