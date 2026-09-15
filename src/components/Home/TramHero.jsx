@@ -34,7 +34,7 @@ const TramHero = () => {
     // content is centered vertically instead. Match the breakpoint via JS so
     // the desktop layout stays pixel-identical.
     useEffect(() => {
-        const mq = window.matchMedia?.("(max-width: 768px)");
+        const mq = window.matchMedia?.("(max-width: 1024px)");
         if (!mq) return;
         const on = () => setIsMobile(mq.matches);
         on();
@@ -117,7 +117,7 @@ const TramHero = () => {
         <>
         <div
             className="relative h-screen supports-[height:100dvh]:h-dvh w-full overflow-hidden select-none"
-            style={{ backgroundColor: "#ffffff" }}
+            style={{ backgroundColor: "#ffffff", overflowX: "hidden" }}
         >
             {!d4 && (
             <>
@@ -239,11 +239,8 @@ const TramHero = () => {
 
                     {/* GDG logo — top left */}
                     <div
-                        className="absolute pointer-events-none"
+                        className="absolute pointer-events-none left-[4.79%] top-[2.5%] lg:top-[6.64%] w-[min(32vw,130px)] lg:w-[min(22vw,323px)]"
                         style={{
-                            left: "4.79%",
-                            top: isMobile ? "2.5%" : "6.64%",
-                            width: isMobile ? "min(32vw, 130px)" : "min(22vw, 323px)",
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 0ms",
                         }}
@@ -258,15 +255,8 @@ const TramHero = () => {
 
                     {/* Nav — right edge (upper area) */}
                     <div
-                        className={`absolute product_sans ${
-                            isMobile
-                                ? "flex flex-row items-center justify-center gap-[8px]"
-                                : "flex flex-col items-end gap-[8px]"
-                        }`}
+                        className="absolute product_sans left-[2%] right-[2%] top-[9.5%] lg:left-auto lg:right-[1.5%] lg:top-[6.64%] lg:w-auto flex flex-row items-center justify-center gap-x-[8px] gap-y-[4px] flex-wrap lg:flex-col lg:items-end lg:gap-[8px]"
                         style={{
-                            ...(isMobile
-                                ? { left: 0, right: 0, top: "9.5%", width: "100%" }
-                                : { right: "1.5%", top: "6.64%" }),
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 700ms",
                         }}
@@ -302,9 +292,7 @@ const TramHero = () => {
                                 }}
                                 className="whitespace-nowrap leading-none cursor-pointer hover:opacity-60 transition-opacity"
                                 style={{
-                                    fontSize: isMobile
-                                        ? "clamp(9px, 2.8vw, 13px)"
-                                        : "min(2.08vw, 30px)",
+                                    fontSize: "min(2.08vw, 30px)",
                                     color,
                                     textDecoration: "none",
                                 }}
@@ -316,18 +304,12 @@ const TramHero = () => {
 
                     {/* DevFest headline */}
                     <div
-                        className="absolute product_sans pointer-events-none"
+                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[30%] top-[17%] lg:top-[20.4%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
                         style={{
-                            left: isMobile ? "50%" : "30%",
-                            top: isMobile ? "22%" : "20.4%",
-                            transform: isMobile ? "translateX(-50%)" : undefined,
-                            fontSize: isMobile
-                                ? "clamp(30px, 12vw, 64px)"
-                                : "min(12.5vw, 180px)",
+                            fontSize: "clamp(28px, 5.5vw, 180px)",
                             fontWeight: 700,
                             lineHeight: 1,
                             color: "#000000",
-                            whiteSpace: "nowrap",
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 150ms",
                         }}
@@ -337,18 +319,12 @@ const TramHero = () => {
 
                     {/* Kolkata'26 */}
                     <div
-                        className="absolute product_sans pointer-events-none"
+                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[31%] top-[30%] lg:top-[37.3%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
                         style={{
-                            left: isMobile ? "50%" : "31%",
-                            top: isMobile ? "33%" : "37.3%",
-                            transform: isMobile ? "translateX(-50%)" : undefined,
-                            fontSize: isMobile
-                                ? "clamp(24px, 10vw, 52px)"
-                                : "min(10.42vw, 150px)",
+                            fontSize: "clamp(22px, 4.5vw, 150px)",
                             fontWeight: 500,
                             lineHeight: 1,
                             color: "#4285f4",
-                            whiteSpace: "nowrap",
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 300ms",
                         }}
@@ -358,17 +334,11 @@ const TramHero = () => {
 
                     {/* Bengali tagline */}
                     <div
-                        className="absolute product_sans pointer-events-none"
+                        className="absolute product_sans pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[33%] top-[44%] lg:top-[54.79%] max-w-[90vw] lg:max-w-none text-center lg:text-left whitespace-normal lg:whitespace-nowrap"
                         style={{
-                            left: isMobile ? "50%" : "33%",
-                            top: isMobile ? "42%" : "54.79%",
-                            transform: isMobile ? "translateX(-50%)" : undefined,
-                            fontSize: isMobile
-                                ? "clamp(12px, 4vw, 20px)"
-                                : "min(2.99vw, 43px)",
+                            fontSize: "clamp(10px, 2vw, 43px)",
                             lineHeight: 1,
                             color: "#000000",
-                            whiteSpace: "nowrap",
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 450ms",
                         }}
@@ -379,23 +349,17 @@ const TramHero = () => {
                     {/* Get Tickets button */}
                     <a
                         href="#tickets"
-                        className="absolute product_sans flex items-center justify-center cursor-pointer select-none"
+                        className="absolute product_sans flex items-center justify-center cursor-pointer select-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[41.74%] top-[64%] lg:top-[68%] rounded-full whitespace-nowrap"
                         style={{
-                            left: isMobile ? "50%" : "41.74%",
-                            top: isMobile ? "62%" : "68%",
-                            transform: isMobile ? "translateX(-50%)" : undefined,
-                            padding: isMobile ? "0 26px" : "0 42px",
-                            height: isMobile ? "52px" : "68px",
-                            lineHeight: isMobile ? "1" : "58px",
-                            border: "5px solid transparent",
+                            padding: "0 20px",
+                            height: "48px",
+                            lineHeight: "1",
+                            border: "3px solid transparent",
                             borderRadius: "50px",
                             background:
                                 "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(98deg, #F63130 0%, #4787EA 35%, #34A853 72%, #FBBC04 100%) border-box",
                             color: "#000000",
-                            fontSize: isMobile
-                                ? "clamp(17px, 6.5vw, 30px)"
-                                : "min(2.43vw, 35px)",
-                            whiteSpace: "nowrap",
+                            fontSize: "clamp(14px, 2.8vw, 35px)",
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 600ms",
                         }}
