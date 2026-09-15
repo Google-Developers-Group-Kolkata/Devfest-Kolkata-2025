@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const LEFT_DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const RIGHT_DIGITS = ["5", "3", "8", "5", "9", "12", "1", "9"];
 
-const TicketCard = ({ isMobile, reveal, revealRef }) => (
+const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, index }) => (
     <div
         ref={revealRef}
         className="relative bg-white border-2 border-solid border-black overflow-hidden"
@@ -206,12 +206,167 @@ const TicketCard = ({ isMobile, reveal, revealRef }) => (
                 fontSize: isMobile
                     ? "clamp(14px, 4.4vw, 24px)"
                     : "clamp(22px, 1.9vw, 28px)",
-                fontWeight: 300,
+                fontWeight: 500,
                 lineHeight: 1,
                 color: "#4787ea",
             }}
         >
-            GDG Kolkata
+            Purchase
+        </div>
+
+        {/* Coming Soon full-cover stamp */}
+        <div
+            className="absolute product_sans pointer-events-none flex items-center justify-center"
+            style={{
+                inset: 0,
+                borderRadius: "45px",
+                background: "rgba(255,255,255,0.3)",
+                backdropFilter: "blur(18px)",
+                WebkitBackdropFilter: "blur(18px)",
+            }}
+        >
+            <div
+                key={`${stampTick}-${index}`}
+                className={`ticket-stamp ${stampStarted ? "ticket-stamp-go" : ""}`}
+                style={{
+                    opacity: 0,
+                    position: "absolute",
+                    inset: 0,
+                    padding: isMobile ? "5%" : "3.5%",
+                    boxSizing: "border-box",
+                    animationDelay: `${index * 320}ms`,
+                }}
+            >
+                {/* Full-ticket red-bordered stamp (SVG) */}
+                <svg
+                    viewBox="0 0 369 443"
+                    width="100%"
+                    height="100%"
+                    preserveAspectRatio="xMidYMid meet"
+                    style={{ display: "block", overflow: "visible" }}
+                >
+                    <defs>
+                        <linearGradient
+                            id="inkFade"
+                            x1="0"
+                            y1="0"
+                            x2="1"
+                            y2="1"
+                        >
+                            <stop offset="0%" stopColor="#E02020" stopOpacity="0.9" />
+                            <stop offset="100%" stopColor="#B3120E" stopOpacity="0.75" />
+                        </linearGradient>
+                    </defs>
+
+                    {/* outer red border */}
+                    <rect
+                        x="12"
+                        y="12"
+                        width="345"
+                        height="419"
+                        rx="30"
+                        fill="rgba(224,32,32,0.07)"
+                        stroke="#E02020"
+                        strokeWidth="7"
+                    />
+
+                    {/* inner dashed border */}
+                    <rect
+                        x="28"
+                        y="28"
+                        width="313"
+                        height="387"
+                        rx="20"
+                        fill="none"
+                        stroke="#E02020"
+                        strokeWidth="3"
+                        strokeDasharray="14 9"
+                    />
+
+                    {/* corner brackets between the borders */}
+                    {[
+                        [12, 12],
+                        [357, 12],
+                        [12, 431],
+                        [357, 431],
+                    ].map(([cx, cy], i) => (
+                        <rect
+                            key={i}
+                            x={cx - 20}
+                            y={cy - 20}
+                            width="40"
+                            height="40"
+                            rx="8"
+                            fill="none"
+                            stroke="#E02020"
+                            strokeWidth="6"
+                        />
+                    ))}
+
+                    {/* top banner text */}
+                    <text
+                        x="184.5"
+                        y="102"
+                        textAnchor="middle"
+                        fill="url(#inkFade)"
+                        fontSize="26"
+                        fontWeight="800"
+                        letterSpacing="10"
+                    >
+                        OFFICIAL
+                    </text>
+
+                    {/* center "COMING SOON" rotated like a hand stamp */}
+                    <g transform="rotate(-18 184.5 221.5)">
+                        <text
+                            x="184.5"
+                            y="212"
+                            textAnchor="middle"
+                            fill="url(#inkFade)"
+                            fontSize="52"
+                            fontWeight="900"
+                            letterSpacing="4"
+                        >
+                            COMING
+                        </text>
+                        <text
+                            x="184.5"
+                            y="264"
+                            textAnchor="middle"
+                            fill="url(#inkFade)"
+                            fontSize="52"
+                            fontWeight="900"
+                            letterSpacing="4"
+                        >
+                            SOON
+                        </text>
+                        <text
+                            x="184.5"
+                            y="286"
+                            textAnchor="middle"
+                            fill="url(#inkFade)"
+                            fontSize="18"
+                            fontWeight="700"
+                            letterSpacing="8"
+                        >
+                            ••••••
+                        </text>
+                    </g>
+
+                    {/* bottom banner */}
+                    <text
+                        x="184.5"
+                        y="368"
+                        textAnchor="middle"
+                        fill="url(#inkFade)"
+                        fontSize="20"
+                        fontWeight="800"
+                        letterSpacing="6"
+                    >
+                        NOT FOR SALE
+                    </text>
+                </svg>
+            </div>
         </div>
     </div>
 );
@@ -220,8 +375,12 @@ const TicketsSection = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [headingP, setHeadingP] = useState(0);
     const [cardP, setCardP] = useState(() => [0, 0, 0]);
+    const [stampStarted, setStampStarted] = useState(false);
+    const [stampTick, setStampTick] = useState(0);
     const headingRef = useRef(null);
     const cardRefs = useRef([]);
+    const sectionRef = useRef(null);
+    const inViewRef = useRef(false);
 
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 768px)");
@@ -262,6 +421,19 @@ const TicketsSection = () => {
                         return next;
                     });
                 });
+
+                // Live-stamp: trigger once each time the section enters the screen
+                // and keep it stamped while the user stops inside it.
+                const section = sectionRef.current;
+                if (section) {
+                    const r = section.getBoundingClientRect();
+                    const inView = r.top < vh && r.bottom > 0;
+                    if (inView && !inViewRef.current) {
+                        setStampStarted(true);
+                        setStampTick((t) => t + 1);
+                    }
+                    inViewRef.current = inView;
+                }
             });
         };
         update();
@@ -277,6 +449,7 @@ const TicketsSection = () => {
     return (
         <section
             id="tickets"
+            ref={sectionRef}
             className="relative w-full bg-white select-none"
         >
             <div
@@ -321,7 +494,10 @@ const TicketsSection = () => {
                     {[0, 1, 2].map((key) => (
                         <TicketCard
                             key={key}
+                            index={key}
                             isMobile={isMobile}
+                            stampStarted={stampStarted}
+                            stampTick={stampTick}
                             reveal={{
                                 opacity: cardP[key],
                                 transform: `translateY(${(1 - cardP[key]) * 22}px) scale(${0.85 + cardP[key] * 0.15})`,

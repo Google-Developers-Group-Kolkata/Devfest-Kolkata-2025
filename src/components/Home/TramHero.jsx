@@ -378,7 +378,7 @@ const TramHero = () => {
 
                     {/* Get Tickets button */}
                     <a
-                        href="/ticket"
+                        href="#tickets"
                         className="absolute product_sans flex items-center justify-center cursor-pointer select-none"
                         style={{
                             left: isMobile ? "50%" : "41.74%",
