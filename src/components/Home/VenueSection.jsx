@@ -54,9 +54,8 @@ const FaceCopy = ({ face, opacity, shift, stacked }) => (
         }}
     >
         <h2
-            className="product_sans"
+            className="product_sans text-[28px] sm:text-[34px] md:text-[42px] lg:text-[52px] xl:text-[56px]"
             style={{
-                fontSize: "clamp(28px, 4.6vw, 68px)",
                 fontWeight: 700,
                 lineHeight: 1.05,
                 letterSpacing: "-0.01em",
@@ -67,10 +66,8 @@ const FaceCopy = ({ face, opacity, shift, stacked }) => (
         </h2>
 
         <div
-            className="product_sans"
+            className="product_sans mt-5 text-[19px] sm:text-[22px] md:mt-8 md:text-[27px] lg:text-[32px] xl:mt-12 xl:text-[36px]"
             style={{
-                marginTop: "clamp(14px, 2.2vw, 32px)",
-                fontSize: "clamp(19px, 3vw, 44px)",
                 fontWeight: 500,
                 lineHeight: 1.25,
                 color: "#000000",
@@ -86,23 +83,15 @@ const FaceCopy = ({ face, opacity, shift, stacked }) => (
                 href={face.captionHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="product_sans inline-block underline-offset-4 hover:underline"
-                style={{
-                    marginTop: "clamp(12px, 1.8vw, 26px)",
-                    fontSize: "clamp(12px, 1.2vw, 18px)",
-                    color: "#5f6368",
-                }}
+                className="product_sans mt-5 inline-block text-[13px] underline-offset-4 hover:underline md:mt-8 md:text-[14px] xl:mt-12 xl:text-[15px]"
+                style={{ color: "#5f6368" }}
             >
                 {face.caption}
             </a>
         ) : (
             <div
-                className="product_sans"
-                style={{
-                    marginTop: "clamp(12px, 1.8vw, 26px)",
-                    fontSize: "clamp(12px, 1.2vw, 18px)",
-                    color: "#5f6368",
-                }}
+                className="product_sans mt-5 text-[13px] md:mt-8 md:text-[14px] xl:mt-12 xl:text-[15px]"
+                style={{ color: "#5f6368" }}
             >
                 {face.caption}
             </div>
@@ -118,12 +107,11 @@ const PhotoFace = ({ src, alt, back = false }) => (
         alt={alt}
         draggable={false}
         loading="lazy"
-        className="absolute inset-0 block h-full w-full object-cover"
+        className="absolute inset-0 block h-full w-full rounded-xl object-cover md:rounded-2xl xl:rounded-[20px]"
         style={{
             transform: back ? "rotateX(180deg)" : "none",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            borderRadius: "clamp(14px, 1.8vw, 28px)",
             boxShadow: "0 24px 60px rgba(0,0,0,0.28)",
         }}
     />
@@ -132,23 +120,14 @@ const PhotoFace = ({ src, alt, back = false }) => (
 const VenueSection = () => {
     const sectionRef = useRef(null);
     const [p, setP] = useState(0);
-    const [isMobile, setIsMobile] = useState(false);
     const [reduced, setReduced] = useState(false);
 
     useEffect(() => {
-        const mq = window.matchMedia("(max-width: 768px)");
         const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
-        const on = () => {
-            setIsMobile(mq.matches);
-            setReduced(rm.matches);
-        };
+        const on = () => setReduced(rm.matches);
         on();
-        mq.addEventListener?.("change", on);
         rm.addEventListener?.("change", on);
-        return () => {
-            mq.removeEventListener?.("change", on);
-            rm.removeEventListener?.("change", on);
-        };
+        return () => rm.removeEventListener?.("change", on);
     }, []);
 
     // Progress through the pinned runway: 0 as the section locks to the top of
@@ -188,25 +167,21 @@ const VenueSection = () => {
     // Slight tilt that eases from one face's angle to the other's. It lives on
     // the photo's container, so frame and photo carry the exact same angle.
     const tilt = FACES[0].tilt + (FACES[1].tilt - FACES[0].tilt) * flip;
-    // Side margin. Desktop gets a generous one so the full-width row breathes;
-    // phones keep a tight gutter or the copy runs out of room.
-    const gutter = isMobile ? "clamp(20px, 6vw, 40px)" : "clamp(56px, 8vw, 180px)";
+    // Content shell, shared by both layouts — same width cap and side gutter as
+    // the About/Tickets sections above, so every section lines up.
+    const SHELL =
+        "mx-auto w-full max-w-[1120px] px-5 sm:px-8 md:px-10 xl:px-16";
 
     // One size for the photo frame, shared by both layouts. The `min()` caps it
     // against viewport height as well as width, so the portrait card can't
     // outgrow the pinned screen on a short display.
-    const photoRatio = isMobile ? "5 / 4" : "4 / 6";
-    const photoMaxWidth = isMobile
-        ? "min(100%, 380px)"
-        : "min(clamp(215px, 24vw, 415px), calc(62vh * 4 / 6))";
+    const PHOTO_FRAME =
+        "relative aspect-[5/4] w-full max-w-[300px] shrink-0 md:aspect-[4/6] md:max-w-[min(300px,calc(74vh*0.66))] lg:max-w-[min(340px,calc(74vh*0.66))] xl:max-w-[min(380px,calc(74vh*0.66))]";
 
     // The two copy blocks stacked and crossfaded, so the column never reflows
     // mid-turn.
     const copyColumn = (
-        <div
-            className="relative w-full"
-            style={{ minHeight: "clamp(190px, 26vw, 330px)" }}
-        >
+        <div className="relative min-h-[190px] w-full md:min-h-[230px] xl:min-h-[290px]">
             {/* Brand glow, crossfaded with the copy. Sits behind the text and
                 bleeds past the column — there is no card to contain it now. */}
             <div
@@ -238,20 +213,12 @@ const VenueSection = () => {
         return (
             <section id="venue" className="relative w-full select-none">
                 <div
-                    className="flex w-full flex-col"
-                    style={{
-                        gap: "clamp(40px, 6vw, 90px)",
-                        padding: `clamp(40px, 7vw, 96px) ${gutter}`,
-                    }}
+                    className={`flex w-full flex-col gap-10 py-10 md:gap-14 md:py-16 xl:gap-20 xl:py-20 ${SHELL}`}
                 >
                     {FACES.map((face) => (
                         <div
                             key={face.title}
-                            className="flex w-full items-center"
-                            style={{
-                                flexDirection: isMobile ? "column" : "row",
-                                gap: "clamp(24px, 4vw, 64px)",
-                            }}
+                            className="flex w-full flex-col items-center gap-8 md:flex-row md:gap-6 lg:gap-8 xl:gap-10"
                         >
                             <div className="relative w-full">
                                 <div
@@ -262,12 +229,8 @@ const VenueSection = () => {
                                 <FaceCopy face={face} opacity={1} shift={0} />
                             </div>
                             <div
-                                className="relative w-full shrink-0"
-                                style={{
-                                    maxWidth: photoMaxWidth,
-                                    aspectRatio: photoRatio,
-                                    transform: `rotate(${face.tilt}deg)`,
-                                }}
+                                className={PHOTO_FRAME}
+                                style={{ transform: `rotate(${face.tilt}deg)` }}
                             >
                                 <PhotoFace src={face.photo} alt={face.photoAlt} />
                             </div>
@@ -287,11 +250,8 @@ const VenueSection = () => {
         >
             <div className="sticky top-0 flex h-screen w-full items-center supports-[height:100dvh]:h-dvh">
                 <div
-                    className="flex w-full items-center"
+                    className={`flex w-full flex-col items-center gap-8 md:flex-row md:gap-6 lg:gap-8 xl:gap-10 ${SHELL}`}
                     style={{
-                        flexDirection: isMobile ? "column" : "row",
-                        gap: "clamp(28px, 5vw, 80px)",
-                        padding: `0 ${gutter}`,
                         transform: `translateY(${lift}px)`,
                         willChange: "transform",
                     }}
@@ -302,11 +262,9 @@ const VenueSection = () => {
                         the container is angled with the photo rather than the
                         photo leaning inside an upright box. */}
                     <div
-                        className="relative w-full shrink-0"
+                        className={PHOTO_FRAME}
                         style={{
                             perspective: "1600px",
-                            maxWidth: photoMaxWidth,
-                            aspectRatio: photoRatio,
                             transform: `rotate(${tilt}deg)`,
                             willChange: "transform",
                         }}

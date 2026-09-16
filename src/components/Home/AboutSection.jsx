@@ -89,13 +89,14 @@ const TOKENS = SEGMENTS.flatMap(({ t, c }) =>
 // How far (px) the whole section starts below its resting place.
 const SLIDE = 72;
 
-// Accent geometry, scaled off the viewport so it stays in proportion.
-const DECOR_VARS = {
-    "--dec-o": "clamp(5px, 0.85vw, 13px)", // frame offset
-    "--dec-s": "clamp(1.5px, 0.16vw, 2.5px)", // stroke width
-    "--dec-c": "clamp(18px, 3.1vw, 46px)", // circle diameter
-    "--dec-l": "clamp(28px, 5.5vw, 80px)", // line length
-};
+// Accent geometry — frame offset, stroke width, circle diameter, line length.
+// Stepped at the breakpoints rather than scaled off the viewport.
+const DECOR_CLASS = [
+    "[--dec-o:5px] md:[--dec-o:7px] xl:[--dec-o:9px]",
+    "[--dec-s:1.5px] xl:[--dec-s:2px]",
+    "[--dec-c:18px] md:[--dec-c:26px] xl:[--dec-c:32px]",
+    "[--dec-l:28px] md:[--dec-l:44px] xl:[--dec-l:56px]",
+].join(" ");
 
 const CORNERS = {
     tl: { top: "calc(var(--dec-c) / -2)", left: "calc(var(--dec-c) / -2)" },
@@ -268,7 +269,6 @@ const AboutSection = () => {
         transform: `translateY(${(1 - photoProgress[i]) * 20}px) scale(${0.9 + photoProgress[i] * 0.1})`,
         transformOrigin: "center",
         transition: "opacity 150ms linear, transform 150ms linear",
-        ...DECOR_VARS,
     });
 
     // Mobile: stacked full-width cards with real spacing so everything fits
@@ -278,32 +278,19 @@ const AboutSection = () => {
             <section
                 ref={sectionRef}
                 id="about"
-                className="relative w-full select-none"
-                style={{ padding: "10vw 6vw calc(6vw + 36px)" }}
+                className="relative w-full select-none px-5 pb-16 pt-10 sm:px-8"
             >
                 <div style={riseStyle}>
                     <h2
-                        className="product_sans"
-                        style={{
-                            fontSize: "clamp(24px, 7.5vw, 40px)",
-                            fontWeight: 500,
-                            lineHeight: 1.1,
-                            color: "#000000",
-                            marginBottom: "5vw",
-                        }}
+                        className="product_sans mb-5 text-[22px] sm:text-[26px]"
+                        style={{ fontWeight: 500, lineHeight: 1.1, color: "#000000" }}
                     >
                         Memories we Created
                     </h2>
                     <div
                         ref={textRef}
-                        className="product_sans pointer-events-none"
-                        style={{
-                            fontSize: "clamp(14px, 4.3vw, 19px)",
-                            fontWeight: 500,
-                            lineHeight: 1.45,
-                            color: "#000000",
-                            marginBottom: "10vw",
-                        }}
+                        className="product_sans pointer-events-none mb-10 text-[14px] sm:text-[15px]"
+                        style={{ fontWeight: 500, lineHeight: 1.45, color: "#000000" }}
                     >
                         {renderWords()}
                     </div>
@@ -314,10 +301,10 @@ const AboutSection = () => {
                                 ref={(el) => {
                                     photoRefs.current[i] = el;
                                 }}
-                                className="relative w-full"
+                                className={`relative w-full ${DECOR_CLASS} ${
+                                    i === PHOTOS.length - 1 ? "" : "mb-12"
+                                }`}
                                 style={{
-                                    marginBottom:
-                                        i === PHOTOS.length - 1 ? 0 : "12vw",
                                     aspectRatio: "384 / 231",
                                     ...photoStyle(i),
                                 }}
@@ -345,20 +332,18 @@ const AboutSection = () => {
         <section
             ref={sectionRef}
             id="about"
-            className="relative w-full select-none"
-            style={{ paddingBottom: "clamp(24px, 4vw, 64px)" }}
+            className="relative w-full select-none px-6 pb-8 md:px-10 xl:px-16 xl:pb-12"
         >
             <div
-                className="relative w-full mx-auto"
+                className="relative mx-auto w-full max-w-[1120px]"
                 style={{ aspectRatio: "1440 / 1143", ...riseStyle }}
             >
                 {/* Heading */}
                 <h2
-                    className="absolute product_sans"
+                    className="product_sans absolute text-[26px] md:text-[30px] lg:text-[36px] xl:text-[42px]"
                     style={{
                         left: "4.9%",
                         top: "7.5%",
-                        fontSize: "clamp(24px, 4.2vw, 60px)",
                         fontWeight: 500,
                         lineHeight: 1.1,
                         color: "#000000",
@@ -370,12 +355,11 @@ const AboutSection = () => {
                 {/* About paragraph — fills word by word on scroll */}
                 <div
                     ref={textRef}
-                    className="absolute product_sans pointer-events-none"
+                    className="product_sans pointer-events-none absolute text-[16px] md:text-[18px] lg:text-[23px] xl:text-[28px]"
                     style={{
                         left: "4.9%",
                         top: "19.5%",
                         width: "59%",
-                        fontSize: "clamp(16px, 2.85vw, 41px)",
                         fontWeight: 500,
                         lineHeight: 1.35,
                         color: "#000000",
@@ -391,7 +375,7 @@ const AboutSection = () => {
                         ref={(el) => {
                             photoRefs.current[i] = el;
                         }}
-                        className="absolute"
+                        className={`absolute ${DECOR_CLASS}`}
                         style={{
                             left: `${p.left}%`,
                             top: `${p.top}%`,

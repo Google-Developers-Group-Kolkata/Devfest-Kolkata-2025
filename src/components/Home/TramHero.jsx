@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import VenueSection from "./VenueSection";
-import FaqSection from "./FaqSection";
+import FaqTramSection from "./FaqTramSection";
 import FooterSection from "./FooterSection";
 
 // Looping, muted YouTube footage behind the Desktop 4 hero.
@@ -106,7 +106,7 @@ const TramHero = () => {
     const logoStyle = {
         left: started ? "3.75%" : "50%",
         top: started ? "3.1%" : "38%",
-        width: started ? "min(18.5vw, 18.5vh)" : "min(92vw, 92vh)",
+        width: started ? "min(15vw, 15vh)" : "min(78vw, 78vh)",
         transform: !show
             ? "translateX(-50%) scale(0.55)"
             : started
@@ -186,7 +186,7 @@ const TramHero = () => {
             {/* Start the experience button — fades in, fades out on click */}
             <button
                 type="button"
-                className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-[clamp(5px,0.6vw,10px)] cursor-pointer bg-transparent border-0 p-3 -m-3 rounded-full transition-all duration-500 ease-out motion-reduce:transition-none group ${
+                className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 md:gap-2 cursor-pointer bg-transparent border-0 p-3 -m-3 rounded-full transition-all duration-500 ease-out motion-reduce:transition-none group ${
                     started
                         ? "opacity-0 -translate-y-3 pointer-events-none"
                         : show
@@ -199,16 +199,12 @@ const TramHero = () => {
                 }}
                 onClick={() => setStarted(true)}
             >
-                <span
-                    className="product_sans font-medium text-black whitespace-nowrap leading-none tracking-normal"
-                    style={{ fontSize: "17px" }}
-                >
+                <span className="product_sans font-medium text-black whitespace-nowrap leading-none tracking-normal text-[14px] md:text-[15px]">
                     Start the experience
                 </span>
                 <svg
                     viewBox="0 0 49 25"
-                    className="text-black transition-transform duration-200 group-hover:translate-x-1.5"
-                    style={{ width: "22px", height: "auto" }}
+                    className="h-auto w-[18px] text-black transition-transform duration-200 group-hover:translate-x-1.5 md:w-5"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
@@ -266,7 +262,7 @@ const TramHero = () => {
                     {/* GDG logo — top left. Inverted (hue kept) so the black
                         wordmark reads as white against the footage. */}
                     <div
-                        className="absolute z-10 pointer-events-none left-[4.79%] top-[2.5%] lg:top-[5%] w-[min(32vw,130px)] lg:w-[min(22vw,323px)]"
+                        className="absolute z-10 pointer-events-none left-5 top-5 w-[96px] md:left-10 md:w-[130px] lg:w-[170px] xl:left-16 xl:w-[200px]"
                         style={{
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 0ms",
@@ -282,10 +278,10 @@ const TramHero = () => {
                     </div>
 
                     {/* Headline stack — centered on every breakpoint */}
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center pointer-events-none">
+                    <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center md:px-10 xl:px-16">
                         {/* DevFest headline */}
                         <div
-                            className="product_sans d4-devfest d4-outline whitespace-nowrap"
+                            className="product_sans d4-outline whitespace-nowrap text-[38px] sm:text-[50px] md:text-[70px] lg:text-[92px] xl:text-[116px] 2xl:text-[132px]"
                             style={{
                                 fontWeight: 700,
                                 lineHeight: 1,
@@ -303,7 +299,7 @@ const TramHero = () => {
 
                         {/* Kolkata'26 */}
                         <div
-                            className="product_sans d4-kolkata d4-outline whitespace-nowrap mt-[0.04em]"
+                            className="product_sans d4-outline mt-[0.04em] whitespace-nowrap text-[31px] sm:text-[41px] md:text-[57px] lg:text-[75px] xl:text-[94px] 2xl:text-[107px]"
                             style={{
                                 fontWeight: 500,
                                 lineHeight: 1,
@@ -318,7 +314,7 @@ const TramHero = () => {
 
                         {/* Bengali tagline */}
                         <div
-                            className="product_sans d4-bengali mt-[0.9em] max-w-[90vw]"
+                            className="product_sans mt-[0.9em] max-w-[90vw] text-[13px] sm:text-[15px] md:text-[18px] lg:text-[21px] xl:text-[24px]"
                             style={{
                                 lineHeight: 1.35,
                                 color: "#ffffff",
@@ -333,12 +329,9 @@ const TramHero = () => {
                         {/* Get Tickets button */}
                         <a
                             href="#tickets"
-                            className="product_sans d4-tickets pointer-events-auto mt-[1.5em] flex items-center justify-center cursor-pointer select-none rounded-full whitespace-nowrap transition-transform duration-200 hover:scale-105"
+                            className="product_sans pointer-events-auto mt-[1.5em] flex h-9 cursor-pointer select-none items-center justify-center whitespace-nowrap rounded-full px-5 text-[14px] leading-none transition-transform duration-200 hover:scale-105 md:h-11 md:px-6 md:text-[16px] xl:h-12 xl:px-7 xl:text-[18px]"
                             style={{
-                                padding: "0 clamp(20px, 3vw, 32px)",
-                                height: "clamp(42px, 6vw, 56px)",
-                                lineHeight: "1",
-                                border: "4px solid transparent",
+                                border: "3px solid transparent",
                                 borderRadius: "50px",
                                 background:
                                     "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(98deg, #F63130 0%, #4787EA 35%, #34A853 72%, #FBBC04 100%) border-box",
@@ -363,7 +356,7 @@ const TramHero = () => {
                     >
                         <svg
                             viewBox="0 0 24 24"
-                            className="w-[clamp(20px,2.4vw,30px)] h-auto"
+                            className="h-auto w-4 md:w-5 xl:w-6"
                             fill="none"
                             stroke="#ffffff"
                             strokeWidth="2"
@@ -387,23 +380,14 @@ const TramHero = () => {
                         >
                             <div className="product_sans text-center text-white cs-title-pop">
                                 <div
-                                    className="cs-float"
-                                    style={{
-                                        fontSize: "clamp(40px, 8vw, 90px)",
-                                        fontWeight: 700,
-                                        lineHeight: 1,
-                                        whiteSpace: "nowrap",
-                                    }}
+                                    className="cs-float whitespace-nowrap text-[32px] md:text-[52px] lg:text-[62px] xl:text-[72px]"
+                                    style={{ fontWeight: 700, lineHeight: 1 }}
                                 >
                                     Coming Soon
                                 </div>
                                 <div
-                                    className="cs-subtitle-in"
-                                    style={{
-                                        marginTop: "12px",
-                                        fontSize: "clamp(16px, 3vw, 30px)",
-                                        color: "rgba(255,255,255,0.8)",
-                                    }}
+                                    className="cs-subtitle-in mt-3 text-[14px] md:text-[18px] xl:text-[22px]"
+                                    style={{ color: "rgba(255,255,255,0.8)" }}
                                 >
                                     {comingSoonItem}
                                 </div>
@@ -414,15 +398,7 @@ const TramHero = () => {
                                     setComingSoonItem(null);
                                     window.scrollTo({ top: 0, behavior: "smooth" });
                                 }}
-                                className="product_sans cs-btn-pop cursor-pointer transition-transform hover:scale-105"
-                                style={{
-                                    border: "3px solid #ffffff",
-                                    borderRadius: "50px",
-                                    color: "#ffffff",
-                                    background: "transparent",
-                                    padding: "10px 36px",
-                                    fontSize: "clamp(16px, 2.5vw, 24px)",
-                                }}
+                                className="product_sans cs-btn-pop cursor-pointer rounded-[50px] border-[3px] border-white bg-transparent px-8 py-2 text-[14px] text-white transition-transform hover:scale-105 md:text-[16px] xl:text-[18px]"
                             >
                                 Home
                             </button>
@@ -433,7 +409,7 @@ const TramHero = () => {
         </div>
         {d4 && (
             <div
-                className="relative z-10 w-full bg-white rounded-t-[clamp(20px,3vw,44px)]"
+                className="relative z-10 w-full rounded-t-2xl bg-white md:rounded-t-3xl xl:rounded-t-[32px]"
                 style={{ boxShadow: "0 -24px 60px rgba(0,0,0,0.28)" }}
             >
                 {/* Kolkata doodle backdrop — one continuous layer that holds
@@ -445,7 +421,7 @@ const TramHero = () => {
                     scrollport, which would freeze the sticky layer inside. */}
                 <div
                     id="doodle-backdrop"
-                    className="pointer-events-none absolute inset-0 rounded-t-[clamp(20px,3vw,44px)]"
+                    className="pointer-events-none absolute inset-0 rounded-t-2xl md:rounded-t-3xl xl:rounded-t-[32px]"
                     aria-hidden="true"
                     style={{ overflow: "clip" }}
                 >
@@ -464,7 +440,7 @@ const TramHero = () => {
                     <AboutSection />
                     <TicketsSection />
                     <VenueSection />
-                    <FaqSection />
+                    <FaqTramSection />
                 </div>
             </div>
         )}

@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
-import ticketsData from "@/tickets.json";
 
 // No-auth endpoint: browser -> Next.js server -> Firebase.
-// Same merge logic as main branch ticket page, but done server-side so the
-// D4 "Grab your Tickets" section needs no sign-in and no client Firebase keys.
+// Done server-side so the D4 "Grab your Tickets" section needs no sign-in and
+// no client Firebase keys.
 function getDb() {
     if (admin.apps.length) return admin.firestore();
     try {
         const serviceAccount = {
             projectId: process.env.FIREBASE_PROJECT_ID,
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\n/g, "\n"),
         };
 
         if (
@@ -32,93 +31,59 @@ function getDb() {
     }
 }
 
-const defaultColors = ["blue", "green", "red", "yellow"];
+// The four ticket artworks in /public/ticket. A doc whose `color` is missing or
+// unknown falls back to one of these by position, so cards stay distinct.
+const COLORS = ["red", "blue", "green", "yellow"];
+
+const toNumber = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+};
 
 export async function GET() {
     try {
         const db = getDb();
         if (!db) throw new Error("Firebase not configured");
 
-        const snap = await db.collection("devfest-tickets").get();
+        const snap = await db.collection("devfest2026-tickets").get();
         if (snap.empty) throw new Error("No tickets in Firebase");
 
-        // Normalize Firebase docs to the same backend shape main uses
-        const backendTickets = snap.docs.map((doc) => {
+        // Firestore doc shape: color, isActive, isCommingSoon, price, title, url
+        const tickets = snap.docs.map((doc, index) => {
             const d = doc.data();
-            const priceInPaise =
-                d.priceInPaise ??
-                (d.price != null ? Math.round(Number(d.price) * 100) : null);
+            const color = String(d.color ?? "").toLowerCase();
             return {
-                id: d.id ?? doc.id,
-                name: d.name || d.title || doc.id,
-                priceInPaise,
-                description: d.description || null,
-                available: d.available ?? d.isActive ?? true,
-                slug: d.slug || doc.id,
-                // Purchase link comes from Firebase
-                url: d.url || d.purchaseUrl || d.link || null,
-                // Event year, if the doc carries it
-                year: d.year ?? null,
-                // Perks list, if the doc carries its own
-                features: Array.isArray(d.features) ? d.features : null,
+                id: doc.id,
+                title: d.title ?? "Ticket",
+                // Stored as a string ("299") — kept verbatim for display.
+                price: d.price ?? null,
+                url: d.url ?? null,
+                isActive: d.isActive ?? false,
+                // Note the field's spelling in Firestore; the corrected one is
+                // accepted too, in case the doc is ever fixed up.
+                isComingSoon: d.isCommingSoon ?? d.isComingSoon ?? false,
+                color: COLORS.includes(color)
+                    ? color
+                    : COLORS[index % COLORS.length],
             };
         });
 
-        // Year gate: only docs from the current year participate.
-        // Older docs (or docs with no/mismatched year) are treated as old
-        // and excluded — with none left, the client keeps its coming-soon defaults.
-        const currentYear = new Date().getFullYear();
-        const currentTickets = backendTickets.filter(
-            (t) => t.year === currentYear
-        );
-        if (currentTickets.length === 0) {
-            return NextResponse.json({ tickets: [] }, { status: 200 });
-        }
-
-        // Merge with local display data — same as main branch (match by slug)
-        const mergedTickets = currentTickets.map((backendTicket, index) => {
-            const localTicket = ticketsData.tickets.find(
-                (lt) => lt.slug === backendTicket.slug
-            );
-            return {
-                ...backendTicket,
-                title: localTicket?.title || backendTicket.name,
-                features: localTicket?.features ||
-                    backendTicket.features || [
-                        "Entry to DevFest",
-                        "Full-access to conference",
-                        "Breakfast & Lunch",
-                        "Hi-Tea",
-                        "Keynotes, Panels",
-                    ],
-                price:
-                    backendTicket.priceInPaise != null
-                        ? backendTicket.priceInPaise / 100
-                        : (localTicket?.price ?? null),
-                color:
-                    localTicket?.color ||
-                    defaultColors[index % defaultColors.length],
-                description:
-                    backendTicket.description ||
-                    localTicket?.description ||
-                    "Join us for an amazing DevFest experience!",
-            };
-        });
-
-        // Available first (cheapest first), then the rest — same ordering as before
-        const available = mergedTickets
-            .filter((t) => t.available)
-            .sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-        const unavailable = mergedTickets
-            .filter((t) => !t.available)
-            .sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+        // Buyable first (cheapest first), then the rest — same ordering the
+        // old ticket page used.
+        const byPrice = (a, b) => toNumber(a.price) - toNumber(b.price);
+        const onSale = tickets
+            .filter((t) => t.isActive && !t.isComingSoon)
+            .sort(byPrice);
+        const rest = tickets
+            .filter((t) => !(t.isActive && !t.isComingSoon))
+            .sort(byPrice);
 
         return NextResponse.json(
-            { tickets: [...available, ...unavailable] },
+            { tickets: [...onSale, ...rest] },
             { status: 200 }
         );
     } catch (error) {
-        // Client falls back to the default 3 coming-soon cards on any failure
+        // Client falls back to the default coming-soon cards on any failure
         return NextResponse.json(
             { error: "Failed to load tickets" },
             { status: 500 }

@@ -2,419 +2,257 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const LEFT_DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8"];
-const RIGHT_DIGITS = ["5", "3", "8", "5", "9", "12", "1", "9"];
+const RED = "#F63130";
 
-const TicketCard = ({ isMobile, reveal, revealRef, stampStarted, stampTick, index, ticket }) => {
+// Ticket shape (scalloped edges + the stub notch top and bottom) comes from
+// these assets. Their own 474x234 box is the coordinate system for everything
+// below, and the card is stretched to exactly that box. Which one a card wears
+// is the `color` field on its Firestore doc; `accent` is that artwork's fill,
+// reused for anything drawn on top of white.
+const PALETTE = {
+    red: { bg: "/ticket/background-red.svg", accent: "#F63130" },
+    blue: { bg: "/ticket/background-blue.svg", accent: "#4285F4" },
+    green: { bg: "/ticket/background-green.svg", accent: "#34A853" },
+    yellow: { bg: "/ticket/background-yellow.svg", accent: "#FBBC04" },
+};
+
+const paletteFor = (color) =>
+    PALETTE[String(color ?? "").toLowerCase()] ?? PALETTE.red;
+
+// Clips an overlay to the ticket silhouette, so nothing leaks past the notches.
+const maskWith = (bg) => ({
+    WebkitMaskImage: `url(${bg})`,
+    maskImage: `url(${bg})`,
+    WebkitMaskSize: "100% 100%",
+    maskSize: "100% 100%",
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+});
+
+// Card text scales with the card itself (cqw), so it only needs to step down
+// as the ticket name gets longer.
+const nameSizeFor = (name) => {
+    const n = (name || "").length;
+    if (n <= 14) return "6.6cqw";
+    if (n <= 22) return "5.4cqw";
+    if (n <= 34) return "4.3cqw";
+    return "3.6cqw";
+};
+
+const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket }) => {
     const live = ticket?.live && ticket?.url;
     const isDefault = ticket?.source !== "server";
-    const nameLen = (ticket?.name || "").length;
-    const nameSize = nameLen <= 12 ? "9cqw" : nameLen <= 22 ? "7cqw" : "5.5cqw";
+    const { bg, accent } = paletteFor(ticket?.color);
+    // Sold out only applies to a real ticket Firebase has switched off;
+    // everything else that can't be bought yet reads as coming soon.
+    const stampLabel =
+        !isDefault && !ticket?.isActive ? "Sold Out" : "Coming Soon";
     return (
-    <div
-        ref={revealRef}
-        onClick={() => {
-            if (live) window.open(ticket.url, "_blank", "noopener,noreferrer");
-        }}
-        className="relative bg-white border-2 border-solid border-black overflow-hidden"
-        style={{
-            aspectRatio: "369 / 443",
-            borderRadius: "45px",
-            flex: isMobile ? "0 0 auto" : "0 1 400px",
-            width: isMobile ? "min(86vw, 420px)" : "100%",
-            maxWidth: isMobile ? "420px" : "420px",
-            containerType: "inline-size",
-            opacity: reveal.opacity,
-            transform: reveal.transform,
-            transformOrigin: "center",
-            transition: "opacity 150ms linear, transform 150ms linear",
-            cursor: live ? "pointer" : "default",
-        }}
-    >
-        {/* TRAM — top center of stub */}
         <div
-            className="absolute product_sans pointer-events-none whitespace-nowrap"
+            ref={revealRef}
+            onClick={() => {
+                if (live) window.open(ticket.url, "_blank", "noopener,noreferrer");
+            }}
+            className="relative w-full max-w-[360px] shrink-0 grow-0 overflow-hidden md:w-[290px] lg:w-[320px] xl:w-[360px]"
             style={{
-                left: "50%",
-                top: "1.5%",
-                transform: "translateX(-50%)",
-                fontSize: "11cqw",
-                fontWeight: 500,
-                lineHeight: 1,
-                color: "#4787ea",
-                letterSpacing: "0.02em",
+                aspectRatio: "474 / 234",
+                containerType: "inline-size",
+                backgroundImage: `url(${bg})`,
+                backgroundSize: "100% 100%",
+                backgroundRepeat: "no-repeat",
+                opacity: reveal.opacity,
+                transform: reveal.transform,
+                transformOrigin: "center",
+                transition: "opacity 150ms linear, transform 150ms linear",
+                cursor: live ? "pointer" : "default",
             }}
         >
-            TRAM
-        </div>
+            {/* Dashed stub perforation, run between the notches of the artwork */}
+            <svg
+                viewBox="0 0 474 234"
+                className="pointer-events-none absolute inset-0 h-full w-full"
+                aria-hidden="true"
+            >
+                <path
+                    d="M 118 27 V 207"
+                    stroke="#FFFFFF"
+                    strokeWidth="2.2"
+                    strokeDasharray="9 7.5"
+                    strokeLinecap="round"
+                />
+            </svg>
 
-        {/* UP / DOWN — rotated vertical stub labels */}
-        <div
-            className="absolute product_sans pointer-events-none"
-            style={{
-                left: "1.5%",
-                top: "1%",
-                transform: "rotate(-90deg)",
-                transformOrigin: "left top",
-                fontSize: "9cqw",
-                fontWeight: 500,
-                lineHeight: 1,
-                color: "#000000",
-            }}
-        >
-            UP
-        </div>
-        <div
-            className="absolute product_sans pointer-events-none"
-            style={{
-                left: "88%",
-                top: "0.5%",
-                transform: "rotate(-90deg)",
-                transformOrigin: "left top",
-                fontSize: "4.5cqw",
-                fontWeight: 500,
-                lineHeight: 1,
-                color: "#000000",
-            }}
-        >
-            DOWN
-        </div>
-
-        {/* Perforation box: two vertical dashed lines framing the stub columns */}
-        <div
-            className="absolute inset-y-0"
-            style={{
-                left: "14%",
-                borderLeft: "2px dashed #000000",
-            }}
-        />
-        <div
-            className="absolute inset-y-0"
-            style={{
-                left: "86.5%",
-                borderLeft: "2px dashed #000000",
-            }}
-        />
-        {/* Horizontal perforation under the stub header */}
-        <div
-            className="absolute left-0 right-0"
-            style={{
-                top: "16%",
-                borderTop: "2px dashed #000000",
-            }}
-        />
-        {/* Row dividers */}
-        <div
-            className="absolute"
-            style={{
-                top: "38%",
-                left: "13.6%",
-                width: "73%",
-                borderTop: "2px dashed #000000",
-            }}
-        />
-        <div
-            className="absolute"
-            style={{
-                top: "70.8%",
-                left: "13.6%",
-                width: "73%",
-                borderTop: "2px dashed #000000",
-            }}
-        />
-        <div
-            className="absolute"
-            style={{
-                top: "89.8%",
-                left: "13.6%",
-                width: "73%",
-                borderTop: "2px dashed #000000",
-            }}
-        />
-
-        {/* Edge serial-number strips (perforation rows) */}
-        <div
-            className="absolute product_sans flex flex-col pointer-events-none"
-            style={{
-                left: "2.5%",
-                top: "9%",
-                bottom: "5%",
-                justifyContent: "space-between",
-                fontSize: "8.5cqw",
-                lineHeight: 1,
-                color: "#000000",
-            }}
-        >
-            {LEFT_DIGITS.map((d, i) => (
-                <span key={i}>{d}</span>
-            ))}
-        </div>
-        <div
-            className="absolute product_sans flex flex-col pointer-events-none"
-            style={{
-                left: "89.5%",
-                top: "9%",
-                bottom: "5%",
-                justifyContent: "space-between",
-                fontSize: "8.5cqw",
-                lineHeight: 1,
-                color: "#000000",
-            }}
-        >
-            {RIGHT_DIGITS.map((d, i) => (
-                <span key={i}>{d}</span>
-            ))}
-        </div>
-
-        {/* Ticket info — shrinks with name length, clamps to 3 lines */}
-        <div
-            className="absolute product_sans pointer-events-none"
-            title={ticket?.name}
-            style={{
-                left: "21%",
-                right: "14%",
-                top: "19%",
-                fontSize: nameSize,
-                fontWeight: 500,
-                lineHeight: 1.1,
-                color: "#000000",
-                display: "-webkit-box",
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-                overflowWrap: "anywhere",
-            }}
-        >
-            {ticket?.name || "SUPER EARLY BIRD"}
-        </div>
-        <div
-            className="absolute product_sans pointer-events-none"
-            style={{
-                left: "21%",
-                top: "76%",
-                fontSize: "10cqw",
-                fontWeight: 500,
-                lineHeight: 1,
-                color: "#000000",
-                whiteSpace: "nowrap",
-            }}
-        >
-            {ticket?.priceLabel || "Rs 499"}
-        </div>
-        {(isDefault || live) && (
-        <div
-            className="absolute product_sans"
-            style={{
-                left: "21%",
-                top: "92%",
-                fontSize: "6.5cqw",
-                fontWeight: 500,
-                lineHeight: 1,
-                color: "#4787ea",
-                pointerEvents: live ? "auto" : "none",
-            }}
-        >
-            {live ? (
-                <a
-                    href={ticket.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ color: "inherit", textDecoration: "none" }}
-                >
-                    Purchase
-                </a>
-            ) : (
-                <span className="pointer-events-none">Purchase</span>
-            )}
-        </div>
-        )}
-
-        {/* Full-cover stamp — Coming Soon on default cards, SOLD OUT on server sold-out cards */}
-        {!live && (
-        <div
-            className="absolute product_sans pointer-events-none flex items-center justify-center"
-            style={{
-                inset: 0,
-                borderRadius: "45px",
-                background: isDefault ? "rgba(255,255,255,0.3)" : "transparent",
-                backdropFilter: isDefault ? "blur(18px)" : "none",
-                WebkitBackdropFilter: isDefault ? "blur(18px)" : "none",
-            }}
-        >
+            {/* Stub: rotated -90deg so it reads bottom-to-top along the perforation */}
             <div
-                key={`${stampTick}-${index}`}
-                className={`ticket-stamp ${stampStarted ? "ticket-stamp-go" : ""}`}
+                className="pointer-events-none absolute flex items-center"
                 style={{
-                    opacity: 0,
-                    position: "absolute",
-                    inset: 0,
-                    padding: isMobile ? "5%" : "3.5%",
-                    boxSizing: "border-box",
-                    animationDelay: `${index * 320}ms`,
+                    left: 0,
+                    top: "100%",
+                    width: "49.37cqw",
+                    height: "24.9cqw",
+                    transform: "rotate(-90deg)",
+                    transformOrigin: "left top",
+                    gap: "3.5cqw",
+                    paddingLeft: "4.5cqw",
                 }}
             >
-                {/* Full-ticket red-bordered stamp (SVG) */}
-                <svg
-                    viewBox="0 0 369 443"
-                    width="100%"
-                    height="100%"
-                    preserveAspectRatio="xMidYMid meet"
-                    style={{ display: "block", overflow: "visible" }}
+                <img
+                    src="/logo-brackets-white.svg"
+                    alt=""
+                    style={{ width: "6.2cqw", height: "auto", flex: "0 0 auto" }}
+                />
+                <div
+                    className="product_sans flex flex-col whitespace-nowrap"
+                    style={{
+                        gap: "2.6cqw",
+                        color: "#FFFFFF",
+                        fontWeight: 500,
+                        lineHeight: 1,
+                    }}
                 >
-                    <defs>
-                        <linearGradient
-                            id="inkFade"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                        >
-                            <stop offset="0%" stopColor="#E02020" stopOpacity="0.9" />
-                            <stop offset="100%" stopColor="#B3120E" stopOpacity="0.75" />
-                        </linearGradient>
-                    </defs>
-
-                    {/* outer red border */}
-                    <rect
-                        x="12"
-                        y="12"
-                        width="345"
-                        height="419"
-                        rx="30"
-                        fill="rgba(224,32,32,0.07)"
-                        stroke="#E02020"
-                        strokeWidth="7"
-                    />
-
-                    {/* inner dashed border */}
-                    <rect
-                        x="28"
-                        y="28"
-                        width="313"
-                        height="387"
-                        rx="20"
-                        fill="none"
-                        stroke="#E02020"
-                        strokeWidth="3"
-                        strokeDasharray="14 9"
-                    />
-
-                    {/* corner brackets between the borders */}
-                    {[
-                        [12, 12],
-                        [357, 12],
-                        [12, 431],
-                        [357, 431],
-                    ].map(([cx, cy], i) => (
-                        <rect
-                            key={i}
-                            x={cx - 20}
-                            y={cy - 20}
-                            width="40"
-                            height="40"
-                            rx="8"
-                            fill="none"
-                            stroke="#E02020"
-                            strokeWidth="6"
-                        />
-                    ))}
-
-                    {/* top banner text */}
-                    <text
-                        x="184.5"
-                        y="102"
-                        textAnchor="middle"
-                        fill="url(#inkFade)"
-                        fontSize="26"
-                        fontWeight="800"
-                        letterSpacing="10"
-                    >
-                        OFFICIAL
-                    </text>
-
-                    {/* center stamp — COMING SOON on defaults, SOLD OUT on sold-out */}
-                    <g transform="rotate(-18 184.5 221.5)">
-                        <text
-                            x="184.5"
-                            y="212"
-                            textAnchor="middle"
-                            fill="url(#inkFade)"
-                            fontSize="52"
-                            fontWeight="900"
-                            letterSpacing="4"
-                        >
-                            {isDefault ? "COMING" : "SOLD"}
-                        </text>
-                        <text
-                            x="184.5"
-                            y="264"
-                            textAnchor="middle"
-                            fill="url(#inkFade)"
-                            fontSize="52"
-                            fontWeight="900"
-                            letterSpacing="4"
-                        >
-                            {isDefault ? "SOON" : "OUT"}
-                        </text>
-                        <text
-                            x="184.5"
-                            y="286"
-                            textAnchor="middle"
-                            fill="url(#inkFade)"
-                            fontSize="18"
-                            fontWeight="700"
-                            letterSpacing="8"
-                        >
-                            ••••••
-                        </text>
-                    </g>
-
-                    {/* bottom banner */}
-                    <text
-                        x="184.5"
-                        y="368"
-                        textAnchor="middle"
-                        fill="url(#inkFade)"
-                        fontSize="20"
-                        fontWeight="800"
-                        letterSpacing="6"
-                    >
-                        NOT FOR SALE
-                    </text>
-                </svg>
+                    <span style={{ fontSize: "2.8cqw" }}>Google Developer Group</span>
+                    <span style={{ fontSize: "3.2cqw" }}>Kolkata</span>
+                </div>
             </div>
+
+            {/* Main stub: name, price, and the purchase CTA when the ticket is live */}
+            <div
+                className="absolute flex flex-col items-center justify-center text-center"
+                style={{
+                    left: "24.9%",
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    padding: "4% 5% 6.25% 5%",
+                    gap: "4.5cqw",
+                }}
+            >
+                <div
+                    className="product_sans pointer-events-none"
+                    title={ticket?.name}
+                    style={{
+                        fontSize: nameSizeFor(ticket?.name),
+                        fontWeight: 500,
+                        lineHeight: 1.15,
+                        color: "#FFFFFF",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        overflowWrap: "anywhere",
+                    }}
+                >
+                    {ticket?.name || "Super Early Bird"}
+                </div>
+                <div
+                    className="product_sans pointer-events-none whitespace-nowrap"
+                    style={{
+                        fontSize: "3.2cqw",
+                        fontWeight: 500,
+                        lineHeight: 1,
+                        color: "#FFFFFF",
+                    }}
+                >
+                    {ticket?.priceLabel || "Rs. 299"}
+                </div>
+                {live && (
+                    <a
+                        href={ticket.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="product_sans"
+                        style={{
+                            background: "#FFFFFF",
+                            color: accent,
+                            borderRadius: "999px",
+                            padding: "1.2cqw 4cqw",
+                            fontSize: "2.9cqw",
+                            fontWeight: 500,
+                            lineHeight: 1,
+                            textDecoration: "none",
+                        }}
+                    >
+                        Purchase
+                    </a>
+                )}
+            </div>
+
+            {/* Howrah Bridge skyline along the bottom of the main stub */}
+            <img
+                src="/ticket/howrah_bridge.svg"
+                alt=""
+                className="pointer-events-none absolute"
+                style={{ left: "33.5%", bottom: "4%", width: "58%", height: "auto" }}
+            />
+
+            {/* Full-cover stamp — Coming Soon on default cards, SOLD OUT on server sold-out cards */}
+            {!live && (
+                <div
+                    className="pointer-events-none absolute inset-0 flex items-center"
+                    style={{
+                        // Masked with the same asset, so the scrim never leaks
+                        // past the notches. It also mutes the name and price so
+                        // the stamp reads over them instead of fighting them.
+                        background: isDefault
+                            ? "rgba(0,0,0,0.45)"
+                            : "rgba(0,0,0,0.35)",
+                        ...maskWith(bg),
+                    }}
+                >
+                    <div
+                        className="product_sans w-full text-center"
+                        style={{
+                            background: "#FFFFFF",
+                            color: "#0B0B0B",
+                            padding: "2.6cqw 0",
+                            fontSize: "5cqw",
+                            fontWeight: 500,
+                            lineHeight: 1,
+                            letterSpacing: "0.01em",
+                        }}
+                    >
+                        {stampLabel}
+                    </div>
+                </div>
+            )}
         </div>
-        )}
-    </div>
     );
 };
 
-const DEFAULT_CARDS = [0, 1, 2].map((i) => ({
+const DEFAULT_CARDS = ["red", "blue", "green"].map((color, i) => ({
     key: `default-${i}`,
-    name: "SUPER EARLY BIRD",
-    priceLabel: "Rs 499",
+    name: "Super Early Bird",
+    priceLabel: "Rs. 299",
     url: null,
+    color,
     live: false,
+    isActive: true,
+    isComingSoon: true,
     source: "default",
 }));
 
-// Server ticket (same shape as main branch) -> tram card model.
-// A card is live only when Firebase marks it available AND gives a purchase link.
+// Firestore doc (color, isActive, isCommingSoon, price, title, url) -> card
+// model. A card is buyable only when it is active, not coming soon, and carries
+// a purchase link.
 const toCard = (t, i) => {
     const url = t.url || null;
+    const isActive = t.isActive ?? false;
+    const isComingSoon = t.isComingSoon ?? false;
     return {
-        key: String(t.slug ?? t.id ?? i),
-        name: t.title || t.name || "Ticket",
-        priceLabel: t.price != null ? `Rs ${t.price}` : "Rs 499",
+        key: String(t.id ?? i),
+        name: t.title || "Ticket",
+        priceLabel: t.price != null ? `Rs. ${t.price}` : "Rs. 299",
         url,
-        live: (t.available ?? true) && !!url,
+        color: t.color,
+        isActive,
+        isComingSoon,
+        live: isActive && !isComingSoon && !!url,
         source: "server",
     };
 };
 
 const TicketsSection = () => {
-    const [isMobile, setIsMobile] = useState(false);
     const [headingP, setHeadingP] = useState(0);
     const [tickets, setTickets] = useState(DEFAULT_CARDS);
     const [cardP, setCardP] = useState(() => DEFAULT_CARDS.map(() => 0));
@@ -449,14 +287,6 @@ const TicketsSection = () => {
         return () => {
             cancelled = true;
         };
-    }, []);
-
-    useEffect(() => {
-        const mq = window.matchMedia("(max-width: 768px)");
-        const onChange = () => setIsMobile(mq.matches);
-        onChange();
-        mq.addEventListener?.("change", onChange);
-        return () => mq.removeEventListener?.("change", onChange);
     }, []);
 
     // Scroll-driven reveal (bi-directional): fade in while scrolling down,
@@ -521,51 +351,31 @@ const TicketsSection = () => {
             ref={sectionRef}
             className="relative w-full select-none"
         >
-            <div
-                className="relative w-full"
-                style={{
-                    padding: isMobile ? "0 6vw" : "0 clamp(20px, 5vw, 72px)",
-                }}
-            >
+            <div className="relative mx-auto w-full max-w-[1120px] px-5 sm:px-8 md:px-10 xl:px-16">
                 {/* Heading */}
                 <h2
                     ref={headingRef}
-                    className="product_sans w-full"
+                    className="product_sans w-full pt-10 text-center text-[32px] sm:text-[38px] md:pt-14 md:text-[44px] lg:text-[54px] xl:pt-20 xl:text-[64px]"
                     style={{
-                        textAlign: "center",
-                        fontSize: isMobile
-                            ? "clamp(40px, 12.5vw, 62px)"
-                            : "clamp(48px, 8.4vw, 100px)",
                         fontWeight: 500,
                         lineHeight: 0.95,
                         color: "#000000",
-                        paddingTop: isMobile ? "8vw" : "clamp(40px, 6vw, 90px)",
                         opacity: headingP,
                         transform: `translateY(${(1 - headingP) * 26}px)`,
                         transition:
                             "opacity 150ms linear, transform 150ms linear",
                     }}
                 >
-                    Grab your Tickets
+                    Grab your <span style={{ color: RED }}>Tickets</span>
                 </h2>
 
                 {/* Ticket cards — flexible: renders however many the server returns */}
-                <div
-                    className="w-full flex"
-                    style={{
-                        flexWrap: "wrap",
-                        justifyContent: isMobile ? "center" : "center",
-                        gap: isMobile ? "7vw" : "clamp(20px, 3.5vw, 56px)",
-                        marginTop: isMobile ? "6vw" : "clamp(28px, 7vw, 92px)",
-                        marginBottom: "clamp(16px, 3vw, 40px)",
-                    }}
-                >
+                <div className="mt-8 mb-5 flex w-full flex-wrap justify-center gap-7 md:mt-12 md:gap-8 xl:mt-16 xl:mb-8 xl:gap-10">
                     {tickets.map((ticket, key) => (
                         <TicketCard
                             key={ticket.key}
                             ticket={ticket}
                             index={key}
-                            isMobile={isMobile}
                             stampStarted={stampStarted}
                             stampTick={stampTick}
                             reveal={{
@@ -578,28 +388,6 @@ const TicketsSection = () => {
                         />
                     ))}
                 </div>
-
-                {/* Subheading */}
-                <h2
-                    className="product_sans w-full"
-                    style={{
-                        textAlign: "center",
-                        fontSize: isMobile
-                            ? "clamp(40px, 12.5vw, 62px)"
-                            : "clamp(48px, 8.4vw, 100px)",
-                        fontWeight: 500,
-                        lineHeight: 1,
-                        color: "#000000",
-                        paddingTop: isMobile ? "4vw" : "clamp(30px, 4vw, 60px)",
-                        paddingBottom: isMobile
-                            ? "8vw"
-                            : "clamp(40px, 6vw, 90px)",
-                    }}
-                >
-                    Everything you
-                    <br />
-                    need to <span style={{ color: "#4787ea" }}>know....</span>
-                </h2>
             </div>
         </section>
     );
