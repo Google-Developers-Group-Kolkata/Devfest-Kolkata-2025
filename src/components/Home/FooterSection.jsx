@@ -98,7 +98,7 @@ const FooterSection = () => {
     const brandChars = "DevFest Kolkata '26".split("");
 
     return (
-        <div className="w-full px-2 mt-18 pt-12">
+        <div className="w-full">
             <footer className="w-full overflow-hidden rounded-t-4xl bg-[#1e1e1e] text-zinc-100 font-sans shadow-2xl border border-zinc-800">
                 <div className="max-w-7xl mx-auto px-2 pt-12 pb-8 sm:px-10 sm:pt-16 lg:px-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">

@@ -126,20 +126,37 @@
 
 /* D4 hero type sizes live on the elements as Tailwind steps. */
 /* D4 headline — hollow letterforms so the background video reads through
-   them. The stroke inherits `color`, so each line keeps its own hue. */
+   them, with the stroke sitting entirely OUTSIDE each glyph. The stroke
+   inherits `color`, so each line keeps its own hue.
+
+   Why SVG and not `-webkit-text-stroke`: that property can only centre the
+   stroke on the glyph outline, so half its width is spent eating into the
+   letter. At headline sizes that closes up the small counters — the bowls of
+   `e`, `s` and `a` collide with themselves and the word reads as wire. The
+   markup instead paints the stroke at double width and masks the glyph away,
+   which leaves exactly the half that fell outside: a true outer stroke, with
+   every counter at its designed size. */
 .d4-outline {
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke-color: currentColor;
-  -webkit-text-stroke-width: 2px;
-  paint-order: stroke fill;
-  /* The stroke is centred on the glyph outline, so each letter grows by half
-     the stroke width on both sides and the default tracking closes up. Buy it
-     back so the outlines stay separated. */
+  /* An outer stroke grows each letter by its full width on both sides, so the
+     default tracking closes up. Buy it back to keep the outlines separated. */
   letter-spacing: 0.045em;
 }
+.d4-outline text {
+  fill: none;
+  stroke: currentColor;
+  /* Double the intended 2px: the mask discards the inner half. */
+  stroke-width: 4px;
+  /* Sharp corners would otherwise throw spikes well past the letterform. */
+  stroke-linejoin: round;
+}
+/* The knockout copy inside the mask: black hides, so this is the glyph body. */
+.d4-outline mask text {
+  fill: #000;
+  stroke: none;
+}
 @media (min-width: 1024px) {
-  .d4-outline {
-    -webkit-text-stroke-width: 4px;
+  .d4-outline text {
+    stroke-width: 8px;
   }
 }
 

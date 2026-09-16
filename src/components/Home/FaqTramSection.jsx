@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+    motion,
+    useMotionTemplate,
+    useReducedMotion,
+    useScroll,
+    useSpring,
+    useTransform,
+} from "framer-motion";
 
 // station-banner.svg wraps its artwork in an opaque white paper, which would
 // read as a white box over the doodle backdrop the sections scroll across.
@@ -35,7 +43,6 @@ const FAQS = [
 // its arrow. The pole runs down at 15.4% of the width — that column is what
 // has to end up behind the tram.
 const BANNER_ASPECT = "1287 / 1311";
-const BANNER_H_OVER_W = 1311 / 1287;
 const BOARD_BLUE = "#2D4FA1";
 const BOARD = { left: 24.93, top: 11.4, width: 65.74, height: 25.89 };
 
@@ -47,13 +54,14 @@ const STAGE_ASPECT = 3;
 const LAYOUT = {
     desktop: {
         stageWidth: "min(88vw, 132vh)",
-        stageBottom: "4vh",
+        // The tram is parked on the bottom edge of the viewport.
+        stageBottom: "0px",
         bannerWidth: 58, // % of the stage width
         bannerLeft: 43.5, // % of the stage width
         bannerTop: -104.2, // % of the stage height, from its top
         clip: 0.7, // boards are cut off this far (in stage heights) above the stage bottom
-        headCentre: [50, 20], // % of the viewport width — centred, then parked left
-        headMiddle: [36, 36], // % of the viewport height
+        headTop: 36, // % of the viewport height
+        headExit: "112vw", // far enough left to clear the widest line
         line1: "clamp(30px, 5.8vw, 92px)",
         line2: "clamp(34px, 6.4vw, 104px)",
     },
@@ -61,41 +69,44 @@ const LAYOUT = {
         // The tram runs wider than the screen so its body still fills the
         // bottom edge once the board needs most of the width above it.
         stageWidth: "min(150vw, 77vh)",
-        stageBottom: "4vh",
+        stageBottom: "0px",
         bannerWidth: 80,
         bannerLeft: 7,
         bannerTop: -179.5,
         clip: 0.7,
-        headCentre: [50, 34],
-        headMiddle: [40, 19],
+        headTop: 40,
+        headExit: "128vw",
         line1: "9.5vw",
         line2: "10.5vw",
     },
 };
 
-// Scroll spent on the heading before the first board rides up; the rest is one
+// Scroll spent on the heading before the first board rides in; the rest is one
 // slot per board.
 const INTRO = 0.13;
 const RUNWAY_VH = 120 + FAQS.length * 90;
+const SLOT = (1 - INTRO) / FAQS.length;
 
-const clamp01 = (n) => Math.min(1, Math.max(0, n));
+// Where a board's slide sits inside its own slot, in slot units. The entry
+// starts a shade before the slot does so the outgoing board is still leaving
+// as the next one arrives — the boards read as one line of stations passing
+// rather than four separate cuts.
+const ENTER = [-0.05, 0.35];
+const EXIT = [0.78, 1.05];
 
-const smoothstep = (edge0, edge1, x) => {
-    const t = clamp01((x - edge0) / (edge1 - edge0));
-    return t * t * (3 - 2 * t);
-};
+// Nothing precedes the first board, so it pulls away well before its own slot:
+// it is already on its way in while the heading is still on its way out, and
+// since both travel left the two read as one movement instead of a handover
+// with an empty stage in the middle.
+const FIRST_ENTER = 0.045;
 
-const lerp = (a, b, t) => a + (b - a) * t;
+// Smoothstep, the same curve the section used before Framer Motion drove it.
+const EASE = (t) => t * t * (3 - 2 * t);
 
-// How far a board has to drop, as a percentage of its own height, to put its top
-// edge below the clip line — i.e. the shortest travel that hides it completely.
-// Anything beyond that is spent out of sight, so the ride up is timed against
-// this rather than a blanket 100%.
-const travelFor = (L) => {
-    const gap = 1 - L.clip - L.bannerTop / 100; // in stage heights
-    const height = (L.bannerWidth / 100) * STAGE_ASPECT * BANNER_H_OVER_W;
-    return Math.min(100, (gap / height) * 100 + 6);
-};
+// Scroll position is quantised and jumpy — wheel notches, trackpad momentum,
+// mobile fling. Running it through a spring turns each of those steps into a
+// glide, which is what keeps the boards from snapping across the screen.
+const SPRING = { stiffness: 110, damping: 26, mass: 0.35, restDelta: 0.0005 };
 
 // The copy that stands in for the board's original "RAILWAY STATION" lettering.
 // Type is sized in cqw so it tracks the board rather than the viewport, with px
@@ -152,51 +163,81 @@ const BoardCopy = ({ faq, index }) => (
     </div>
 );
 
+// One board's ride: in from the right, hold, out to the left. Both offsets are
+// read off CSS custom properties rather than baked into the motion values, so
+// a switch between the mobile and desktop layouts is picked up by the browser
+// without having to rebuild any of these hooks.
+const Board = ({ faq, index, progress, layout, last }) => {
+    const start = INTRO + index * SLOT;
+
+    const enter = useTransform(
+        progress,
+        [
+            index === 0 ? FIRST_ENTER : start + ENTER[0] * SLOT,
+            start + ENTER[1] * SLOT,
+        ],
+        [1, 0],
+        { ease: EASE },
+    );
+    // The last board holds its place while the section unpins and scrolls away
+    // under its own steam, so it never gets an exit.
+    const exit = useTransform(
+        progress,
+        [start + EXIT[0] * SLOT, start + EXIT[1] * SLOT],
+        [0, last ? 0 : 1],
+        { ease: EASE },
+    );
+
+    const x = useMotionTemplate`calc(var(--board-in) * ${enter} + var(--board-out) * ${exit})`;
+
+    return (
+        <motion.div
+            className="absolute"
+            style={{
+                left: `${layout.bannerLeft}%`,
+                top: `${layout.bannerTop}%`,
+                width: `${layout.bannerWidth}%`,
+                aspectRatio: BANNER_ASPECT,
+                x,
+                zIndex: index,
+            }}
+        >
+            <img
+                src={BANNER_SRC}
+                alt=""
+                draggable={false}
+                className="absolute inset-0 block h-full w-full"
+            />
+            <BoardCopy faq={faq} index={index} />
+        </motion.div>
+    );
+};
+
 const FaqTramSection = () => {
     const sectionRef = useRef(null);
-    const [p, setP] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
-    const [reduced, setReduced] = useState(false);
+    const reduced = useReducedMotion();
 
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 768px)");
-        const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
-        const on = () => {
-            setIsMobile(mq.matches);
-            setReduced(rm.matches);
-        };
+        const on = () => setIsMobile(mq.matches);
         on();
         mq.addEventListener?.("change", on);
-        rm.addEventListener?.("change", on);
-        return () => {
-            mq.removeEventListener?.("change", on);
-            rm.removeEventListener?.("change", on);
-        };
+        return () => mq.removeEventListener?.("change", on);
     }, []);
 
     // Progress through the pinned runway: 0 as the section locks to the top of
     // the viewport, 1 once it has been scrolled all the way through.
-    useEffect(() => {
-        let raf;
-        const update = () => {
-            cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => {
-                const sec = sectionRef.current;
-                if (!sec) return;
-                const rect = sec.getBoundingClientRect();
-                const travel = rect.height - window.innerHeight;
-                setP(travel > 0 ? clamp01(-rect.top / travel) : 0);
-            });
-        };
-        update();
-        window.addEventListener("scroll", update, { passive: true });
-        window.addEventListener("resize", update);
-        return () => {
-            window.removeEventListener("scroll", update);
-            window.removeEventListener("resize", update);
-            cancelAnimationFrame(raf);
-        };
-    }, []);
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ["start start", "end end"],
+    });
+    const p = useSpring(scrollYProgress, SPRING);
+
+    // Heading: centred while the section locks, then slides clean off the left
+    // edge as the first board comes in from the right.
+    const headF = useTransform(p, [0, INTRO], [0, 1], { ease: EASE });
+    const headX = useMotionTemplate`calc(var(--head-out) * ${headF})`;
 
     const L = isMobile ? LAYOUT.mobile : LAYOUT.desktop;
 
@@ -232,7 +273,11 @@ const FaqTramSection = () => {
     // every board is simply listed.
     if (reduced) {
         return (
-            <section id="faqs" className="relative w-full select-none">
+            <section
+                ref={sectionRef}
+                id="faqs"
+                className="relative w-full select-none"
+            >
                 <div className="mx-auto w-full max-w-[1120px] px-5 py-14 sm:px-8 md:px-10 md:py-20 xl:px-16">
                     <div className="text-center md:text-left">{heading}</div>
                     <div className="mt-10 flex flex-col gap-6 md:mt-14">
@@ -295,15 +340,6 @@ const FaqTramSection = () => {
         );
     }
 
-    // Heading: centred while the section locks, then slides left and parks with
-    // the bold line bleeding off the edge.
-    const slide = smoothstep(0, INTRO, p);
-    const centre = lerp(L.headCentre[0], L.headCentre[1], slide);
-    const middle = lerp(L.headMiddle[0], L.headMiddle[1], slide);
-
-    const slot = (1 - INTRO) / FAQS.length;
-    const boardTravel = travelFor(L);
-
     const stageStyle = {
         width: "var(--stage-w)",
         height: "var(--stage-h)",
@@ -323,23 +359,31 @@ const FaqTramSection = () => {
                     "--stage-w": L.stageWidth,
                     "--stage-h": `calc(${L.stageWidth} / ${STAGE_ASPECT})`,
                     "--stage-b": L.stageBottom,
+                    // A board sits at bannerLeft% of the centred stage box, so
+                    // the ride in is whatever puts its left edge just past the
+                    // right edge of the viewport, and the ride out is whatever
+                    // takes its right edge just past the left one.
+                    "--board-in": `calc(52vw + var(--stage-w) * ${(
+                        0.5 -
+                        L.bannerLeft / 100
+                    ).toFixed(4)})`,
+                    "--board-out": `calc(-52vw + var(--stage-w) * ${(
+                        0.5 -
+                        (L.bannerLeft + L.bannerWidth) / 100
+                    ).toFixed(4)})`,
+                    "--head-out": `-${L.headExit}`,
                 }}
             >
                 {/* Frequently / ASKED QUESTIONS */}
-                <div
+                <motion.div
                     className="pointer-events-none absolute left-0 z-10 w-full text-center"
-                    style={{
-                        top: `${middle}%`,
-                        transform: `translate(${centre - 50}vw, -50%) scale(${lerp(1.06, 1, slide)})`,
-                        willChange: "transform",
-                    }}
+                    style={{ top: `${L.headTop}%`, x: headX, y: "-50%" }}
                 >
                     {heading}
-                </div>
+                </motion.div>
 
-                {/* Boards. Clipped part-way down the tram body, so a board that
-                    has not risen yet is nowhere to be seen and the pole reads as
-                    running down behind the tram. */}
+                {/* Boards. Clipped part-way down the tram body, so the pole
+                    reads as running down behind the tram as the board passes. */}
                 <div
                     className="pointer-events-none absolute inset-0 z-20"
                     style={{
@@ -350,46 +394,21 @@ const FaqTramSection = () => {
                         className="absolute left-1/2 -translate-x-1/2"
                         style={stageStyle}
                     >
-                        {FAQS.map((faq, i) => {
-                            // One slot each: ride up, hold, drop back behind the
-                            // tram. The last board stays up while the section
-                            // unpins and scrolls away on its own.
-                            const t = clamp01((p - INTRO) / slot - i);
-                            const rise = smoothstep(0, 0.3, t);
-                            const drop =
-                                i === FAQS.length - 1
-                                    ? 0
-                                    : smoothstep(0.8, 1, t);
-                            const y = ((1 - rise) + drop) * boardTravel;
-
-                            return (
-                                <div
-                                    key={faq.q}
-                                    className="absolute"
-                                    style={{
-                                        left: `${L.bannerLeft}%`,
-                                        top: `${L.bannerTop}%`,
-                                        width: `${L.bannerWidth}%`,
-                                        aspectRatio: BANNER_ASPECT,
-                                        transform: `translate3d(0, ${y}%, 0)`,
-                                        willChange: "transform",
-                                        zIndex: i,
-                                    }}
-                                >
-                                    <img
-                                        src={BANNER_SRC}
-                                        alt=""
-                                        draggable={false}
-                                        className="absolute inset-0 block h-full w-full"
-                                    />
-                                    <BoardCopy faq={faq} index={i} />
-                                </div>
-                            );
-                        })}
+                        {FAQS.map((faq, i) => (
+                            <Board
+                                key={faq.q}
+                                faq={faq}
+                                index={i}
+                                progress={p}
+                                layout={L}
+                                last={i === FAQS.length - 1}
+                            />
+                        ))}
                     </div>
                 </div>
 
-                {/* The tram itself — the one thing that never moves */}
+                {/* The tram itself — parked on the bottom edge, the one thing
+                    that never moves */}
                 <div
                     className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2"
                     style={stageStyle}

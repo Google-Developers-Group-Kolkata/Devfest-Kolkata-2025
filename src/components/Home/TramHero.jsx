@@ -25,6 +25,59 @@ const TILES = [
     { src: "/desktop3/calcutta.webp", left: 72.78, top: 41.31, w: 19.31, h: 28.42, dx: 28, dy: 14, rot: -14 },
 ];
 
+// A headline whose stroke sits outside the glyph rather than straddling it.
+// The invisible copy is what takes part in layout — it keeps the Tailwind type
+// steps, the tracking and the a11y tree working exactly as plain text — and the
+// SVG on top paints the same string at double stroke width, masking the glyph
+// body away so only the outer half of the stroke survives. See `.d4-outline`
+// in globals.css for why `-webkit-text-stroke` cannot do this.
+const OutlineText = ({ text, maskId, className = "", style }) => (
+    <div className={`relative ${className}`} style={style}>
+        <span style={{ color: "transparent" }}>{text}</span>
+        <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            style={{ overflow: "visible" }}
+        >
+            <defs>
+                <mask
+                    id={maskId}
+                    maskUnits="userSpaceOnUse"
+                    x="-20%"
+                    y="-20%"
+                    width="140%"
+                    height="140%"
+                >
+                    <rect
+                        x="-20%"
+                        y="-20%"
+                        width="140%"
+                        height="140%"
+                        fill="#fff"
+                    />
+                    <text
+                        x="50%"
+                        y="50%"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                    >
+                        {text}
+                    </text>
+                </mask>
+            </defs>
+            <text
+                x="50%"
+                y="50%"
+                textAnchor="middle"
+                dominantBaseline="central"
+                mask={`url(#${maskId})`}
+            >
+                {text}
+            </text>
+        </svg>
+    </div>
+);
+
 const TramHero = () => {
     const [show, setShow] = useState(false);
     const [started, setStarted] = useState(false);
@@ -266,11 +319,10 @@ const TramHero = () => {
                         style={{
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 0ms",
-                            filter: "invert(1) hue-rotate(180deg) drop-shadow(0 2px 10px rgba(0,0,0,0.5))",
                         }}
                     >
                         <img
-                            src="/gdg-kolkata-logo.webp"
+                            src="/gdg-kolkata-logo-white.png"
                             alt="GDG Kolkata"
                             draggable={false}
                             className="block w-full h-auto"
@@ -280,25 +332,27 @@ const TramHero = () => {
                     {/* Headline stack — centered on every breakpoint */}
                     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center md:px-10 xl:px-16">
                         {/* DevFest headline */}
-                        <div
+                        <OutlineText
+                            text="DevFest"
+                            maskId="d4-outline-devfest"
                             className="product_sans d4-outline whitespace-nowrap text-[38px] sm:text-[50px] md:text-[70px] lg:text-[92px] xl:text-[116px] 2xl:text-[132px]"
                             style={{
                                 fontWeight: 700,
                                 lineHeight: 1,
                                 color: "#ffffff",
-                                // drop-shadow, not text-shadow: with a transparent
-                                // fill a text-shadow would blur through the hollow
+                                // drop-shadow, not text-shadow: with a hollow
+                                // letterform a text-shadow would blur through the
                                 // centres instead of hugging the stroke.
                                 filter: "drop-shadow(0 2px 12px rgba(0,0,0,0.55))",
                                 opacity: d4In ? 1 : 0,
                                 transition: "opacity 900ms ease 150ms",
                             }}
-                        >
-                            DevFest
-                        </div>
+                        />
 
                         {/* Kolkata'26 */}
-                        <div
+                        <OutlineText
+                            text={"Kolkata\u201926"}
+                            maskId="d4-outline-kolkata"
                             className="product_sans d4-outline mt-[0.04em] whitespace-nowrap text-[31px] sm:text-[41px] md:text-[57px] lg:text-[75px] xl:text-[94px] 2xl:text-[107px]"
                             style={{
                                 fontWeight: 500,
@@ -308,9 +362,7 @@ const TramHero = () => {
                                 opacity: d4In ? 1 : 0,
                                 transition: "opacity 900ms ease 300ms",
                             }}
-                        >
-                            Kolkata&rsquo;26
-                        </div>
+                        />
 
                         {/* Bengali tagline */}
                         <div
