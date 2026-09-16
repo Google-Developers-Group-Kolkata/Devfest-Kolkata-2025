@@ -54,14 +54,14 @@ export default function Support() {
         <div className="bg-gray-50 flex flex-col min-h-screen">
             <main className="max-w-3xl mx-auto px-6 py-10 bg-gray-50 text-gray-800">
                 <h1 className="text-4xl font-bold text-blue-600 mb-6">
-                    Devfest Kolkata 2025– Support
+                    Devfest Kolkata 2026– Support
                 </h1>
 
                 {/* Intro Section */}
                 <section className="mb-8">
                     <p>
                         Welcome to the support page for{" "}
-                        <strong>Devfest Kolkata 2025</strong>. We're here to
+                        <strong>Devfest Kolkata 2026</strong>. We're here to
                         help you with any questions or issues you might have.
                     </p>
                 </section>
@@ -238,7 +238,7 @@ export default function Support() {
                 <section>
                     <p>
                         Thank you for visiting{" "}
-                        <strong>Devfest Kolkata 2025</strong>!
+                        <strong>Devfest Kolkata 2026</strong>!
                     </p>
                 </section>
             </main>

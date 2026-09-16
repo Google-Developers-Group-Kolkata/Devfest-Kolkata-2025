@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -10,10 +9,13 @@ import {
     FaYoutube,
     FaGithub,
     FaFacebook,
-    FaArrowRight,
-    FaCheck,
-    FaEnvelope,
+    FaPeopleGroup,
+    FaArrowUpRightFromSquare,
 } from "react-icons/fa6";
+
+// The chapter's own page on GDG's community platform, where every GDG Kolkata
+// event is listed and people can join.
+const COMMUNITY_URL = "https://gdg.community.dev/gdg-kolkata/";
 
 const SOCIAL_LINKS = [
     {
@@ -54,52 +56,41 @@ const SOCIAL_LINKS = [
     },
 ];
 
+// Two kinds of entry. `section` scrolls to a section of this page through the
+// ref TramHero holds for it — no hash in the url, so nothing to keep in sync
+// with the markup. `href` leaves the page, and every one of those opens in a
+// new tab so a reader checking the terms doesn't lose their place.
 const FOOTER_NAV = [
     {
         title: "Event",
         links: [
-            { label: "Overview", href: "/#overview" },
-            { label: "Mystery Speakers", href: "/#speakers" },
-            { label: "Our Team", href: "/team" },
-            { label: "FAQ", href: "/#faq" },
-        ],
-    },
-    {
-        title: "Community",
-        links: [
-            { label: "GDG Kolkata", href: "https://gdg.community.dev/gdg-kolkata/" },
-            { label: "Women Techmakers", href: "https://devfestkolkata.in" },
-            { label: "Google Developers", href: "https://developers.google.com" },
-            { label: "Become Volunteer", href: "https://devfestkolkata.in" },
+            { label: "Overview", section: "about" },
+            { label: "Tickets", section: "tickets" },
+            { label: "Venue", section: "venue" },
+            { label: "Our Team", section: "team" },
+            { label: "FAQ", section: "faqs" },
         ],
     },
     {
         title: "Guidelines",
         links: [
-            { label: "Code of Conduct", href: "https://devfestkolkata.in" },
-            { label: "Community Terms", href: "https://devfestkolkata.in" },
-            { label: "Privacy Policy", href: "https://devfestkolkata.in" },
+            { label: "Privacy Policy", href: "/privacy-policy" },
+            { label: "Terms of Use", href: "/terms-of-use" },
+            { label: "Support", href: "/support" },
         ],
     },
 ];
 
-const FooterSection = () => {
-    const [email, setEmail] = useState("");
-    const [subscribed, setSubscribed] = useState(false);
+// One look for both, so the column reads as a list either way.
+const NAV_ITEM =
+    "text-left text-sm text-zinc-400 hover:text-white transition-colors duration-150";
 
-    const handleSubscribe = (e) => {
-        e.preventDefault();
-        if (email.trim()) {
-            setSubscribed(true);
-            setEmail("");
-        }
-    };
-
+const FooterSection = ({ onNavigate }) => {
     const brandChars = "DevFest Kolkata '26".split("");
 
     return (
         <div className="w-full">
-            <footer className="w-full overflow-hidden rounded-t-4xl bg-[#1e1e1e] text-zinc-100 font-sans shadow-2xl border border-zinc-800">
+            <footer className="w-full overflow-hidden bg-[#1e1e1e] text-zinc-100 font-sans shadow-2xl border border-zinc-800">
                 <div className="max-w-7xl mx-auto px-2 pt-12 pb-8 sm:px-10 sm:pt-16 lg:px-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
                         {/* 1. Brand & Socials */}
@@ -169,12 +160,26 @@ const FooterSection = () => {
                                     <ul className="flex flex-col gap-2.5">
                                         {section.links.map((link) => (
                                             <li key={link.label}>
-                                                <Link
-                                                    href={link.href}
-                                                    className="text-sm text-zinc-400 hover:text-white transition-colors duration-150"
-                                                >
-                                                    {link.label}
-                                                </Link>
+                                                {link.section ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            onNavigate?.(link.section)
+                                                        }
+                                                        className={`${NAV_ITEM} cursor-pointer`}
+                                                    >
+                                                        {link.label}
+                                                    </button>
+                                                ) : (
+                                                    <a
+                                                        href={link.href}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={NAV_ITEM}
+                                                    >
+                                                        {link.label}
+                                                    </a>
+                                                )}
                                             </li>
                                         ))}
                                     </ul>
@@ -182,68 +187,49 @@ const FooterSection = () => {
                             ))}
                         </div>
 
-                        {/* 3. Newsletter */}
+                        {/* 3. Community */}
                         <div
+                            // The id is older than this card, which used to hold
+                            // the newsletter sign-up. Nothing on the site links
+                            // to it, but an old post might, and it still lands on
+                            // the same place in the footer.
                             id="register"
                             className="lg:col-span-4 flex flex-col gap-4 bg-zinc-900/90 rounded-2xl p-6 border border-zinc-800 shadow-inner scroll-mt-28"
                         >
                             <div className="flex items-center gap-2">
-                                <div className="size-8 rounded-lg bg-[#EA4335]/15 text-[#EA4335] flex items-center justify-center">
-                                    <FaEnvelope className="size-4" />
+                                <div className="size-8 rounded-lg bg-[#4285F4]/15 text-[#4285F4] flex items-center justify-center">
+                                    <FaPeopleGroup className="size-4" />
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-bold text-white tracking-tight">
-                                        DevFest Dispatch
+                                        GDG Kolkata Community
                                     </h4>
                                     <p className="text-xs text-zinc-400">
-                                        Never miss a drop or announcement
+                                        Meetups, study jams and DevFest news
                                     </p>
                                 </div>
                             </div>
 
                             <p className="text-xs text-zinc-400 leading-relaxed">
-                                Subscribe to get mystery speaker reveals, ticket
-                                announcements, and workshop registration links sent
-                                straight to your inbox.
+                                Join the chapter to hear about speaker reveals,
+                                ticket drops and workshop registrations first — and
+                                to find every event we run through the year.
                             </p>
 
-                            {subscribed ? (
-                                <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-emerald-400 text-xs font-medium duration-300">
-                                    <FaCheck
-                                        className="size-4 shrink-0 text-emerald-400"
-                                    />
-                                    <span>
-                                        You&apos;re subscribed! Stay tuned for
-                                        speaker &amp; ticket drops.
-                                    </span>
-                                </div>
-                            ) : (
-                                <form
-                                    onSubmit={handleSubscribe}
-                                    className="flex flex-col gap-2.5"
+                            <div className="flex flex-col gap-2.5">
+                                <a
+                                    href={COMMUNITY_URL}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#EA4335] hover:bg-[#d93025] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
                                 >
-                                    <div className="relative">
-                                        <input
-                                            type="email"
-                                            required
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="Enter your email address..."
-                                            className="w-full rounded-xl bg-zinc-950 border border-zinc-700/80 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4] transition-all"
-                                        />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#EA4335] hover:bg-[#d93025] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
-                                    >
-                                        <span>Join Mailing List</span>
-                                        <FaArrowRight className="size-3" />
-                                    </button>
-                                    <span className="text-[10px] text-zinc-500 text-center">
-                                        No spam. Unsubscribe anytime.
-                                    </span>
-                                </form>
-                            )}
+                                    <span>Join the Community</span>
+                                    <FaArrowUpRightFromSquare className="size-3" />
+                                </a>
+                                <span className="text-[10px] text-zinc-500 text-center">
+                                    Free to join · opens gdg.community.dev
+                                </span>
+                            </div>
                         </div>
                     </div>
 

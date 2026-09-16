@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import VenueSection from "./VenueSection";
@@ -79,6 +79,16 @@ const OutlineText = ({ text, maskId, className = "", style }) => (
     </div>
 );
 
+// Where the logo comes to rest, top left. The intro logo animates to exactly
+// this on "Start the experience" and Desktop 4 mounts its own white logo into
+// it, so the handover between the two artworks neither moves nor resizes.
+// Kept as one string because the moment the two disagree, the logo jumps.
+const LOGO_HOME =
+    "left-5 top-10 w-[150px] md:left-10 md:w-[200px] lg:w-[270px] xl:left-16 xl:w-[300px]";
+
+// Where it starts: big, and centred on the intro screen.
+const LOGO_INTRO = "left-1/2 top-[38%] w-[min(78vw,78vh)]";
+
 const TramHero = () => {
     const [show, setShow] = useState(false);
     const [started, setStarted] = useState(false);
@@ -143,6 +153,31 @@ const TramHero = () => {
         return () => clearTimeout(t);
     }, []);
 
+    // The footer navigates by scrolling to these rather than by changing the
+    // url to a hash. This is the one component that renders both the sections
+    // and the footer, so the refs belong here.
+    const sectionRefs = {
+        about: useRef(null),
+        tickets: useRef(null),
+        venue: useRef(null),
+        team: useRef(null),
+        faqs: useRef(null),
+    };
+
+    const scrollToSection = (key) => {
+        const el = sectionRefs[key]?.current;
+        if (!el) return;
+        // Smooth, unless the reader has asked for less motion — a long
+        // animated scroll is exactly what that setting is about.
+        const reduced = window.matchMedia?.(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+        el.scrollIntoView({
+            behavior: reduced ? "auto" : "smooth",
+            block: "start",
+        });
+    };
+
     // Enter or Space starts the experience while the intro is on screen.
     useEffect(() => {
         if (started) return;
@@ -156,11 +191,10 @@ const TramHero = () => {
         return () => window.removeEventListener("keydown", onKey);
     }, [started]);
 
-    // Big centered logo -> Desktop 3 style small top-left logo (54,32 / 266x47)
+    // Big centered logo -> LOGO_HOME. Only the parts that need no breakpoints
+    // live here; `left`, `top` and `width` come from the two class strings and
+    // still transition, since the transition is declared on this element.
     const logoStyle = {
-        left: started ? "3.75%" : "50%",
-        top: started ? "3.1%" : "38%",
-        width: started ? "min(15vw, 15vh)" : "min(78vw, 78vh)",
         transform: !show
             ? "translateX(-50%) scale(0.55)"
             : started
@@ -196,9 +230,12 @@ const TramHero = () => {
                 />
             </div>
 
-            {/* GDG Kolkata logo — fades in centered, then on "Start" animates up
-                to the small Desktop 3 top-left position */}
-            <div className="absolute" style={logoStyle}>
+            {/* GDG Kolkata logo — fades in centered, then on "Start" animates
+                up to LOGO_HOME, where Desktop 4's white logo takes over from it */}
+            <div
+                className={`absolute ${started ? LOGO_HOME : LOGO_INTRO}`}
+                style={logoStyle}
+            >
                 <img
                     src="/gdg-kolkata-logo.webp"
                     alt="GDG Kolkata"
@@ -316,7 +353,7 @@ const TramHero = () => {
                     {/* GDG logo — top left. Inverted (hue kept) so the black
                         wordmark reads as white against the footage. */}
                     <div
-                        className="absolute z-10 pointer-events-none left-5 top-10 w-[150px] md:left-10 md:w-[200px] lg:w-[270px] xl:left-16 xl:w-[300px]"
+                        className={`absolute z-10 pointer-events-none ${LOGO_HOME}`}
                         style={{
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 0ms",
@@ -490,11 +527,21 @@ const TramHero = () => {
                 </div>
 
                 <div className="relative">
-                    <AboutSection />
-                    <TicketsSection />
-                    <VenueSection />
-                    <TeamSection />
-                    <FaqTramSection />
+                    <div ref={sectionRefs.about}>
+                        <AboutSection />
+                    </div>
+                    <div ref={sectionRefs.tickets}>
+                        <TicketsSection />
+                    </div>
+                    <div ref={sectionRefs.venue}>
+                        <VenueSection />
+                    </div>
+                    <div ref={sectionRefs.team}>
+                        <TeamSection />
+                    </div>
+                    <div ref={sectionRefs.faqs}>
+                        <FaqTramSection />
+                    </div>
                 </div>
             </div>
         )}
@@ -502,7 +549,7 @@ const TramHero = () => {
             /* The pinned hero is positioned (z-0), so it would paint over an
                in-flow footer — keep the footer on the same layer as the panel. */
             <div className="relative z-10">
-                <FooterSection />
+                <FooterSection onNavigate={scrollToSection} />
             </div>
         )}
         </>

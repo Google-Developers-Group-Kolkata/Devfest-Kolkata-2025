@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
                 Privacy Policy
             </h1>
             <p className="text-gray-600 text-sm mb-6">
-                Effective date: <strong>13/09/2025</strong>
+                Effective date: <strong>13/09/2026</strong>
             </p>
 
             {/* Section 1 */}
@@ -353,10 +353,10 @@ export default function PrivacyPolicy() {
 
             <footer className="text-sm text-gray-600 mt-6">
                 <p>
-                    Last updated: <strong>13/09/2025</strong>
+                    Last updated: <strong>13/09/2026</strong>
                 </p>
                 <p>
-                    © 2025 Google Developer Groups Kolkata. All rights reserved.
+                    © 2026 Google Developer Groups Kolkata. All rights reserved.
                 </p>
             </footer>
         </main>
