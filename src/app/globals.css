@@ -151,6 +151,24 @@
     font-size: min(2.43vw, 40px);
   }
 }
+/* D4 headline — hollow letterforms so the background video reads through
+   them. The stroke inherits `color`, so each line keeps its own hue. */
+.d4-outline {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-color: currentColor;
+  -webkit-text-stroke-width: 2px;
+  paint-order: stroke fill;
+  /* The stroke is centred on the glyph outline, so each letter grows by half
+     the stroke width on both sides and the default tracking closes up. Buy it
+     back so the outlines stay separated. */
+  letter-spacing: 0.045em;
+}
+@media (min-width: 1024px) {
+  .d4-outline {
+    -webkit-text-stroke-width: 4px;
+  }
+}
+
 /* D4 tram — portrait phones keep the big tram; short landscape gets a
    small tram so it stays at the bottom instead of covering the text */
 .d4-tram {
@@ -320,6 +338,24 @@
   animation: tram-slide 6.5s cubic-bezier(0.33, 0, 0.2, 1) forwards;
 }
 
+/* D4 scroll cue — gentle nudge down */
+.d4-scroll-cue {
+  animation: d4-scroll-cue 1.9s ease-in-out infinite;
+}
+
+/* Only Y here — Tailwind v4 centers the cue with the `translate` property,
+   which composes with `transform` instead of being overwritten by it. */
+@keyframes d4-scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(10px);
+  }
+}
+
 /* Coming Soon overlay entrance */
 .cs-overlay {
   animation: cs-overlay-in 400ms ease both;
@@ -412,6 +448,10 @@
   .tram-slide {
     animation: none;
     transform: translateX(100vw);
+  }
+
+  .d4-scroll-cue {
+    animation: none;
   }
 }
 
@@ -528,7 +568,11 @@
     overflow-x: hidden;
   }
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
+    /* overflow-x lives on <html> only: the root's value propagates to the
+       viewport, so horizontal scroll is still clipped, while `body` stays a
+       non-scroll-container — setting it here would turn body into body's own
+       scrollport and silently break every `position: sticky` descendant. */
+    @apply bg-background text-foreground;
     font-family: var(--font-google-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }

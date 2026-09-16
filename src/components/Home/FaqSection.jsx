@@ -66,7 +66,7 @@ const FaqSection = () => {
     return (
         <section
             id="faqs"
-            className="relative w-full bg-white select-none"
+            className="relative w-full select-none"
         >
             <div
                 className="w-full flex"

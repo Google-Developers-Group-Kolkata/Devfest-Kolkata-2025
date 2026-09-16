@@ -519,7 +519,7 @@ const TicketsSection = () => {
         <section
             id="tickets"
             ref={sectionRef}
-            className="relative w-full bg-white select-none"
+            className="relative w-full select-none"
         >
             <div
                 className="relative w-full"

@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
+import VenueSection from "./VenueSection";
 import FaqSection from "./FaqSection";
 import FooterSection from "./FooterSection";
+
+// Looping, muted YouTube footage behind the Desktop 4 hero.
+const HERO_VIDEO_SRC =
+    "https://www.youtube-nocookie.com/embed/tcrpjKyCQ2g?autoplay=1&mute=1&loop=1&playlist=tcrpjKyCQ2g&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1";
 
 // Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
 // Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
@@ -116,8 +121,11 @@ const TramHero = () => {
     return (
         <>
         <div
-            className="relative h-screen supports-[height:100dvh]:h-dvh w-full overflow-hidden select-none"
-            style={{ backgroundColor: "#ffffff", overflowX: "hidden" }}
+            className="sticky top-0 z-0 h-screen supports-[height:100dvh]:h-dvh w-full overflow-hidden select-none"
+            style={{
+                backgroundColor: d4 ? "#000000" : "#ffffff",
+                overflowX: "hidden",
+            }}
         >
             {!d4 && (
             <>
@@ -216,29 +224,53 @@ const TramHero = () => {
             </>
             )}
 
-            {/* ===== Desktop 4 hero — everything fades in except the tram,
-                  which slides in from the left -> right (same animation) ===== */}
+            {/* Background footage — mounted a beat early so YouTube can buffer
+                while the collage scatters, then cross-fades in with Desktop 4 */}
+            {(scatter || d4) && (
+                <div
+                    className="absolute inset-0 overflow-hidden pointer-events-none"
+                    style={{
+                        backgroundColor: "#000000",
+                        opacity: d4In ? 1 : 0,
+                        transition: "opacity 900ms ease",
+                        zIndex: 0,
+                    }}
+                >
+                    <iframe
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-0 pointer-events-none"
+                        style={{
+                            // 16:9 blown up to cover the viewport in both axes
+                            width: "max(100vw, 177.78vh)",
+                            height: "max(100vh, 56.25vw)",
+                            filter: "contrast(110%) brightness(90%)",
+                        }}
+                        src={HERO_VIDEO_SRC}
+                        title="DevFest Hero Background Video"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    />
+                    {/* Scrim — keeps the white headline readable over the footage */}
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            background:
+                                "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.65) 100%)",
+                        }}
+                    />
+                </div>
+            )}
+
+            {/* ===== Desktop 4 hero — centered over the looping background video ===== */}
             {d4 && (
                 <>
-                    {/* Tram re-runs its left->right slide */}
+                    {/* GDG logo — top left. Inverted (hue kept) so the black
+                        wordmark reads as white against the footage. */}
                     <div
-                        key="d4-tram"
-                        className="tram-slide d4-tram absolute left-0 will-change-transform pointer-events-none"
-                    >
-                        <img
-                            src="/hero-tram/tram.webp"
-                            alt=""
-                            draggable={false}
-                            className="block w-full h-auto"
-                        />
-                    </div>
-
-                    {/* GDG logo — top left */}
-                    <div
-                        className="absolute pointer-events-none left-[4.79%] top-[2.5%] lg:top-[6.64%] w-[min(32vw,130px)] lg:w-[min(22vw,323px)]"
+                        className="absolute z-10 pointer-events-none left-[4.79%] top-[2.5%] lg:top-[5%] w-[min(32vw,130px)] lg:w-[min(22vw,323px)]"
                         style={{
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 0ms",
+                            filter: "invert(1) hue-rotate(180deg) drop-shadow(0 2px 10px rgba(0,0,0,0.5))",
                         }}
                     >
                         <img
@@ -249,114 +281,98 @@ const TramHero = () => {
                         />
                     </div>
 
-                    {/* Nav — right edge (upper area) */}
-                    <div
-                        className="absolute product_sans left-[2%] right-[2%] top-[9.5%] lg:left-auto lg:right-[1.5%] lg:top-[6.64%] lg:w-auto flex flex-row items-center justify-center gap-x-[8px] gap-y-[4px] flex-wrap lg:flex-col lg:items-end lg:gap-[8px]"
-                        style={{
-                            opacity: d4In ? 1 : 0,
-                            transition: "opacity 900ms ease 700ms",
-                        }}
-                    >
-                        {[["Home", "#4787ea", "home", "scroll"],
-                            ["About", "#000000", "about", "section"],
-                            ["Speaker", "#000000", "speakers", "soon"],
-                            ["Tickets", "#000000", "tickets", "section"],
-                            ["Agenda", "#000000", "agenda", "soon"],
-                            ["FAQs", "#000000", "faqs", "section"],
-                        ].map(([label, color, id, kind]) => (
-                            <a
-                                key={label}
-                                href={kind === "ticket" ? "/ticket" : `#${id}`}
-                                onClick={(e) => {
-                                    if (kind === "ticket") return;
-                                    e.preventDefault();
-                                    if (kind === "soon") {
-                                        setComingSoonItem(label);
-                                        return;
-                                    }
-                                    setComingSoonItem(null);
-                                    if (kind === "scroll") {
-                                        window.scrollTo({ top: 0, behavior: "smooth" });
-                                        return;
-                                    }
-                                    document
-                                        .getElementById(id)
-                                        ?.scrollIntoView({
-                                            behavior: "smooth",
-                                            block: "start",
-                                        });
-                                }}
-                                className="whitespace-nowrap leading-none cursor-pointer hover:opacity-60 transition-opacity"
-                                style={{
-                                    fontSize: "min(2.08vw, 30px)",
-                                    color,
-                                    textDecoration: "none",
-                                }}
-                            >
-                                {label}
-                            </a>
-                        ))}
+                    {/* Headline stack — centered on every breakpoint */}
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center pointer-events-none">
+                        {/* DevFest headline */}
+                        <div
+                            className="product_sans d4-devfest d4-outline whitespace-nowrap"
+                            style={{
+                                fontWeight: 700,
+                                lineHeight: 1,
+                                color: "#ffffff",
+                                // drop-shadow, not text-shadow: with a transparent
+                                // fill a text-shadow would blur through the hollow
+                                // centres instead of hugging the stroke.
+                                filter: "drop-shadow(0 2px 12px rgba(0,0,0,0.55))",
+                                opacity: d4In ? 1 : 0,
+                                transition: "opacity 900ms ease 150ms",
+                            }}
+                        >
+                            DevFest
+                        </div>
+
+                        {/* Kolkata'26 */}
+                        <div
+                            className="product_sans d4-kolkata d4-outline whitespace-nowrap mt-[0.04em]"
+                            style={{
+                                fontWeight: 500,
+                                lineHeight: 1,
+                                color: "#4285f4",
+                                filter: "drop-shadow(0 2px 12px rgba(0,0,0,0.55))",
+                                opacity: d4In ? 1 : 0,
+                                transition: "opacity 900ms ease 300ms",
+                            }}
+                        >
+                            Kolkata&rsquo;26
+                        </div>
+
+                        {/* Bengali tagline */}
+                        <div
+                            className="product_sans d4-bengali mt-[0.9em] max-w-[90vw]"
+                            style={{
+                                lineHeight: 1.35,
+                                color: "#ffffff",
+                                textShadow: "0 2px 18px rgba(0,0,0,0.6)",
+                                opacity: d4In ? 1 : 0,
+                                transition: "opacity 900ms ease 450ms",
+                            }}
+                        >
+                            কলকাতার ছন্দে, DevFest-এর আনন্দে !
+                        </div>
+
+                        {/* Get Tickets button */}
+                        <a
+                            href="#tickets"
+                            className="product_sans d4-tickets pointer-events-auto mt-[1.5em] flex items-center justify-center cursor-pointer select-none rounded-full whitespace-nowrap transition-transform duration-200 hover:scale-105"
+                            style={{
+                                padding: "0 clamp(20px, 3vw, 32px)",
+                                height: "clamp(42px, 6vw, 56px)",
+                                lineHeight: "1",
+                                border: "4px solid transparent",
+                                borderRadius: "50px",
+                                background:
+                                    "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(98deg, #F63130 0%, #4787EA 35%, #34A853 72%, #FBBC04 100%) border-box",
+                                color: "#000000",
+                                opacity: d4In ? 1 : 0,
+                                transition: "opacity 900ms ease 600ms, transform 200ms ease",
+                            }}
+                        >
+                            Get Tickets
+                        </a>
                     </div>
 
-                    {/* DevFest headline */}
-                    <div
-                        className="absolute product_sans d4-devfest pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[30%] top-[20%] portrait:top-[26%] lg:top-[20.4%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
-                        style={{
-                            fontWeight: 700,
-                            lineHeight: 1,
-                            color: "#000000",
-                            opacity: d4In ? 1 : 0,
-                            transition: "opacity 900ms ease 150ms",
-                        }}
-                    >
-                        DevFest
-                    </div>
-
-                    {/* Kolkata'26 */}
-                    <div
-                        className="absolute product_sans d4-kolkata pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[31%] top-[32%] portrait:top-[33%] lg:top-[37.3%] whitespace-nowrap max-w-[90vw] lg:max-w-none"
-                        style={{
-                            fontWeight: 500,
-                            lineHeight: 1,
-                            color: "#4285f4",
-                            opacity: d4In ? 1 : 0,
-                            transition: "opacity 900ms ease 300ms",
-                        }}
-                    >
-                        Kolkata&rsquo;26
-                    </div>
-
-                    {/* Bengali tagline */}
-                    <div
-                        className="absolute product_sans d4-bengali pointer-events-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[33%] top-[43%] portrait:top-[39%] lg:top-[54.79%] max-w-[90vw] lg:max-w-none text-center lg:text-left whitespace-normal lg:whitespace-nowrap"
-                        style={{
-                            lineHeight: 1,
-                            color: "#000000",
-                            opacity: d4In ? 1 : 0,
-                            transition: "opacity 900ms ease 450ms",
-                        }}
-                    >
-                        কলকাতার ছন্দে, DevFest-এর আনন্দে !
-                    </div>
-
-                    {/* Get Tickets button */}
+                    {/* Scroll cue */}
                     <a
-                        href="#tickets"
-                        className="absolute product_sans d4-tickets flex items-center justify-center cursor-pointer select-none left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[41.74%] top-[62%] portrait:top-[48%] lg:top-[68%] rounded-full whitespace-nowrap"
+                        href="#about"
+                        aria-label="Scroll to about section"
+                        className="d4-scroll-cue absolute z-10 left-1/2 -translate-x-1/2 bottom-[5%] flex items-center justify-center rounded-full p-2"
                         style={{
-                            padding: "0 32px",
-                            height: "56px",
-                            lineHeight: "1",
-                            border: "4px solid transparent",
-                            borderRadius: "50px",
-                            background:
-                                "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(98deg, #F63130 0%, #4787EA 35%, #34A853 72%, #FBBC04 100%) border-box",
-                            color: "#000000",
                             opacity: d4In ? 1 : 0,
-                            transition: "opacity 900ms ease 600ms",
+                            transition: "opacity 900ms ease 750ms",
                         }}
                     >
-                        Get Tickets
+                        <svg
+                            viewBox="0 0 24 24"
+                            className="w-[clamp(20px,2.4vw,30px)] h-auto"
+                            fill="none"
+                            stroke="#ffffff"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path d="M5 9l7 7 7-7" />
+                        </svg>
                     </a>
 
                     {/* Coming Soon overlay — blurs the whole screen until Home */}
@@ -415,10 +431,50 @@ const TramHero = () => {
                 </>
             )}
         </div>
-        {d4 && <AboutSection />}
-        {d4 && <TicketsSection />}
-        {d4 && <FaqSection />}
-        {d4 && <FooterSection />}
+        {d4 && (
+            <div
+                className="relative z-10 w-full bg-white rounded-t-[clamp(20px,3vw,44px)]"
+                style={{ boxShadow: "0 -24px 60px rgba(0,0,0,0.28)" }}
+            >
+                {/* Kolkata doodle backdrop — one continuous layer that holds
+                    still while About / Tickets / FAQ scroll over it. No
+                    overflow here on purpose: an overflow ancestor would become
+                    the sticky child's scrollport and kill the effect. */}
+                {/* overflow `clip`, not `hidden`: it trims the backdrop to the
+                    panel's rounded top without turning this box into a
+                    scrollport, which would freeze the sticky layer inside. */}
+                <div
+                    id="doodle-backdrop"
+                    className="pointer-events-none absolute inset-0 rounded-t-[clamp(20px,3vw,44px)]"
+                    aria-hidden="true"
+                    style={{ overflow: "clip" }}
+                >
+                    <div
+                        className="sticky top-0 h-screen supports-[height:100dvh]:h-dvh w-full"
+                        style={{
+                            backgroundImage: "url(/background.svg)",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center top",
+                            backgroundRepeat: "no-repeat",
+                        }}
+                    />
+                </div>
+
+                <div className="relative">
+                    <AboutSection />
+                    <TicketsSection />
+                    <VenueSection />
+                    <FaqSection />
+                </div>
+            </div>
+        )}
+        {d4 && (
+            /* The pinned hero is positioned (z-0), so it would paint over an
+               in-flow footer — keep the footer on the same layer as the panel. */
+            <div className="relative z-10">
+                <FooterSection />
+            </div>
+        )}
         </>
     );
 };
