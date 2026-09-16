@@ -44,10 +44,10 @@ export async function POST(request) {
         const ticketData = await request.json();
 
         // Make sure the collection exists
-        await ensureCollectionExists("attendees");
+        await ensureCollectionExists("attendees2026");
 
         // Store complete ticket data in Firestore (all fields dynamically)
-        const docRef = await db.collection("attendees").add({
+        const docRef = await db.collection("attendees2026").add({
             id: ticketData.Id,
             module: ticketData.Module,
             eventType: ticketData["Event Type"],
@@ -57,7 +57,7 @@ export async function POST(request) {
         });
 
         // Cleanup sentinel if it was created (no-op if it doesn't exist)
-        await db.collection("attendees").doc("_init").delete();
+        await db.collection("attendees2026").doc("_init").delete();
 
         return NextResponse.json(
             {
