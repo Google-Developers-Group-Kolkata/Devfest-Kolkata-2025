@@ -67,28 +67,6 @@
       }
     },
     {
-      "id": 8,
-      "name": "Subhadip Saha",
-      "role": "Web Dev",
-      "image": "/team/Subhadip Saha.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/subhadipsahaofficial",
-        "instagram": "https://instagram.com/subh05sus_"
-      }
-    },
-    {
-      "id": 9,
-      "name": "Subinoy Biswas",
-      "role": "Web Dev",
-      "image": "/team/Subinoy Biswas.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/heysubinoy",
-        "instagram": "https://instagram.com/biswas.subinoy"
-      }
-    },
-    {
       "id": 10,
       "name": "Subhadip Das",
       "role": "Web Dev",
@@ -133,17 +111,6 @@
       }
     },
     {
-      "id": 15,
-      "name": "Rahul Khandait",
-      "role": "PR and Outreach",
-      "image": "/team/Rahul Khandait.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/rahulkhandait",
-        "instagram": "https://instagram.com/rahulkhandait_sde"
-      }
-    },
-    {
       "id": 18,
       "name": "Titash Shil",
       "role": "PR and Outreach",
@@ -155,42 +122,9 @@
       }
     },
     {
-      "id": 19,
-      "name": "Sayantika Dey",
-      "role": "Emcee",
-      "image": "/team/Sayantika Dey.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/sayantika-dey-232b80271",
-        "instagram": "https://instagram.com/sayantika_dey"
-      }
-    },
-    {
-      "id": 20,
-      "name": "Gurdil Singh",
-      "role": "Photography / Videography",
-      "image": "/team/Gurdil Singh.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/gurdil-singh-05124b339",
-        "instagram": "https://instagram.com/photographicgurdil_68"
-      }
-    },
-    {
-      "id": 21,
-      "name": "Pawan Sharma",
-      "role": "Photography / Videography",
-      "image": "/team/Pawan.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/pawan-sharma-243a82249",
-        "instagram": "https://instagram.com/_pawa.n_"
-      }
-    },
-    {
       "id": 22,
       "name": "Soumyadeep Halder",
-      "role": "Photography / Videography",
+      "role": "Videography",
       "image": "/team/Soumyadeep Halder.png",
       "socialLinks": {
         "twitter": "https://x.com",
@@ -198,17 +132,7 @@
         "instagram": "https://instagram.com/smydppp"
       }
     },
-    {
-      "id": 23,
-      "name": "Prativa Dhar",
-      "role": "Social Media",
-      "image": "/team/Prativa Dhar.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://linkedin.com/in/prativa-dhar-707389304",
-        "instagram": "https://instagram.com/prativa_sparkwr"
-      }
-    },
+
     {
       "id": 24,
       "name": "Sweety Jha",
@@ -251,17 +175,6 @@
         "twitter": "https://x.com",
         "linkedin": "https://linkedin.com/in/suchinta-chanda",
         "instagram": "https://instagram.com/raj_.suchinta_"
-      }
-    },
-    {
-      "id": 28,
-      "name": "Ananya Chatterjee",
-      "role": "Emcee",
-      "image": "/team/Ananya Chatterjee.png",
-      "socialLinks": {
-        "twitter": "https://x.com",
-        "linkedin": "https://www.linkedin.com/in/ananyachatterjee012",
-        "instagram": "https://instagram.com/ananya_titli"
       }
     }
   ],

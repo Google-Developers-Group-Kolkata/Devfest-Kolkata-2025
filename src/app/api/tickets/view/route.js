@@ -48,7 +48,9 @@ export async function GET() {
         const snap = await db.collection("devfest2026-tickets").get();
         if (snap.empty) throw new Error("No tickets in Firebase");
 
-        // Firestore doc shape: color, isActive, isCommingSoon, price, title, url
+        // Firestore doc shape: color, isActive, isCommingSoon, price, title,
+        // url, and optionally venue and date, which override the event-wide
+        // strings the card otherwise prints.
         const tickets = snap.docs.map((doc, index) => {
             const d = doc.data();
             const color = String(d.color ?? "").toLowerCase();
@@ -58,6 +60,8 @@ export async function GET() {
                 // Stored as a string ("299") — kept verbatim for display.
                 price: d.price ?? null,
                 url: d.url ?? null,
+                venue: d.venue ?? null,
+                date: d.date ?? null,
                 isActive: d.isActive ?? false,
                 // Note the field's spelling in Firestore; the corrected one is
                 // accepted too, in case the doc is ever fixed up.

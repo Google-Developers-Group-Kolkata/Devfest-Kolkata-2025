@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 
 const RED = "#F63130";
+const INK = "#0B0B0B";
 
-// Ticket shape (scalloped edges + the stub notch top and bottom) comes from
-// these assets. Their own 474x234 box is the coordinate system for everything
-// below, and the card is stretched to exactly that box. Which one a card wears
-// is the `color` field on its Firestore doc; `accent` is that artwork's fill,
-// reused for anything drawn on top of white.
+// Ticket artwork: the coloured border, the white body inside it, the corner
+// radius and every notch come from these assets. Their own 959x317 box is the
+// coordinate system for everything drawn on top, and the card is stretched to
+// exactly that box. Which one a card wears is the `color` field on its
+// Firestore doc; `accent` is that artwork's fill, reused for the perforation
+// dashes and the purchase pill.
 const PALETTE = {
     red: { bg: "/ticket/background-red.svg", accent: "#F63130" },
     blue: { bg: "/ticket/background-blue.svg", accent: "#4285F4" },
@@ -18,6 +20,31 @@ const PALETTE = {
 
 const paletteFor = (color) =>
     PALETTE[String(color ?? "").toLowerCase()] ?? PALETTE.red;
+
+const TICKET_W = 959;
+const TICKET_H = 317;
+
+// The artwork's landmarks, read off the asset in its own units. The two
+// perforations are the notch pairs top and bottom, and they cut the ticket
+// into three stubs: barcode, middle, price.
+const BODY = { left: 14.23, right: 945.43, top: 11.25, bottom: 304.44 };
+const PERF_L = 143.12;
+const PERF_R = 740.1;
+const NOTCH_TOP = 37.72; // where the top notches bottom out
+const NOTCH_BOTTOM = 277.97; // and where the bottom pair begins
+
+const px = (v) => `${(v / TICKET_W) * 100}%`;
+const py = (v) => `${(v / TICKET_H) * 100}%`;
+// The card holds a fixed aspect ratio, so one artwork unit is the same
+// fraction of its width whichever axis it is measured on: `cq` sizes the type
+// and the gaps, which have to scale with the card rather than the viewport.
+const cq = (v) => `${(v / TICKET_W) * 100}cqw`;
+
+// Venue and date are the same on every ticket, so they live here rather than
+// in each Firestore doc — a doc can still override either with its own
+// `venue` or `date` string.
+const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
+const EVENT_DATE = "22nd November, 2026";
 
 // Clips an overlay to the ticket silhouette, so nothing leaks past the notches.
 const maskWith = (bg) => ({
@@ -29,15 +56,59 @@ const maskWith = (bg) => ({
     maskRepeat: "no-repeat",
 });
 
-// Card text scales with the card itself (cqw), so it only needs to step down
-// as the ticket name gets longer.
+// The name sits in the price stub, which is only 205 units wide, so a long
+// one has to step down to keep to three lines.
 const nameSizeFor = (name) => {
     const n = (name || "").length;
-    if (n <= 14) return "6.6cqw";
-    if (n <= 22) return "5.4cqw";
-    if (n <= 34) return "4.3cqw";
-    return "3.6cqw";
+    if (n <= 12) return cq(23);
+    if (n <= 18) return cq(21);
+    if (n <= 28) return cq(18);
+    return cq(15);
 };
+
+// Type on the card scales with the card, which holds down to roughly a 520px
+// ticket and turns to specks below it. `floor` keeps the pieces that carry
+// meaning — name, price, the purchase pill — legible on a phone, and the
+// venue and date, which no floor can fit into their share of a 350px ticket,
+// are dropped there instead: the Venue section right below says both.
+const floor = (min, size) => `max(${min}px, ${size})`;
+
+// The barcode is decoration, not a scannable symbol: the bars are derived from
+// the ticket's purchase url, so they are stable between renders and differ from
+// ticket to ticket, with nothing extra to ship or to store. Even indices are
+// bars, odd ones the gaps between them. It reads turned a quarter-turn, the way
+// a stub barcode does, so the bars run across the stub and the scan axis down
+// it — which is also what gives them room: 225 of the artwork's units to stack
+// in rather than the stub's 75 of width.
+const BAR_COUNT = 25;
+
+const barsFor = (seed) => {
+    let h = 2166136261;
+    const key = String(seed ?? "ticket");
+    for (let i = 0; i < key.length; i++) {
+        h = Math.imul(h ^ key.charCodeAt(i), 16777619);
+    }
+    const bars = [];
+    for (let i = 0; i < BAR_COUNT; i++) {
+        h = Math.imul(h ^ (h >>> 15), 2246822507);
+        bars.push(1 + ((h >>> 9) % 3));
+    }
+    return bars;
+};
+
+const Barcode = ({ seed }) => (
+    <div className="flex h-full w-full flex-col items-stretch" aria-hidden="true">
+        {barsFor(seed).map((weight, i) => (
+            <div
+                key={i}
+                style={{
+                    flex: `${weight} 0 0`,
+                    background: i % 2 ? "transparent" : INK,
+                }}
+            />
+        ))}
+    </div>
+);
 
 const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket }) => {
     const live = ticket?.live && ticket?.url;
@@ -47,15 +118,16 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
     // everything else that can't be bought yet reads as coming soon.
     const stampLabel =
         !isDefault && !ticket?.isActive ? "Sold Out" : "Coming Soon";
+    const name = ticket?.name || "Super Early Bird";
     return (
         <div
             ref={revealRef}
             onClick={() => {
                 if (live) window.open(ticket.url, "_blank", "noopener,noreferrer");
             }}
-            className="relative w-full max-w-[360px] shrink-0 grow-0 overflow-hidden md:w-[290px] lg:w-[320px] xl:w-[360px]"
+            className="relative w-full max-w-[760px] overflow-hidden"
             style={{
-                aspectRatio: "474 / 234",
+                aspectRatio: `${TICKET_W} / ${TICKET_H}`,
                 containerType: "inline-size",
                 backgroundImage: `url(${bg})`,
                 backgroundSize: "100% 100%",
@@ -67,95 +139,178 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                 cursor: live ? "pointer" : "default",
             }}
         >
-            {/* Dashed stub perforation, run between the notches of the artwork */}
+            {/* The two stub perforations, run between the notches so the dashes
+                start and stop exactly where the artwork is cut. */}
             <svg
-                viewBox="0 0 474 234"
+                viewBox={`0 0 ${TICKET_W} ${TICKET_H}`}
                 className="pointer-events-none absolute inset-0 h-full w-full"
                 aria-hidden="true"
             >
-                <path
-                    d="M 118 27 V 207"
-                    stroke="#FFFFFF"
-                    strokeWidth="2.2"
-                    strokeDasharray="9 7.5"
-                    strokeLinecap="round"
-                />
+                {[PERF_L, PERF_R].map((x) => (
+                    <path
+                        key={x}
+                        d={`M ${x} ${NOTCH_TOP + 4} V ${NOTCH_BOTTOM - 4}`}
+                        stroke={accent}
+                        strokeWidth="2.6"
+                        strokeDasharray="10 8"
+                        strokeLinecap="round"
+                    />
+                ))}
             </svg>
 
-            {/* Stub: rotated -90deg so it reads bottom-to-top along the perforation */}
+            {/* Barcode stub. The quarter-turn is in the bars themselves —
+                stacked rather than side by side — because turning this box
+                instead would swing its 225 units of height across a stub only
+                129 wide. A ticket with no url yet falls back to its own key, so
+                the coming-soon cards still differ from each other. */}
             <div
-                className="pointer-events-none absolute flex items-center"
+                className="pointer-events-none absolute"
                 style={{
-                    left: 0,
-                    top: "100%",
-                    width: "49.37cqw",
-                    height: "24.9cqw",
-                    transform: "rotate(-90deg)",
-                    transformOrigin: "left top",
-                    gap: "3.5cqw",
-                    paddingLeft: "4.5cqw",
+                    left: px(BODY.left + 27),
+                    top: py(46),
+                    width: px(PERF_L - BODY.left - 54),
+                    height: py(225),
+                }}
+            >
+                <Barcode seed={ticket?.url || ticket?.key} />
+            </div>
+
+            {/* Middle stub: the lockup, then the venue and date either side of
+                the memorial's dome. */}
+            <div
+                className="pointer-events-none absolute flex items-center justify-center"
+                style={{
+                    left: px(PERF_L),
+                    width: px(PERF_R - PERF_L),
+                    top: py(36),
+                    height: py(52),
+                    gap: cq(13),
                 }}
             >
                 <img
-                    src="/logo-brackets-white.svg"
+                    src="/logo-brackets.svg"
                     alt=""
-                    style={{ width: "6.2cqw", height: "auto", flex: "0 0 auto" }}
+                    style={{ height: cq(38), width: "auto", flex: "0 0 auto" }}
                 />
-                <div
-                    className="product_sans flex flex-col whitespace-nowrap"
+                <span
+                    className="product_sans whitespace-nowrap"
                     style={{
-                        gap: "2.6cqw",
-                        color: "#FFFFFF",
+                        fontSize: cq(46),
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        color: INK,
+                        letterSpacing: "-0.01em",
+                    }}
+                >
+                    DevFest
+                </span>
+                <span
+                    className="product_sans whitespace-nowrap"
+                    style={{
+                        background: "#ECECEC",
+                        color: INK,
+                        borderRadius: "999px",
+                        padding: `${floor(3, cq(7))} ${floor(7, cq(16))}`,
+                        fontSize: floor(9, cq(21)),
                         fontWeight: 500,
                         lineHeight: 1,
                     }}
                 >
-                    <span style={{ fontSize: "2.8cqw" }}>Google Developer Group</span>
-                    <span style={{ fontSize: "3.2cqw" }}>Kolkata</span>
-                </div>
+                    Kolkata
+                </span>
             </div>
 
-            {/* Main stub: name, price, and the purchase CTA when the ticket is live */}
             <div
-                className="absolute flex flex-col items-center justify-center text-center"
+                className="product_sans pointer-events-none absolute @max-[520px]:hidden"
                 style={{
-                    left: "24.9%",
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    padding: "4% 5% 6.25% 5%",
-                    gap: "4.5cqw",
+                    left: px(PERF_L + 30),
+                    top: py(101),
+                    width: px(175),
+                    fontSize: cq(16.5),
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                    color: INK,
                 }}
             >
+                {ticket?.venue || EVENT_VENUE}
+            </div>
+
+            <div
+                className="product_sans pointer-events-none absolute text-right @max-[520px]:hidden"
+                style={{
+                    right: px(TICKET_W - PERF_R + 26),
+                    top: py(101),
+                    width: px(150),
+                    fontSize: cq(16.5),
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                    color: INK,
+                }}
+            >
+                {ticket?.date || EVENT_DATE}
+            </div>
+
+            <img
+                src="/ticket/victoria-memorial.svg"
+                alt=""
+                className="pointer-events-none absolute"
+                style={{
+                    left: px((PERF_L + PERF_R) / 2 - 186),
+                    bottom: py(TICKET_H - BODY.bottom + 2),
+                    width: px(372),
+                    height: "auto",
+                }}
+            />
+
+            {/* Price stub: the ticket's name up top, its price low down, and
+                the purchase pill below that once the ticket is buyable. */}
+            <div
+                className="product_sans pointer-events-none absolute text-center"
+                title={name}
+                style={{
+                    left: px(PERF_R),
+                    width: px(BODY.right - PERF_R),
+                    top: py(42),
+                    padding: `0 ${cq(14)}`,
+                    fontSize: floor(11, nameSizeFor(name)),
+                    fontWeight: 500,
+                    lineHeight: 1.25,
+                    color: INK,
+                    textTransform: "uppercase",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    overflowWrap: "anywhere",
+                }}
+            >
+                {name}
+            </div>
+
+            <div
+                className="product_sans pointer-events-none absolute text-center whitespace-nowrap"
+                style={{
+                    left: px(PERF_R),
+                    width: px(BODY.right - PERF_R),
+                    bottom: py(live ? 104 : 74),
+                    fontSize: floor(12, cq(23)),
+                    fontWeight: 500,
+                    lineHeight: 1,
+                    color: INK,
+                }}
+            >
+                {ticket?.priceLabel || "Rs. 299"}
+            </div>
+
+            {live && (
                 <div
-                    className="product_sans pointer-events-none"
-                    title={ticket?.name}
+                    className="absolute flex justify-center"
                     style={{
-                        fontSize: nameSizeFor(ticket?.name),
-                        fontWeight: 500,
-                        lineHeight: 1.15,
-                        color: "#FFFFFF",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        overflowWrap: "anywhere",
+                        left: px(PERF_R),
+                        width: px(BODY.right - PERF_R),
+                        bottom: py(30),
                     }}
                 >
-                    {ticket?.name || "Super Early Bird"}
-                </div>
-                <div
-                    className="product_sans pointer-events-none whitespace-nowrap"
-                    style={{
-                        fontSize: "3.2cqw",
-                        fontWeight: 500,
-                        lineHeight: 1,
-                        color: "#FFFFFF",
-                    }}
-                >
-                    {ticket?.priceLabel || "Rs. 299"}
-                </div>
-                {live && (
                     <a
                         href={ticket.url}
                         target="_blank"
@@ -163,11 +318,11 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                         onClick={(e) => e.stopPropagation()}
                         className="product_sans"
                         style={{
-                            background: "#FFFFFF",
-                            color: accent,
+                            background: accent,
+                            color: "#FFFFFF",
                             borderRadius: "999px",
-                            padding: "1.2cqw 4cqw",
-                            fontSize: "2.9cqw",
+                            padding: `${floor(4, cq(8))} ${floor(7, cq(22))}`,
+                            fontSize: floor(10, cq(18)),
                             fontWeight: 500,
                             lineHeight: 1,
                             textDecoration: "none",
@@ -175,41 +330,40 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                     >
                         Purchase
                     </a>
-                )}
-            </div>
+                </div>
+            )}
 
-            {/* Howrah Bridge skyline along the bottom of the main stub */}
-            <img
-                src="/ticket/howrah_bridge.svg"
-                alt=""
-                className="pointer-events-none absolute"
-                style={{ left: "33.5%", bottom: "4%", width: "58%", height: "auto" }}
-            />
-
-            {/* Full-cover stamp — Coming Soon on default cards, SOLD OUT on server sold-out cards */}
+            {/* Full-cover stamp — Coming Soon on default cards, Sold Out on a
+                server ticket Firebase has switched off */}
             {!live && (
                 <div
-                    className="pointer-events-none absolute inset-0 flex items-center"
+                    className="pointer-events-none absolute inset-0"
                     style={{
                         // Masked with the same asset, so the scrim never leaks
-                        // past the notches. It also mutes the name and price so
+                        // past the notches. It also mutes the stub contents so
                         // the stamp reads over them instead of fighting them.
                         background: isDefault
-                            ? "rgba(0,0,0,0.45)"
-                            : "rgba(0,0,0,0.35)",
+                            ? "rgba(0,0,0,0.38)"
+                            : "rgba(0,0,0,0.30)",
                         ...maskWith(bg),
                     }}
                 >
+                    {/* Sat between the venue line and the price rather than
+                        mid-card: it lands on the memorial, the one band of the
+                        ticket that carries no words. */}
                     <div
-                        className="product_sans w-full text-center"
+                        className="product_sans absolute w-full text-center"
                         style={{
+                            top: py(148),
+                            left: 0,
                             background: "#FFFFFF",
-                            color: "#0B0B0B",
-                            padding: "2.6cqw 0",
-                            fontSize: "5cqw",
+                            color: INK,
+                            padding: `${cq(11)} 0`,
+                            fontSize: floor(14, cq(34)),
                             fontWeight: 500,
                             lineHeight: 1,
                             letterSpacing: "0.01em",
+                            boxShadow: "0 2px 14px rgba(0,0,0,0.30)",
                         }}
                     >
                         {stampLabel}
@@ -232,8 +386,8 @@ const DEFAULT_CARDS = ["red", "blue", "green"].map((color, i) => ({
     source: "default",
 }));
 
-// Firestore doc (color, isActive, isCommingSoon, price, title, url) -> card
-// model. A card is buyable only when it is active, not coming soon, and carries
+// Firestore doc (color, isActive, isCommingSoon, price, title, url, and
+// optionally venue and date) -> card model. A card is buyable only when it is active, not coming soon, and carries
 // a purchase link.
 const toCard = (t, i) => {
     const url = t.url || null;
@@ -245,6 +399,9 @@ const toCard = (t, i) => {
         priceLabel: t.price != null ? `Rs. ${t.price}` : "Rs. 299",
         url,
         color: t.color,
+        // Both optional: the card falls back to the event-wide strings.
+        venue: t.venue || null,
+        date: t.date || null,
         isActive,
         isComingSoon,
         live: isActive && !isComingSoon && !!url,
@@ -369,8 +526,11 @@ const TicketsSection = () => {
                     Grab your <span style={{ color: RED }}>Tickets</span>
                 </h2>
 
-                {/* Ticket cards — flexible: renders however many the server returns */}
-                <div className="mt-8 mb-5 flex w-full flex-wrap justify-center gap-7 md:mt-12 md:gap-8 xl:mt-16 xl:mb-8 xl:gap-10">
+                {/* Ticket cards — flexible: renders however many the server
+                    returns. One to a row: the artwork is close to 3:1, so
+                    side by side would leave the venue and date too small to
+                    read at any sensible page width. */}
+                <div className="mt-8 mb-5 flex w-full flex-col items-center gap-6 md:mt-12 md:gap-7 xl:mt-16 xl:mb-8 xl:gap-8">
                     {tickets.map((ticket, key) => (
                         <TicketCard
                             key={ticket.key}

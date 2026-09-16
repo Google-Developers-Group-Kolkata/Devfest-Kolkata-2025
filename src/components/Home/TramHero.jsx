@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import VenueSection from "./VenueSection";
+import TeamSection from "./TeamSection";
 import FaqTramSection from "./FaqTramSection";
 import FooterSection from "./FooterSection";
 
@@ -315,14 +316,14 @@ const TramHero = () => {
                     {/* GDG logo — top left. Inverted (hue kept) so the black
                         wordmark reads as white against the footage. */}
                     <div
-                        className="absolute z-10 pointer-events-none left-5 top-5 w-[96px] md:left-10 md:w-[130px] lg:w-[170px] xl:left-16 xl:w-[200px]"
+                        className="absolute z-10 pointer-events-none left-5 top-10 w-[150px] md:left-10 md:w-[200px] lg:w-[270px] xl:left-16 xl:w-[300px]"
                         style={{
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 0ms",
                         }}
                     >
                         <img
-                            src="/gdg-kolkata-logo-white.png"
+                            src="/gdg-kolkata-logo-white.svg"
                             alt="GDG Kolkata"
                             draggable={false}
                             className="block w-full h-auto"
@@ -335,7 +336,7 @@ const TramHero = () => {
                         <OutlineText
                             text="DevFest"
                             maskId="d4-outline-devfest"
-                            className="product_sans d4-outline whitespace-nowrap text-[38px] sm:text-[50px] md:text-[70px] lg:text-[92px] xl:text-[116px] 2xl:text-[132px]"
+                            className="product_sans d4-outline whitespace-nowrap text-[48px] sm:text-[50px] md:text-[70px] lg:text-[92px] xl:text-[116px] 2xl:text-[132px]"
                             style={{
                                 fontWeight: 700,
                                 lineHeight: 1,
@@ -492,6 +493,7 @@ const TramHero = () => {
                     <AboutSection />
                     <TicketsSection />
                     <VenueSection />
+                    <TeamSection />
                     <FaqTramSection />
                 </div>
             </div>
