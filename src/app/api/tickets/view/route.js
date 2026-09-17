@@ -48,10 +48,17 @@ export async function GET() {
         const snap = await db.collection("devfest2026-tickets").get();
         if (snap.empty) throw new Error("No tickets in Firebase");
 
-        // Firestore doc shape: color, isActive, isCommingSoon, price, title,
-        // url, and optionally venue and date, which override the event-wide
-        // strings the card otherwise prints.
-        const tickets = snap.docs.map((doc, index) => {
+        // `isHidden` takes a ticket off the site without deleting its doc.
+        // Filtered here rather than with a `where` clause on purpose: a
+        // Firestore equality query skips docs that have no `isHidden` field at
+        // all, which would drop every ticket written before the flag existed.
+        // Only an explicit `true` hides a ticket.
+        const visible = snap.docs.filter((doc) => doc.data().isHidden !== true);
+
+        // Firestore doc shape: color, isActive, isCommingSoon, isHidden, price,
+        // title, url, and optionally venue and date, which override the
+        // event-wide strings the card otherwise prints.
+        const tickets = visible.map((doc, index) => {
             const d = doc.data();
             const color = String(d.color ?? "").toLowerCase();
             return {

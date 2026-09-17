@@ -67,6 +67,7 @@ const FOOTER_NAV = [
             { label: "Overview", section: "about" },
             { label: "Tickets", section: "tickets" },
             { label: "Venue", section: "venue" },
+            { label: "Partners", section: "partners" },
             { label: "Our Team", section: "team" },
             { label: "FAQ", section: "faqs" },
         ],

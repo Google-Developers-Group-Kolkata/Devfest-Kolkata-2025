@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import VenueSection from "./VenueSection";
+import PartnersSection from "./PartnersSection";
 import TeamSection from "./TeamSection";
 import FaqSection from "./FaqSection";
 import FooterSection from "./FooterSection";
@@ -170,6 +171,7 @@ const TramHero = () => {
         about: useRef(null),
         tickets: useRef(null),
         venue: useRef(null),
+        partners: useRef(null),
         team: useRef(null),
         faqs: useRef(null),
     };
@@ -547,6 +549,9 @@ const TramHero = () => {
                     </div>
                     <div ref={sectionRefs.venue}>
                         <VenueSection />
+                    </div>
+                    <div ref={sectionRefs.partners}>
+                        <PartnersSection />
                     </div>
                     <div ref={sectionRefs.team}>
                         <TeamSection />
