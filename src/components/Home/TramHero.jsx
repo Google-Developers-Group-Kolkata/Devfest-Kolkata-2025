@@ -385,7 +385,7 @@ const TramHero = () => {
                         <OutlineText
                             text="DevFest"
                             maskId="d4-outline-devfest"
-                            className="product_sans d4-outline whitespace-nowrap text-[48px] sm:text-[50px] md:text-[70px] lg:text-[92px] xl:text-[116px] 2xl:text-[132px]"
+                            className="product_sans d4-outline whitespace-nowrap text-[70px] sm:text-[74px] md:text-[70px] lg:text-[92px] xl:text-[116px] 2xl:text-[132px]"
                             style={{
                                 fontWeight: 700,
                                 lineHeight: 1,
@@ -403,7 +403,7 @@ const TramHero = () => {
                         <OutlineText
                             text={"Kolkata\u201926"}
                             maskId="d4-outline-kolkata"
-                            className="product_sans d4-outline mt-[0.04em] whitespace-nowrap text-[31px] sm:text-[41px] md:text-[57px] lg:text-[75px] xl:text-[94px] 2xl:text-[107px]"
+                            className="product_sans d4-outline mt-[0.04em] whitespace-nowrap text-[46px] sm:text-[50px] md:text-[57px] lg:text-[75px] xl:text-[94px] 2xl:text-[107px]"
                             style={{
                                 fontWeight: 500,
                                 lineHeight: 1,
@@ -416,7 +416,7 @@ const TramHero = () => {
 
                         {/* Bengali tagline */}
                         <div
-                            className="product_sans mt-[0.9em] max-w-[90vw] text-[13px] sm:text-[15px] md:text-[18px] lg:text-[21px] xl:text-[24px]"
+                            className="product_sans mt-[0.9em] max-w-[90vw] text-[17px] sm:text-[19px] md:text-[18px] lg:text-[21px] xl:text-[24px]"
                             style={{
                                 lineHeight: 1.35,
                                 color: "#ffffff",
@@ -432,7 +432,7 @@ const TramHero = () => {
                         <button
                             type="button"
                             onClick={() => scrollToSection("tickets")}
-                            className="product_sans pointer-events-auto mt-[1.5em] flex h-9 cursor-pointer select-none items-center justify-center whitespace-nowrap rounded-full px-5 text-[14px] leading-none transition-transform duration-200 hover:scale-105 md:h-11 md:px-6 md:text-[16px] xl:h-12 xl:px-7 xl:text-[18px]"
+                            className="product_sans pointer-events-auto mt-[1.5em] flex h-12 cursor-pointer select-none items-center justify-center whitespace-nowrap rounded-full px-8 text-[17px] leading-none transition-transform duration-200 hover:scale-105 md:h-11 md:px-6 md:text-[16px] xl:h-12 xl:px-7 xl:text-[18px]"
                             style={{
                                 border: "3px solid transparent",
                                 borderRadius: "50px",
@@ -460,7 +460,7 @@ const TramHero = () => {
                     >
                         <svg
                             viewBox="0 0 24 24"
-                            className="h-auto w-4 md:w-5 xl:w-6"
+                            className="h-auto w-5 md:w-5 xl:w-6"
                             fill="none"
                             stroke="#ffffff"
                             strokeWidth="2"
