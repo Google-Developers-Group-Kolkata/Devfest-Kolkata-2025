@@ -242,6 +242,7 @@ export default function Speakers() {
     const [speakerData, setSpeakerData] = useState([]);
 
     const fetchSpeakers = async () => {
+        if (!db) return;
         try {
             const speakerCollection = collection(db, "released-speakers");
             const speakerSnapshot = await getDocs(speakerCollection);

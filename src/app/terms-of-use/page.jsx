@@ -1,14 +1,14 @@
 import React from "react";
 
 export default function TermsOfUse() {
-    const appName = "Devfest Kolkata 2025";
+    const appName = "Devfest Kolkata 2026";
     return (
         <main className="max-w-4xl mx-auto px-6 py-10 bg-gray-50 text-gray-800">
             <h1 className="text-4xl font-bold text-green-600 mb-4">
                 Terms of Use
             </h1>
             <p className="text-gray-600 text-sm mb-8">
-                Effective date: <strong>13/09/2025</strong>
+                Effective date: <strong>13/09/2026</strong>
             </p>
 
             {/* Section 1 */}
@@ -210,9 +210,9 @@ export default function TermsOfUse() {
             {/* Footer */}
             <footer className="text-sm text-gray-600 mt-8">
                 <p>
-                    Last updated: <strong>13/09/2025</strong>
+                    Last updated: <strong>13/09/2026</strong>
                 </p>
-                <p>© 2025 Google Developer Groups Kolkata. All rights reserved.</p>
+                <p>© 2026 Google Developer Groups Kolkata. All rights reserved.</p>
             </footer>
         </main>
     );

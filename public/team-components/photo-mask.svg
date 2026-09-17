@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="215.727" height="219.73" viewBox="0 0 215.727 219.73">
+<!-- The portrait's clip: the yellow disc from blob.svg, its two widest points
+     carried straight up to the top of the box and left open there, so the head
+     rises clear of the disc while the body is cut to it. The vertical sides meet
+     the curve where its own tangent is vertical, so there is no visible corner.
+     Generated from blob.svg - regenerate if that artwork changes. -->
+<path fill="#fff" fill-rule="evenodd" d="M 191.86 0 L 191.86 102.77 C 191.859 112.762 190.342 123.172 189.908 133.285 C 189.05 153.259 193.101 175.619 177.693 189.895 C 162.209 204.241 137.423 203.71 115.353 202.361 C 95.094 201.122 76.454 194.584 60.878 182.754 C 43.451 169.519 26.996 153.78 24.401 133.285 C 24.038 130.419 23.86 127.551 23.86 124.691 L 23.86 0 Z"/>
+</svg>
