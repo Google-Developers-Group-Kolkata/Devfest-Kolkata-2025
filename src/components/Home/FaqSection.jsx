@@ -28,6 +28,11 @@ const FAQS = [
         q: "How do I get my ticket ?",
         a: "Tap Get Tickets or the Tickets link in the menu, pick your pass and complete your booking instantly.",
     },
+    {
+        n: "05",
+        q: "Can I refund or transfer my ticket ?",
+        a: "Tickets are non-refundable, but they are transferable — if you cannot make it, write to us before the event and we will move your pass to whoever attends in your place.",
+    },
 ];
 
 const Chevron = ({ open }) => (
@@ -90,7 +95,7 @@ const FaqSection = () => {
                         : "clamp(50px, 8vw, 130px)",
                 }}
             >
-                {/* Left block — 04 / ANSWERS */}
+                {/* Left block — 05 / ANSWERS */}
                 <div
                     className="flex flex-col"
                     style={{
@@ -111,7 +116,7 @@ const FaqSection = () => {
                             color: "#c1c1c1",
                         }}
                     >
-                        04
+                        05
                     </div>
                     <div
                         className="product_sans pointer-events-none"
