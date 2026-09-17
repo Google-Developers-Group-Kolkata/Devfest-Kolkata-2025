@@ -20,8 +20,8 @@ const FAQS = [
     },
     {
         n: "03",
-        q: "What is included with the conference pass ?",
-        a: "Access to all talks and workshops, networking with speakers, refreshments and exclusive GDG Kolkata goodies.",
+        q: "Is my Day 1 ticket valid for Day 2 ?",
+        a: "No — each day is ticketed separately. A Day 1 pass admits you on Day 1 only and is not applicable for Day 2, and a Day 2 pass is likewise not applicable for Day 1, so book both passes if you want to attend both days.",
     },
     {
         n: "04",

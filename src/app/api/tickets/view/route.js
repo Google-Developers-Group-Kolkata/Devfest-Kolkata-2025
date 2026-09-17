@@ -40,6 +40,24 @@ const toNumber = (v) => {
     return Number.isFinite(n) ? n : 0;
 };
 
+// Which day of the festival a pass admits to. A doc can say so outright with a
+// `day` of 1 or 2; failing that the day is read off the `date` string it
+// already carries, so passes written before the two-day split still land in
+// the right section. Anything else comes back as null and the section groups
+// it separately rather than dropping it.
+const DAY_DATE_MARKS = { 1: /\b21(st)?\b/i, 2: /\b22(nd)?\b/i };
+
+const dayOf = (d) => {
+    const n = Number(d.day);
+    if (n === 1 || n === 2) return n;
+    const date = String(d.date ?? "");
+    if (!date) return null;
+    for (const [day, mark] of Object.entries(DAY_DATE_MARKS)) {
+        if (mark.test(date)) return Number(day);
+    }
+    return null;
+};
+
 export async function GET() {
     try {
         const db = getDb();
@@ -55,8 +73,8 @@ export async function GET() {
         // Only an explicit `true` hides a ticket.
         const visible = snap.docs.filter((doc) => doc.data().isHidden !== true);
 
-        // Firestore doc shape: color, isActive, isCommingSoon, isHidden, price,
-        // title, url, and optionally venue and date, which override the
+        // Firestore doc shape: color, isActive, isCommingSoon, isHidden, day,
+        // price, title, url, and optionally venue and date, which override the
         // event-wide strings the card otherwise prints.
         const tickets = visible.map((doc, index) => {
             const d = doc.data();
@@ -69,6 +87,7 @@ export async function GET() {
                 url: d.url ?? null,
                 venue: d.venue ?? null,
                 date: d.date ?? null,
+                day: dayOf(d),
                 isActive: d.isActive ?? false,
                 // Note the field's spelling in Firestore; the corrected one is
                 // accepted too, in case the doc is ever fixed up.

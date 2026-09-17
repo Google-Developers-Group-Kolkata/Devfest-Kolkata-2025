@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const RED = "#F63130";
 const INK = "#0B0B0B";
@@ -40,11 +40,23 @@ const py = (v) => `${(v / TICKET_H) * 100}%`;
 // and the gaps, which have to scale with the card rather than the viewport.
 const cq = (v) => `${(v / TICKET_W) * 100}cqw`;
 
-// Venue and date are the same on every ticket, so they live here rather than
-// in each Firestore doc — a doc can still override either with its own
-// `venue` or `date` string.
+// Venue is the same on every ticket, so it lives here rather than in each
+// Firestore doc — a doc can still override it with its own `venue` string.
 const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
-const EVENT_DATE = "22nd November, 2026";
+
+// The festival runs over two days and each day is ticketed on its own. A doc
+// says which one it belongs to with `day`; the API also infers it from the
+// doc's `date` when that field is all it has. The date here is what a pass
+// prints unless its doc overrides it.
+const DAYS = [
+    { day: 1, label: "Day 1", date: "21st November, 2026", accent: "#4285F4" },
+    { day: 2, label: "Day 2", date: "22nd November, 2026", accent: RED },
+];
+
+// Passes whose day cannot be determined still have to appear somewhere.
+const UNGROUPED = { day: null, label: "Other passes", date: null, accent: "#5f6368" };
+
+const EVENT_DATE = DAYS[1].date;
 
 // Clips an overlay to the ticket silhouette, so nothing leaks past the notches.
 const maskWith = (bg) => ({
@@ -115,6 +127,8 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
     // A ticket Firebase has switched off is sold out; one that is still on but
     // flagged coming soon has simply not opened yet.
     const stampLabel = ticket?.isActive ? "Coming Soon" : "Sold Out";
+    // Sold out is struck in red; a pass that simply has not opened is neutral.
+    const stampInk = ticket?.isActive ? INK : RED;
     const name = ticket?.name || "Ticket";
     return (
         <div
@@ -330,38 +344,66 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                 </div>
             )}
 
-            {/* Full-cover stamp — Coming Soon on default cards, Sold Out on a
-                server ticket Firebase has switched off */}
+            {/* Rubber stamp — Coming Soon on a pass that has not opened yet,
+                Sold Out on one Firebase has switched off. */}
             {!live && (
                 <div
                     className="pointer-events-none absolute inset-0"
                     style={{
-                        // Masked with the same asset, so the scrim never leaks
-                        // past the notches. It also mutes the stub contents so
-                        // the stamp reads over them instead of fighting them.
-                        background: "rgba(0,0,0,0.30)",
+                        // Masked with the same asset, so the veil never leaks
+                        // past the notches. Pale rather than dark: it fades the
+                        // pass without dulling the ink the stamp is printed in.
+                        background: "rgba(255,255,255,0.58)",
                         ...maskWith(bg),
                     }}
                 >
-                    {/* Sat between the venue line and the price rather than
-                        mid-card: it lands on the memorial, the one band of the
-                        ticket that carries no words. */}
+                    {/* Over the memorial, the one band of the middle stub that
+                        carries no words — the stamp lands on artwork instead of
+                        across the venue and date. */}
                     <div
-                        className="product_sans absolute w-full text-center"
+                        className="absolute flex items-center justify-center"
                         style={{
-                            top: py(148),
-                            left: 0,
-                            background: "#FFFFFF",
-                            color: INK,
-                            padding: `${cq(11)} 0`,
-                            fontSize: floor(14, cq(34)),
-                            fontWeight: 500,
-                            lineHeight: 1,
-                            letterSpacing: "0.01em",
-                            boxShadow: "0 2px 14px rgba(0,0,0,0.30)",
+                            left: px(PERF_L),
+                            width: px(PERF_R - PERF_L),
+                            top: py(118),
+                            height: py(150),
                         }}
                     >
-                        {stampLabel}
+                        {/* Keyed on the tick so the slam replays each time the
+                            section comes back into view. */}
+                        <div
+                            key={stampTick}
+                            className={stampStarted ? "ticket-stamp-go" : undefined}
+                            style={{
+                                // Where the animation lands, and where the
+                                // stamp sits before it has run.
+                                transform: "rotate(-18deg)",
+                                border: `${floor(3, cq(7))} solid ${stampInk}`,
+                                borderRadius: floor(6, cq(18)),
+                                padding: floor(3, cq(6)),
+                                color: stampInk,
+                                // Ink on paper, not a solid plate.
+                                opacity: 0.88,
+                            }}
+                        >
+                            {/* The thin inner ring of a rubber stamp; the gap
+                                between the two is the border above. */}
+                            <div
+                                className="product_sans whitespace-nowrap"
+                                style={{
+                                    border: `${floor(1, cq(2))} solid ${stampInk}`,
+                                    borderRadius: floor(3, cq(11)),
+                                    padding: `${floor(5, cq(11))} ${floor(9, cq(20))}`,
+                                    fontSize: floor(15, cq(44)),
+                                    fontWeight: 700,
+                                    lineHeight: 1,
+                                    letterSpacing: "0.1em",
+                                    textTransform: "uppercase",
+                                }}
+                            >
+                                {stampLabel}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
@@ -369,7 +411,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
     );
 };
 
-// Firestore doc (color, isActive, isCommingSoon, price, title, url, and
+// Firestore doc (color, isActive, isCommingSoon, day, price, title, url, and
 // optionally venue and date) -> card model. A card is buyable only when it is active, not coming soon, and carries
 // a purchase link.
 const toCard = (t, i) => {
@@ -385,11 +427,69 @@ const toCard = (t, i) => {
         // Both optional: the card falls back to the event-wide strings.
         venue: t.venue || null,
         date: t.date || null,
+        // 1, 2, or null when Firebase gives nothing to go on.
+        day: t.day ?? null,
         isActive,
         isComingSoon,
         live: isActive && !isComingSoon && !!url,
     };
 };
+
+// The cards, split into the day sections the page shows. Every configured day
+// gets a section whether or not it has passes yet — an empty one says sales
+// have not opened rather than leaving the day unmentioned — and anything whose
+// day Firebase could not supply is grouped at the end so it is never dropped.
+// `index` is the card's position in the flat list, which is what the reveal
+// animation tracks its progress by.
+const groupByDay = (tickets) => {
+    let index = 0;
+    const take = (group) => ({
+        ...group,
+        cards: tickets
+            .filter((t) => t.day === group.day)
+            .map((ticket) => ({
+                // The day's date is what the pass prints unless its own doc
+                // spells one out.
+                ticket: { ...ticket, date: ticket.date || group.date },
+                index: index++,
+            })),
+    });
+    const days = DAYS.map(take);
+    const rest = take(UNGROUPED);
+    return rest.cards.length ? [...days, rest] : days;
+};
+
+// Day heading — the label over its date, under a short bar in the day's colour.
+const DayHeading = ({ group, progress }) => (
+    <div
+        className="flex w-full flex-col items-center"
+        style={{
+            opacity: progress,
+            transform: `translateY(${(1 - progress) * 18}px)`,
+            transition: "opacity 150ms linear, transform 150ms linear",
+        }}
+    >
+        <div
+            aria-hidden="true"
+            className="h-[4px] w-10 rounded-full md:w-12"
+            style={{ background: group.accent }}
+        />
+        <div
+            className="product_sans mt-3 text-[22px] md:mt-4 md:text-[26px] xl:text-[30px]"
+            style={{ fontWeight: 600, lineHeight: 1.1, color: INK }}
+        >
+            {group.label}
+        </div>
+        {group.date && (
+            <div
+                className="product_sans mt-1 text-[14px] md:text-[16px] xl:text-[17px]"
+                style={{ fontWeight: 400, color: "#5f6368" }}
+            >
+                {group.date}
+            </div>
+        )}
+    </div>
+);
 
 const TicketsSection = () => {
     const [headingP, setHeadingP] = useState(0);
@@ -409,6 +509,9 @@ const TicketsSection = () => {
     useEffect(() => {
         setCardP((prev) => tickets.map((_, i) => prev[i] ?? 0));
     }, [tickets.length]);
+
+    // The day sections, rebuilt whenever Firebase hands over a different list.
+    const groups = useMemo(() => groupByDay(tickets), [tickets]);
 
     // No-auth load: Next.js server fetches Firebase, client just renders.
     // Whatever Firebase returns is the whole list — live ones are buyable, the
@@ -513,38 +616,69 @@ const TicketsSection = () => {
                     Grab your <span style={{ color: RED }}>Tickets</span>
                 </h2>
 
-                {/* Ticket cards — flexible: renders however many the server
-                    returns. One to a row: the artwork is close to 3:1, so
-                    side by side would leave the venue and date too small to
-                    read at any sensible page width. */}
+                {/* Ticket cards, one day section at a time — flexible:
+                    renders however many the server returns for each day. One
+                    card to a row: the artwork is close to 3:1, so side by side
+                    would leave the venue and date too small to read at any
+                    sensible page width. */}
                 <div className="mt-8 mb-5 flex w-full flex-col items-center gap-6 md:mt-12 md:gap-7 xl:mt-16 xl:mb-8 xl:gap-8">
-                    {tickets.map((ticket, key) => (
-                        <TicketCard
-                            key={ticket.key}
-                            ticket={ticket}
-                            index={key}
-                            stampStarted={stampStarted}
-                            stampTick={stampTick}
-                            reveal={{
-                                opacity: cardP[key] ?? 0,
-                                transform: `translateY(${(1 - (cardP[key] ?? 0)) * 22}px) scale(${0.85 + (cardP[key] ?? 0) * 0.15})`,
-                            }}
-                            revealRef={(el) => {
-                                cardRefs.current[key] = el;
-                            }}
-                        />
-                    ))}
-
-                    {/* Only once the fetch has settled — before that the row
+                    {/* Nothing at all from Firebase is one message for the
+                        whole section, not an empty line under every day. Shown
+                        only once the fetch has settled — before that the row
                         stays blank rather than flashing this and replacing it
                         with cards a moment later. */}
-                    {loaded && tickets.length === 0 && (
+                    {loaded && tickets.length === 0 ? (
                         <p
                             className="product_sans text-center text-[15px] md:text-[17px]"
                             style={{ color: "#5f6368" }}
                         >
                             Ticket sales open soon — check back shortly.
                         </p>
+                    ) : (
+                        groups.map((group) => (
+                            <div
+                                key={group.label}
+                                className="flex w-full flex-col items-center gap-6 md:gap-7 xl:gap-8"
+                            >
+                                <DayHeading
+                                    group={group}
+                                    progress={
+                                        // The heading arrives with its first
+                                        // card, or with the section's heading
+                                        // when the day has none.
+                                        group.cards.length
+                                            ? cardP[group.cards[0].index] ?? 0
+                                            : headingP
+                                    }
+                                />
+
+                                {group.cards.map(({ ticket, index }) => (
+                                    <TicketCard
+                                        key={ticket.key}
+                                        ticket={ticket}
+                                        index={index}
+                                        stampStarted={stampStarted}
+                                        stampTick={stampTick}
+                                        reveal={{
+                                            opacity: cardP[index] ?? 0,
+                                            transform: `translateY(${(1 - (cardP[index] ?? 0)) * 22}px) scale(${0.85 + (cardP[index] ?? 0) * 0.15})`,
+                                        }}
+                                        revealRef={(el) => {
+                                            cardRefs.current[index] = el;
+                                        }}
+                                    />
+                                ))}
+
+                                {loaded && group.cards.length === 0 && (
+                                    <p
+                                        className="product_sans text-center text-[15px] md:text-[17px]"
+                                        style={{ color: "#5f6368" }}
+                                    >
+                                        Passes for this day open soon.
+                                    </p>
+                                )}
+                            </div>
+                        ))
                     )}
                 </div>
             </div>

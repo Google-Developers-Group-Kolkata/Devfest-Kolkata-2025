@@ -442,6 +442,13 @@
   .d4-scroll-cue {
     animation: none;
   }
+
+  /* The stamp still has to appear — only the slam is dropped. `.ticket-stamp-go`
+     fills both ways, so without the animation the element keeps the rotation
+     its inline style already sets. */
+  .ticket-stamp-go {
+    animation: none;
+  }
 }
 
 /* Live "Coming Soon" rubber-stamp slam */
