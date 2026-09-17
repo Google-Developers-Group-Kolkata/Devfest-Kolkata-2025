@@ -5,12 +5,11 @@ import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import VenueSection from "./VenueSection";
 import TeamSection from "./TeamSection";
-import FaqTramSection from "./FaqTramSection";
+import FaqSection from "./FaqSection";
 import FooterSection from "./FooterSection";
 
 // Looping, muted YouTube footage behind the Desktop 4 hero.
-const HERO_VIDEO_SRC =
-    "https://www.youtube-nocookie.com/embed/tcrpjKyCQ2g?autoplay=1&mute=1&loop=1&playlist=tcrpjKyCQ2g&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1";
+const HERO_VIDEO_SRC = "https://www.youtube-nocookie.com/embed/tcrpjKyCQ2g?start=6&autoplay=1&mute=1&loop=1&playlist=tcrpjKyCQ2g&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1";
 
 // Desktop 3 collage — Kolkata landmark tiles (design px 1440x1024 -> % of viewport).
 // Each tile also carries a scatter direction (dx/dy in vw/vh, rot in deg).
@@ -89,6 +88,9 @@ const LOGO_HOME =
 // Where it starts: big, and centred on the intro screen.
 const LOGO_INTRO = "left-1/2 top-[38%] w-[min(78vw,78vh)]";
 
+// How long "Start the experience" waits for a click before starting itself.
+const AUTOSTART_MS = 1500;
+
 const TramHero = () => {
     const [show, setShow] = useState(false);
     const [started, setStarted] = useState(false);
@@ -111,6 +113,14 @@ const TramHero = () => {
         return () => mq.removeEventListener?.("change", on);
     }, []);
 
+    // The button is an invitation, not a gate: if it is left alone the intro
+    // moves on by itself rather than waiting on a click that may never come.
+    useEffect(() => {
+        if (!show || started) return;
+        const t = setTimeout(() => setStarted(true), AUTOSTART_MS);
+        return () => clearTimeout(t);
+    }, [show, started]);
+
     // On "Start the experience", reveal the collage tiles one by one.
     useEffect(() => {
         if (!started) return;
@@ -121,7 +131,7 @@ const TramHero = () => {
     // After the last tile has appeared (~2.9s in), scatter all tiles away.
     useEffect(() => {
         if (!tilesIn) return;
-        const t = setTimeout(() => setScatter(true), 2900);
+        const t = setTimeout(() => setScatter(true), 3000);
         return () => clearTimeout(t);
     }, [tilesIn]);
 
@@ -417,8 +427,9 @@ const TramHero = () => {
                         </div>
 
                         {/* Get Tickets button */}
-                        <a
-                            href="#tickets"
+                        <button
+                            type="button"
+                            onClick={() => scrollToSection("tickets")}
                             className="product_sans pointer-events-auto mt-[1.5em] flex h-9 cursor-pointer select-none items-center justify-center whitespace-nowrap rounded-full px-5 text-[14px] leading-none transition-transform duration-200 hover:scale-105 md:h-11 md:px-6 md:text-[16px] xl:h-12 xl:px-7 xl:text-[18px]"
                             style={{
                                 border: "3px solid transparent",
@@ -431,14 +442,15 @@ const TramHero = () => {
                             }}
                         >
                             Get Tickets
-                        </a>
+                        </button>
                     </div>
 
                     {/* Scroll cue */}
-                    <a
-                        href="#about"
+                    <button
+                        type="button"
+                        onClick={() => scrollToSection("about")}
                         aria-label="Scroll to about section"
-                        className="d4-scroll-cue absolute z-10 left-1/2 -translate-x-1/2 bottom-[5%] flex items-center justify-center rounded-full p-2"
+                        className="d4-scroll-cue absolute z-10 left-1/2 -translate-x-1/2 flex cursor-pointer items-center justify-center rounded-full bottom-[5%] p-2"
                         style={{
                             opacity: d4In ? 1 : 0,
                             transition: "opacity 900ms ease 750ms",
@@ -456,7 +468,7 @@ const TramHero = () => {
                         >
                             <path d="M5 9l7 7 7-7" />
                         </svg>
-                    </a>
+                    </button>
 
                     {/* Coming Soon overlay — blurs the whole screen until Home */}
                     {comingSoonItem && (
@@ -540,7 +552,7 @@ const TramHero = () => {
                         <TeamSection />
                     </div>
                     <div ref={sectionRefs.faqs}>
-                        <FaqTramSection />
+                        <FaqSection />
                     </div>
                 </div>
             </div>

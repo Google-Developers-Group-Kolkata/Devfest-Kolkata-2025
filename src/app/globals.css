@@ -18,8 +18,9 @@
     position: absolute;
     z-index: -1;
     inset: 0;
-    padding: 2px;
-    /* Border width */
+    /* Ring thickness. Override --gb-width where a card wants a heavier edge
+       than the default. */
+    padding: var(--gb-width, 2px);
     border-radius: inherit;
     /* Match parent's border radius */
     background: linear-gradient(90deg, #EA4335, #4285F4, #34A853, #FBBC04);
@@ -201,6 +202,17 @@
 
 .animate-marquee-vertical {
   animation: marquee-vertical var(--duration) linear infinite;
+}
+
+/* These two sit outside @layer, so they outrank Tailwind's own
+   `motion-reduce:animate-none` — the guard has to live here instead. A marquee
+   that runs forever is exactly the motion this setting asks us to drop; give
+   the row `overflow-x-auto` alongside so its content stays reachable. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical {
+    animation: none;
+  }
 }
 
 .animate-shimmer {

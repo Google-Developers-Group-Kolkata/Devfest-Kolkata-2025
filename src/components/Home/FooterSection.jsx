@@ -38,7 +38,7 @@ const SOCIAL_LINKS = [
     },
     {
         name: "YouTube",
-        href: "https://www.youtube.com/@GDGKolkata",
+        href: "https://www.youtube.com/@GDGKolkata2025",
         icon: FaYoutube,
         hoverColor: "hover:text-[#EA4335] hover:bg-[#EA4335]/10",
     },

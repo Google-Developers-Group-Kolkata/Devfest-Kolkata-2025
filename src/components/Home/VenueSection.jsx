@@ -13,6 +13,13 @@ const MAPS_URL =
 
 const clamp01 = (n) => Math.min(1, Math.max(0, n));
 
+// Phone layout budget, all inside one pinned screen.
+const EDGE_GAP = 100; // kept clear above the copy and below the card, at rest
+const STACK_GAP = 50; // between the copy and the card (matches `gap-6`)
+// Below this pinned height there is no room to stack copy over card — that is
+// a phone on its side, so it falls back to the side-by-side layout.
+const COMPACT_H = 540;
+
 // Ease so each face is held for a beat and the turn happens through the middle.
 const smoothstep = (edge0, edge1, x) => {
     const t = clamp01((x - edge0) / (edge1 - edge0));
@@ -41,12 +48,22 @@ const FACES = [
     },
 ];
 
-// The copy block for one face. Stacked on top of its sibling and crossfaded, so
-// the column never reflows mid-turn.
+// A tilted card is bigger than its own box. For the 4:6 card at `tilt`, these
+// are its rotated bounding height and width as multiples of its width — the
+// card has to be sized against these, not against its layout box, or it gets
+// clipped by the top and bottom of the pinned screen.
+const TILT_RAD = (Math.abs(FACES[0].tilt) * Math.PI) / 180;
+const CARD_BBOX_H = 1.5 * Math.cos(TILT_RAD) + Math.sin(TILT_RAD);
+const CARD_BBOX_W = Math.cos(TILT_RAD) + 1.5 * Math.sin(TILT_RAD);
+
+// The copy block for one face. Laid over its sibling in the same grid cell and
+// crossfaded, so the column is as tall as the taller face and never reflows
+// mid-turn.
 const FaceCopy = ({ face, opacity, shift, stacked }) => (
     <div
-        className={stacked ? "absolute inset-0" : "relative"}
+        className="relative"
         style={{
+            gridArea: stacked ? "1 / 1" : undefined,
             opacity,
             transform: `translateY(${shift}px)`,
             pointerEvents: opacity > 0.5 ? "auto" : "none",
@@ -119,8 +136,15 @@ const PhotoFace = ({ src, alt, back = false }) => (
 
 const VenueSection = () => {
     const sectionRef = useRef(null);
+    const paneRef = useRef(null);
+    const copyRef = useRef(null);
     const [p, setP] = useState(0);
     const [reduced, setReduced] = useState(false);
+    const [narrow, setNarrow] = useState(false);
+    // Measured, not assumed: the copy wraps differently at every width and
+    // `dvh` moves as the browser chrome hides, so the card can only be sized
+    // once we know how much room the pinned screen actually has.
+    const [box, setBox] = useState({ pane: 0, copy: 0, col: 0 });
 
     useEffect(() => {
         const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -129,6 +153,43 @@ const VenueSection = () => {
         rm.addEventListener?.("change", on);
         return () => rm.removeEventListener?.("change", on);
     }, []);
+
+    // Matches Tailwind's `md` breakpoint: below it the copy sits over the card
+    // instead of beside it, and both have to share one screen's height.
+    useEffect(() => {
+        const mq = window.matchMedia("(max-width: 767px)");
+        const on = () => setNarrow(mq.matches);
+        on();
+        mq.addEventListener?.("change", on);
+        return () => mq.removeEventListener?.("change", on);
+    }, []);
+
+    useEffect(() => {
+        const measure = () => {
+            const pane = paneRef.current;
+            const copy = copyRef.current;
+            if (!pane || !copy) return;
+            setBox((b) =>
+                b.pane === pane.clientHeight &&
+                b.copy === copy.offsetHeight &&
+                b.col === copy.offsetWidth
+                    ? b
+                    : {
+                          pane: pane.clientHeight,
+                          copy: copy.offsetHeight,
+                          col: copy.offsetWidth,
+                      }
+            );
+        };
+        measure();
+        const ro = new ResizeObserver(measure);
+        [paneRef.current, copyRef.current].forEach((n) => n && ro.observe(n));
+        window.addEventListener("resize", measure);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener("resize", measure);
+        };
+    }, [reduced]);
 
     // Progress through the pinned runway: 0 as the section locks to the top of
     // the viewport, 1 once it has been scrolled all the way through.
@@ -154,12 +215,39 @@ const VenueSection = () => {
         };
     }, []);
 
+    // A phone screen has no spare height for a big travel — the same 48px that
+    // reads as a gentle arrival on a desktop drives the title into the top edge.
+    const compact = narrow && box.pane > 0 && box.pane < COMPACT_H;
+    const rise = narrow ? 16 : 48;
+    const settle = narrow ? 12 : 32;
+
     // Hold face one, turn through the middle, hold face two.
     const flip = smoothstep(0.18, 0.82, p);
     // Rise and settle at the ends so the block arrives rather than just sitting.
     const entry = smoothstep(0, 0.16, p);
     const exit = 1 - smoothstep(0.86, 1, p);
-    const lift = (1 - entry) * 48 - (1 - exit) * 32;
+    const lift = (1 - entry) * rise - (1 - exit) * settle;
+
+    // On a phone the card takes whatever the copy leaves behind, measured
+    // against its rotated bounding box so the corners stay on screen. Null on
+    // wider screens and before the first measurement, where the class below
+    // caps it instead.
+    const cardW =
+        narrow && box.pane > 0 && box.copy > 0
+            ? Math.round(
+                  Math.max(
+                      120,
+                      Math.min(
+                          248,
+                          (box.pane -
+                              EDGE_GAP * 2 -
+                              (compact ? 0 : box.copy + STACK_GAP)) /
+                              CARD_BBOX_H,
+                          compact ? Infinity : box.col / CARD_BBOX_W
+                      )
+                  )
+              )
+            : null;
 
     // Copy swaps at the halfway point of the photo's turn, so text and image
     // change over together.
@@ -172,16 +260,19 @@ const VenueSection = () => {
     const SHELL =
         "mx-auto w-full max-w-[1120px] px-5 sm:px-8 md:px-10 xl:px-16";
 
-    // One size for the photo frame, shared by both layouts. The `min()` caps it
-    // against viewport height as well as width, so the portrait card can't
-    // outgrow the pinned screen on a short display.
+    // One size for the photo frame, shared by both layouts. The card keeps the
+    // same portrait ratio at every width. From `md` up the `min()` caps it
+    // against viewport height as well as width, so the card can't outgrow the
+    // pinned screen on a short display: the second term is the width at which
+    // the card's own height reaches that share of the viewport. Below `md` the
+    // phone value is only what shows before `cardW` is measured.
     const PHOTO_FRAME =
-        "relative aspect-[5/4] w-full max-w-[300px] shrink-0 md:aspect-[4/6] md:max-w-[min(300px,calc(74vh*0.66))] lg:max-w-[min(340px,calc(74vh*0.66))] xl:max-w-[min(380px,calc(74vh*0.66))]";
+        "relative aspect-[4/6] w-full max-w-[min(240px,calc(40vh*0.62))] shrink-0 md:max-w-[min(300px,calc(74vh*0.66))] lg:max-w-[min(340px,calc(74vh*0.66))] xl:max-w-[min(380px,calc(74vh*0.66))]";
 
     // The two copy blocks stacked and crossfaded, so the column never reflows
     // mid-turn.
     const copyColumn = (
-        <div className="relative min-h-[190px] w-full md:min-h-[230px] xl:min-h-[290px]">
+        <div ref={copyRef} className="relative grid w-full">
             {/* Brand glow, crossfaded with the copy. Sits behind the text and
                 bleeds past the column — there is no card to contain it now. */}
             <div
@@ -218,7 +309,7 @@ const VenueSection = () => {
                     {FACES.map((face) => (
                         <div
                             key={face.title}
-                            className="flex w-full flex-col items-center gap-8 md:flex-row md:gap-6 lg:gap-8 xl:gap-10"
+                            className="flex w-full flex-col items-center gap-6 md:flex-row md:gap-6 lg:gap-8 xl:gap-10"
                         >
                             <div className="relative w-full">
                                 <div
@@ -248,9 +339,14 @@ const VenueSection = () => {
             className="relative w-full select-none"
             style={{ height: `${RUNWAY_VH}vh` }}
         >
-            <div className="sticky top-0 flex h-screen w-full items-center supports-[height:100dvh]:h-dvh">
+            <div
+                ref={paneRef}
+                className="sticky top-0 flex h-screen w-full items-center supports-[height:100dvh]:h-dvh"
+            >
                 <div
-                    className={`flex w-full flex-col items-center gap-8 md:flex-row md:gap-6 lg:gap-8 xl:gap-10 ${SHELL}`}
+                    className={`flex w-full items-center gap-6 md:flex-row md:gap-6 lg:gap-8 xl:gap-10 ${
+                        compact ? "flex-row" : "flex-col"
+                    } ${SHELL}`}
                     style={{
                         transform: `translateY(${lift}px)`,
                         willChange: "transform",
@@ -267,6 +363,7 @@ const VenueSection = () => {
                             perspective: "1600px",
                             transform: `rotate(${tilt}deg)`,
                             willChange: "transform",
+                            ...(cardW ? { maxWidth: `${cardW}px` } : null),
                         }}
                     >
                         <div

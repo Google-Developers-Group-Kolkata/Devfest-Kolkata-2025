@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Google's own easing curve, shared by the chevron and the answer panel so the
+// two halves of a toggle move as one gesture.
+const EASE = [0.4, 0, 0.2, 1];
 
 const FAQS = [
     {
@@ -26,16 +31,15 @@ const FAQS = [
 ];
 
 const Chevron = ({ open }) => (
-    <svg
+    <motion.svg
         width="26"
         height="26"
         viewBox="0 0 24 24"
         fill="none"
         className="flex-none"
-        style={{
-            transform: open ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "transform 250ms ease",
-        }}
+        initial={false}
+        animate={{ rotate: open ? 180 : 0 }}
+        transition={{ duration: 0.35, ease: EASE }}
     >
         <path
             d="M6 9l6 6 6-6"
@@ -44,7 +48,7 @@ const Chevron = ({ open }) => (
             strokeLinecap="round"
             strokeLinejoin="round"
         />
-    </svg>
+    </motion.svg>
 );
 
 const FaqSection = () => {
@@ -62,6 +66,10 @@ const FaqSection = () => {
     const answersFont = isMobile
         ? "clamp(15px, 4.6vw, 23px)"
         : "clamp(17px, 1.9vw, 23px)";
+    // The gradient ring is painted by a masked pseudo-element rather than a
+    // real border, so the card pads itself by the same amount to keep the
+    // content inset it had.
+    const ring = isMobile ? 3 : 5;
 
     return (
         <section
@@ -137,9 +145,10 @@ const FaqSection = () => {
                         return (
                             <div
                                 key={f.n}
-                                className="bg-black cursor-pointer"
+                                className="google-gradient-border bg-black cursor-pointer"
                                 style={{
-                                    border: `${isMobile ? 3 : 5}px solid #f63130`,
+                                    "--gb-width": `${ring}px`,
+                                    padding: `${ring}px`,
                                     borderRadius: isMobile ? "24px" : "30px",
                                     overflow: "hidden",
                                 }}
@@ -184,30 +193,49 @@ const FaqSection = () => {
                                     </span>
                                     <Chevron open={open} />
                                 </div>
-                                <div
-                                    className="product_sans"
-                                    style={{
-                                        maxHeight: open ? "240px" : "0px",
-                                        overflow: "hidden",
-                                        transition: "max-height 300ms ease",
-                                    }}
-                                >
-                                    <div
-                                        className="product_sans"
-                                        style={{
-                                            padding: isMobile
-                                                ? "0 16px 20px"
-                                                : "0 40px 24px",
-                                            fontSize: isMobile
-                                                ? "clamp(13px, 4vw, 16px)"
-                                                : "clamp(15px, 1.4vw, 18px)",
-                                            lineHeight: 1.5,
-                                            color: "rgba(255,255,255,0.82)",
-                                        }}
-                                    >
-                                        {f.a}
-                                    </div>
-                                </div>
+                                {/* `initial={false}` so the row that starts
+                                    open is simply open on load rather than
+                                    unrolling itself. */}
+                                <AnimatePresence initial={false}>
+                                    {open && (
+                                        <motion.div
+                                            key="answer"
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{
+                                                height: "auto",
+                                                opacity: 1,
+                                            }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{
+                                                height: {
+                                                    duration: 0.35,
+                                                    ease: EASE,
+                                                },
+                                                opacity: {
+                                                    duration: 0.25,
+                                                    ease: "easeInOut",
+                                                },
+                                            }}
+                                            style={{ overflow: "hidden" }}
+                                        >
+                                            <div
+                                                className="product_sans"
+                                                style={{
+                                                    padding: isMobile
+                                                        ? "0 16px 20px"
+                                                        : "0 40px 24px",
+                                                    fontSize: isMobile
+                                                        ? "clamp(13px, 4vw, 16px)"
+                                                        : "clamp(15px, 1.4vw, 18px)",
+                                                    lineHeight: 1.5,
+                                                    color: "rgba(255,255,255,0.82)",
+                                                }}
+                                            >
+                                                {f.a}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         );
                     })}

@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+    motion,
+    motionValue,
+    useAnimationFrame,
+    useMotionValue,
+    useReducedMotion,
+} from "framer-motion";
 
 // Memories collage — five photos scattered across the section (design 1440x1143),
 // each with its own hand-drawn style accents. `w` is a % of the section width;
@@ -88,6 +95,143 @@ const TOKENS = SEGMENTS.flatMap(({ t, c }) =>
 
 // How far (px) the whole section starts below its resting place.
 const SLIDE = 72;
+
+// Tiles are close to square, so the 384x231 sources are centre-cropped.
+const TILE_RATIO = 1.15;
+
+// The mobile strip: an endless row where size follows position. Whichever
+// photo is crossing the middle of the screen is the largest, and they taper
+// toward both edges, so each one swells as it arrives and shrinks as it goes.
+const STRIP = {
+    gap: 12,
+    copies: 3, // enough that the loop's seam is never on screen
+    speed: 38, // px per second
+    peak: 1, // scale in the middle of the screen
+    min: 0.6, // scale out at either edge
+};
+
+// Peak tile height for a given strip width — the same clamp the rest of the
+// section uses, but in JS, because the position maths needs the number.
+const tileHeightFor = (width) => Math.min(150, Math.max(112, width * 0.19));
+
+// A soft falloff rather than a straight line: `away` is 0 in the middle of the
+// screen and 1 at the edge, and cosine keeps the peak round instead of pointed.
+const scaleFor = (away) =>
+    STRIP.min + (STRIP.peak - STRIP.min) * Math.cos((away * Math.PI) / 2);
+
+const MemoryStrip = () => {
+    const reduced = useReducedMotion();
+    const viewportRef = useRef(null);
+    const travelled = useRef(0);
+    const [live, setLive] = useState(true);
+    const [box, setBox] = useState({ w: 0, h: 0, view: 0 });
+
+    // Every tile keeps the same layout box and only its transform changes.
+    // A scale that fed back into layout would shift the very tile it was
+    // measured from, and the strip's geometry has to stay fixed for the
+    // position maths to hold.
+    const x = useMotionValue(0);
+    const tiles = useMemo(
+        () =>
+            Array.from({ length: PHOTOS.length * STRIP.copies }, (_, i) => ({
+                photo: PHOTOS[i % PHOTOS.length],
+                copy: Math.floor(i / PHOTOS.length),
+                scale: motionValue(STRIP.min),
+            })),
+        []
+    );
+
+    useEffect(() => {
+        const measure = () => {
+            const view =
+                viewportRef.current?.clientWidth || window.innerWidth || 0;
+            const h = tileHeightFor(view);
+            setBox({ w: h * TILE_RATIO, h, view });
+        };
+        measure();
+        window.addEventListener("resize", measure);
+        return () => window.removeEventListener("resize", measure);
+    }, []);
+
+    // No reason to compute transforms for a strip nobody can see; the page is
+    // long and this sits near the top of it.
+    useEffect(() => {
+        const el = viewportRef.current;
+        if (!el || typeof IntersectionObserver === "undefined") return;
+        const io = new IntersectionObserver(
+            ([entry]) => setLive(entry.isIntersecting),
+            { rootMargin: "200px 0px" }
+        );
+        io.observe(el);
+        return () => io.disconnect();
+    }, []);
+
+    // Place the track and give every tile the scale its position earns.
+    const place = (slid) => {
+        const pitch = box.w + STRIP.gap;
+        if (!pitch || !box.view) return;
+        x.set(-slid);
+        const middle = box.view / 2;
+        tiles.forEach((tile, i) => {
+            const centre = -slid + i * pitch + box.w / 2;
+            const away = Math.min(1, Math.abs(centre - middle) / middle);
+            tile.scale.set(scaleFor(away));
+        });
+    };
+
+    // Counting elapsed time rather than reading the clock keeps the strip from
+    // jumping forward over the stretches where it was paused.
+    useAnimationFrame((_, delta) => {
+        if (reduced || !live) return;
+        const group = PHOTOS.length * (box.w + STRIP.gap);
+        if (!group) return;
+        travelled.current =
+            (travelled.current + (delta / 1000) * STRIP.speed) % group;
+        place(travelled.current);
+    });
+
+    // Standing still for anyone who asked for less motion: every tile at full
+    // size rather than frozen part-way through the wave, which reads as a
+    // plain row instead of a stalled animation. The strip is swipeable there,
+    // so the photos past the edge stay reachable.
+    useEffect(() => {
+        if (reduced) tiles.forEach((tile) => tile.scale.set(STRIP.peak));
+    }, [reduced, tiles]);
+
+    return (
+        <div
+            ref={viewportRef}
+            className="-mx-5 overflow-hidden py-2 motion-reduce:overflow-x-auto sm:-mx-8"
+        >
+            <motion.div
+                className="flex items-center"
+                style={{ x, gap: STRIP.gap, willChange: "transform" }}
+            >
+                {tiles.map((tile, i) => (
+                    <motion.div
+                        key={i}
+                        className="shrink-0"
+                        style={{
+                            width: box.w || undefined,
+                            height: box.h || undefined,
+                            scale: tile.scale,
+                        }}
+                    >
+                        <img
+                            src={tile.photo.src}
+                            alt={tile.copy === 0 ? tile.photo.alt : ""}
+                            aria-hidden={tile.copy === 0 ? undefined : "true"}
+                            draggable={false}
+                            loading="lazy"
+                            className="block h-full w-full rounded-xl object-cover"
+                            style={{ boxShadow: "0 6px 16px rgba(0,0,0,0.14)" }}
+                        />
+                    </motion.div>
+                ))}
+            </motion.div>
+        </div>
+    );
+};
 
 // Accent geometry — frame offset, stroke width, circle diameter, line length.
 // Stepped at the breakpoints rather than scaled off the viewport.
@@ -271,58 +415,31 @@ const AboutSection = () => {
         transition: "opacity 150ms linear, transform 150ms linear",
     });
 
-    // Mobile: stacked full-width cards with real spacing so everything fits
-    // and reveals fully. Desktop: the Figma percentage collage.
+    // Mobile: centred paragraph over a row of photos that scrolls on forever.
+    // Desktop: the Figma percentage collage.
     if (isMobile) {
         return (
             <section
                 ref={sectionRef}
                 id="about"
-                className="relative w-full select-none px-5 pb-16 pt-10 sm:px-8"
+                className="relative w-full select-none overflow-hidden px-5 pb-16 pt-10 sm:px-8"
             >
                 <div style={riseStyle}>
                     <h2
-                        className="product_sans mb-5 text-[22px] sm:text-[26px]"
+                        className="product_sans mb-5 text-center text-[22px] sm:text-[26px]"
                         style={{ fontWeight: 500, lineHeight: 1.1, color: "#000000" }}
                     >
                         Memories we Created
                     </h2>
                     <div
                         ref={textRef}
-                        className="product_sans pointer-events-none mb-10 text-[14px] sm:text-[15px]"
-                        style={{ fontWeight: 500, lineHeight: 1.45, color: "#000000" }}
+                        className="product_sans pointer-events-none mx-auto mb-9 max-w-[52ch] text-center text-[15px] sm:text-[18px] md:text-[21px]"
+                        style={{ fontWeight: 500, lineHeight: 1.5, color: "#000000" }}
                     >
                         {renderWords()}
                     </div>
-                    <div className="w-full flex flex-col">
-                        {PHOTOS.map((p, i) => (
-                            <div
-                                key={p.src}
-                                ref={(el) => {
-                                    photoRefs.current[i] = el;
-                                }}
-                                className={`relative w-full ${DECOR_CLASS} ${
-                                    i === PHOTOS.length - 1 ? "" : "mb-12"
-                                }`}
-                                style={{
-                                    aspectRatio: "384 / 231",
-                                    ...photoStyle(i),
-                                }}
-                            >
-                                <img
-                                    src={p.src}
-                                    alt={p.alt}
-                                    draggable={false}
-                                    loading="lazy"
-                                    className="block w-full h-full object-cover rounded-[4px]"
-                                    style={{
-                                        boxShadow: "0px 6px 14px rgba(0,0,0,0.2)",
-                                    }}
-                                />
-                                <Decor items={p.decor} />
-                            </div>
-                        ))}
-                    </div>
+
+                    <MemoryStrip />
                 </div>
             </section>
         );
