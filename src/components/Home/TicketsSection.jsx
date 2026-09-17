@@ -67,10 +67,9 @@ const nameSizeFor = (name) => {
 };
 
 // Type on the card scales with the card, which holds down to roughly a 520px
-// ticket and turns to specks below it. `floor` keeps the pieces that carry
-// meaning — name, price, the purchase pill — legible on a phone, and the
-// venue and date, which no floor can fit into their share of a 350px ticket,
-// are dropped there instead: the Venue section right below says both.
+// ticket and turns to specks below it. `floor` keeps every piece that carries
+// meaning — name, price, the purchase pill, the venue and the date — legible
+// on a phone.
 const floor = (min, size) => `max(${min}px, ${size})`;
 
 // The barcode is decoration, not a scannable symbol: the bars are derived from
@@ -112,13 +111,11 @@ const Barcode = ({ seed }) => (
 
 const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket }) => {
     const live = ticket?.live && ticket?.url;
-    const isDefault = ticket?.source !== "server";
     const { bg, accent } = paletteFor(ticket?.color);
-    // Sold out only applies to a real ticket Firebase has switched off;
-    // everything else that can't be bought yet reads as coming soon.
-    const stampLabel =
-        !isDefault && !ticket?.isActive ? "Sold Out" : "Coming Soon";
-    const name = ticket?.name || "Super Early Bird";
+    // A ticket Firebase has switched off is sold out; one that is still on but
+    // flagged coming soon has simply not opened yet.
+    const stampLabel = ticket?.isActive ? "Coming Soon" : "Sold Out";
+    const name = ticket?.name || "Ticket";
     return (
         <div
             ref={revealRef}
@@ -221,12 +218,12 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
             </div>
 
             <div
-                className="product_sans pointer-events-none absolute @max-[520px]:hidden"
+                className="product_sans pointer-events-none absolute"
                 style={{
                     left: px(PERF_L + 30),
                     top: py(101),
                     width: px(175),
-                    fontSize: cq(16.5),
+                    fontSize: cq(18),
                     fontWeight: 500,
                     lineHeight: 1.3,
                     color: INK,
@@ -236,12 +233,12 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
             </div>
 
             <div
-                className="product_sans pointer-events-none absolute text-right @max-[520px]:hidden"
+                className="product_sans pointer-events-none absolute text-right"
                 style={{
                     right: px(TICKET_W - PERF_R + 26),
                     top: py(101),
                     width: px(150),
-                    fontSize: cq(16.5),
+                    fontSize: cq(18),
                     fontWeight: 500,
                     lineHeight: 1.3,
                     color: INK,
@@ -342,9 +339,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                         // Masked with the same asset, so the scrim never leaks
                         // past the notches. It also mutes the stub contents so
                         // the stamp reads over them instead of fighting them.
-                        background: isDefault
-                            ? "rgba(0,0,0,0.38)"
-                            : "rgba(0,0,0,0.30)",
+                        background: "rgba(0,0,0,0.30)",
                         ...maskWith(bg),
                     }}
                 >
@@ -374,18 +369,6 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
     );
 };
 
-const DEFAULT_CARDS = ["red", "blue", "green"].map((color, i) => ({
-    key: `default-${i}`,
-    name: "Super Early Bird",
-    priceLabel: "Rs. 299",
-    url: null,
-    color,
-    live: false,
-    isActive: true,
-    isComingSoon: true,
-    source: "default",
-}));
-
 // Firestore doc (color, isActive, isCommingSoon, price, title, url, and
 // optionally venue and date) -> card model. A card is buyable only when it is active, not coming soon, and carries
 // a purchase link.
@@ -396,7 +379,7 @@ const toCard = (t, i) => {
     return {
         key: String(t.id ?? i),
         name: t.title || "Ticket",
-        priceLabel: t.price != null ? `Rs. ${t.price}` : "Rs. 299",
+        priceLabel: t.price != null ? `Rs. ${t.price}` : "Rs. xxx",
         url,
         color: t.color,
         // Both optional: the card falls back to the event-wide strings.
@@ -405,14 +388,16 @@ const toCard = (t, i) => {
         isActive,
         isComingSoon,
         live: isActive && !isComingSoon && !!url,
-        source: "server",
     };
 };
 
 const TicketsSection = () => {
     const [headingP, setHeadingP] = useState(0);
-    const [tickets, setTickets] = useState(DEFAULT_CARDS);
-    const [cardP, setCardP] = useState(() => DEFAULT_CARDS.map(() => 0));
+    // Every card comes from Firebase; until the fetch settles there is nothing
+    // to draw, and `loaded` is what tells the empty state from the wait.
+    const [tickets, setTickets] = useState([]);
+    const [loaded, setLoaded] = useState(false);
+    const [cardP, setCardP] = useState([]);
     const [stampStarted, setStampStarted] = useState(false);
     const [stampTick, setStampTick] = useState(0);
     const headingRef = useRef(null);
@@ -426,8 +411,8 @@ const TicketsSection = () => {
     }, [tickets.length]);
 
     // No-auth load: Next.js server fetches Firebase, client just renders.
-    // Success -> show every server ticket (live ones buyable, rest SOLD OUT).
-    // Failure/empty -> keep the default 3 coming-soon cards.
+    // Whatever Firebase returns is the whole list — live ones are buyable, the
+    // rest carry a stamp. Nothing back means no cards, not a placeholder.
     useEffect(() => {
         let cancelled = false;
         (async () => {
@@ -435,10 +420,12 @@ const TicketsSection = () => {
                 const res = await fetch("/api/tickets/view", { cache: "no-store" });
                 if (!res.ok) return;
                 const data = await res.json();
-                if (!Array.isArray(data.tickets) || data.tickets.length === 0) return;
+                if (!Array.isArray(data.tickets)) return;
                 if (!cancelled) setTickets(data.tickets.map(toCard));
             } catch {
-                // keep DEFAULT_CARDS
+                // leave the list empty
+            } finally {
+                if (!cancelled) setLoaded(true);
             }
         })();
         return () => {
@@ -547,6 +534,18 @@ const TicketsSection = () => {
                             }}
                         />
                     ))}
+
+                    {/* Only once the fetch has settled — before that the row
+                        stays blank rather than flashing this and replacing it
+                        with cards a moment later. */}
+                    {loaded && tickets.length === 0 && (
+                        <p
+                            className="product_sans text-center text-[15px] md:text-[17px]"
+                            style={{ color: "#5f6368" }}
+                        >
+                            Ticket sales open soon — check back shortly.
+                        </p>
+                    )}
                 </div>
             </div>
         </section>

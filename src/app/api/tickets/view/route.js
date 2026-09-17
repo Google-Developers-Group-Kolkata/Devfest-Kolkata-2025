@@ -87,7 +87,8 @@ export async function GET() {
             { status: 200 }
         );
     } catch (error) {
-        // Client falls back to the default coming-soon cards on any failure
+        // The section renders only what Firebase returns, so a failure here
+        // leaves it with no cards rather than a placeholder.
         return NextResponse.json(
             { error: "Failed to load tickets" },
             { status: 500 }
