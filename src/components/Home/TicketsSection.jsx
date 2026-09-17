@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const RED = "#F63130";
+const GREEN = "#34A853";
 const INK = "#0B0B0B";
 
 // Ticket artwork: the coloured border, the white body inside it, the corner
@@ -127,8 +128,9 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
     // A ticket Firebase has switched off is sold out; one that is still on but
     // flagged coming soon has simply not opened yet.
     const stampLabel = ticket?.isActive ? "Coming Soon" : "Sold Out";
-    // Sold out is struck in red; a pass that simply has not opened is neutral.
-    const stampInk = ticket?.isActive ? INK : RED;
+    // Sold out is struck in red; a pass that simply has not opened yet is
+    // green, since it is still to come rather than gone.
+    const stampInk = ticket?.isActive ? GREEN : RED;
     const name = ticket?.name || "Ticket";
     return (
         <div
@@ -421,7 +423,10 @@ const toCard = (t, i) => {
     return {
         key: String(t.id ?? i),
         name: t.title || "Ticket",
-        priceLabel: t.price != null ? `Rs. ${t.price}` : "Rs. xxx",
+        // A pass that has not opened yet keeps its price back, whatever the
+        // doc says — the same placeholder a doc with no price at all gets.
+        priceLabel:
+            isComingSoon || t.price == null ? "Rs. xxx" : `Rs. ${t.price}`,
         url,
         color: t.color,
         // Both optional: the card falls back to the event-wide strings.

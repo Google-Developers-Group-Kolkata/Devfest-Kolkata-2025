@@ -221,12 +221,32 @@ const TeamSection = () => {
     const reduced = useReducedMotion();
     const members = teamData.teamMembers;
     const [selected, setSelected] = useState(0);
+    // Matches the `lg` breakpoint the slides switch layouts at: three cards
+    // from here up, one below.
+    const [threeUp, setThreeUp] = useState(false);
+
+    useEffect(() => {
+        const mq = window.matchMedia("(min-width: 1024px)");
+        const on = () => setThreeUp(mq.matches);
+        on();
+        mq.addEventListener?.("change", on);
+        return () => mq.removeEventListener?.("change", on);
+    }, []);
+
+    // Where the carousel opens. With three cards on screen the middle one is
+    // the one being shown off, so it starts on the second member and the first
+    // sits to its left; with one card on screen the middle card is the only
+    // card, so it starts on the first.
+    const startIndex = Math.min(threeUp ? 1 : 0, Math.max(members.length - 1, 0));
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: "center",
         skipSnaps: false,
         dragFree: false,
+        // Changing this re-inits Embla, which is how the carousel re-centres
+        // when the viewport crosses the breakpoint.
+        startIndex,
     });
 
     const onSelect = useCallback(() => {
