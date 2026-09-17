@@ -145,7 +145,7 @@ const FaqSection = () => {
                         return (
                             <div
                                 key={f.n}
-                                className="google-gradient-border bg-black cursor-pointer"
+                                className="google-gradient-border bg-[#211e1e] cursor-pointer"
                                 style={{
                                     "--gb-width": `${ring}px`,
                                     padding: `${ring}px`,

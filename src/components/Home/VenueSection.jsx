@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, CalendarPlus, MapPin } from "lucide-react";
 
 const PHOTO_FRONT = "/venue.jpg";
 const PHOTO_BACK = "/venue1.jpg";
@@ -10,6 +11,32 @@ const RUNWAY_VH = 260;
 
 const MAPS_URL =
     "https://www.google.com/maps/search/?api=1&query=The+Westin+Kolkata+Rajarhat";
+
+// The one place the event's when/where is written down for the calendar link.
+// The times are local wall-clock hours — `ctz` below tells Google which zone
+// to read them in — and run from doors open to the last session.
+const EVENT = {
+    title: "DevFest Kolkata 2026",
+    start: "20261122T083000",
+    end: "20261122T170000",
+    timeZone: "Asia/Kolkata",
+    location: "The Westin Kolkata Rajarhat, New Town, Kolkata, West Bengal",
+    details:
+        "DevFest Kolkata 2026 by GDG Kolkata — a full day of talks, workshops and community at The Westin Kolkata, Rajarhat.",
+};
+
+// Google Calendar's own event-composer link: it opens a prefilled event the
+// user only has to save, on whichever account they are signed in with.
+const CALENDAR_URL = `https://calendar.google.com/calendar/render?${new URLSearchParams(
+    {
+        action: "TEMPLATE",
+        text: EVENT.title,
+        dates: `${EVENT.start}/${EVENT.end}`,
+        details: EVENT.details,
+        location: EVENT.location,
+        ctz: EVENT.timeZone,
+    }
+).toString()}`;
 
 const clamp01 = (n) => Math.min(1, Math.max(0, n));
 
@@ -31,8 +58,15 @@ const FACES = [
         glow: "radial-gradient(52% 50% at 12% 34%, rgba(66,133,244,0.40) 0%, rgba(66,133,244,0.10) 44%, rgba(66,133,244,0) 72%)",
         title: "Venue of the Event",
         lines: ["The Westin", "Kolkata, Rajarhat"],
-        caption: "Map Guide",
-        captionHref: MAPS_URL,
+        action: {
+            label: "Map Guide",
+            href: MAPS_URL,
+            title: "Open The Westin Kolkata, Rajarhat in Google Maps",
+            icon: MapPin,
+            bg: "#1e1e1e",
+            fg: "#ffffff",
+            ring: "rgba(26,115,232,0.38)",
+        },
         photo: PHOTO_FRONT,
         photoAlt: "The Westin Kolkata, Rajarhat",
         tilt: -15,
@@ -41,7 +75,15 @@ const FACES = [
         glow: "radial-gradient(52% 50% at 12% 34%, rgba(251,188,4,0.52) 0%, rgba(251,188,4,0.14) 46%, rgba(251,188,4,0) 74%)",
         title: "Date of the Event",
         lines: ["22nd November,", "2026"],
-        caption: "Mark Your Calendar",
+        action: {
+            label: "Mark Your Calendar",
+            href: CALENDAR_URL,
+            title: "Add DevFest Kolkata 2026 to your Google Calendar",
+            icon: CalendarPlus,
+            bg: "#1e1e1e",
+            fg: "#ffffff",
+            ring: "rgba(251,188,4,0.48)",
+        },
         photo: PHOTO_BACK,
         photoAlt: "The Westin Kolkata tower by day",
         tilt: -15,
@@ -55,6 +97,42 @@ const FACES = [
 const TILT_RAD = (Math.abs(FACES[0].tilt) * Math.PI) / 180;
 const CARD_BBOX_H = 1.5 * Math.cos(TILT_RAD) + Math.sin(TILT_RAD);
 const CARD_BBOX_W = Math.cos(TILT_RAD) + 1.5 * Math.sin(TILT_RAD);
+
+// The face's call to action. Each face carries its own brand colour, handed to
+// the class names as custom properties so the hover shadow and focus ring can
+// be written in CSS rather than juggled in state.
+const FaceAction = ({ action }) => {
+    const Icon = action.icon;
+    return (
+        <a
+            href={action.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={action.title}
+            aria-label={action.title}
+            className="product_sans group mt-6 inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 text-[15px] shadow-[0_10px_26px_var(--cta-ring)] transition duration-300 ease-out hover:-translate-y-[3px] hover:shadow-[0_20px_44px_var(--cta-ring)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--cta-ring)] active:translate-y-0 active:shadow-[0_8px_20px_var(--cta-ring)] md:mt-9 md:gap-3 md:px-7 md:py-4 md:text-[17px] xl:mt-11 xl:px-8 xl:py-[18px] xl:text-[18px]"
+            style={{
+                "--cta-ring": action.ring,
+                background: action.bg,
+                color: action.fg,
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+            }}
+        >
+            <Icon
+                className="h-[18px] w-[18px] transition-transform duration-300 ease-out group-hover:-rotate-6 group-hover:scale-110 md:h-5 md:w-5 xl:h-[22px] xl:w-[22px]"
+                strokeWidth={2.2}
+                aria-hidden="true"
+            />
+            {action.label}
+            <ArrowUpRight
+                className="h-4 w-4 opacity-70 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 md:h-[18px] md:w-[18px]"
+                strokeWidth={2.2}
+                aria-hidden="true"
+            />
+        </a>
+    );
+};
 
 // The copy block for one face. Laid over its sibling in the same grid cell and
 // crossfaded, so the column is as tall as the taller face and never reflows
@@ -95,24 +173,7 @@ const FaceCopy = ({ face, opacity, shift, stacked }) => (
             ))}
         </div>
 
-        {face.captionHref ? (
-            <a
-                href={face.captionHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="product_sans mt-5 inline-block text-[13px] underline-offset-4 hover:underline md:mt-8 md:text-[14px] xl:mt-12 xl:text-[15px]"
-                style={{ color: "#5f6368" }}
-            >
-                {face.caption}
-            </a>
-        ) : (
-            <div
-                className="product_sans mt-5 text-[13px] md:mt-8 md:text-[14px] xl:mt-12 xl:text-[15px]"
-                style={{ color: "#5f6368" }}
-            >
-                {face.caption}
-            </div>
-        )}
+        <FaceAction action={face.action} />
     </div>
 );
 
