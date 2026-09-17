@@ -299,10 +299,19 @@ const VenueSection = () => {
         </div>
     );
 
+    // The brand glow is deliberately wider than its column, so it has to be
+    // trimmed at the screen edge or it drags a horizontal scrollbar onto the
+    // whole page. `clip`, not `hidden`: `hidden` would make this box the
+    // scrollport for the sticky pane below and kill the pin.
+    const CLIP = "overflow-x-clip";
+
     // Reduced motion: no pinning, no 3D — the two pairings simply stack.
     if (reduced) {
         return (
-            <section id="venue" className="relative w-full select-none">
+            <section
+                id="venue"
+                className={`relative w-full select-none ${CLIP}`}
+            >
                 <div
                     className={`flex w-full flex-col gap-10 py-10 md:gap-14 md:py-16 xl:gap-20 xl:py-20 ${SHELL}`}
                 >
@@ -336,7 +345,7 @@ const VenueSection = () => {
         <section
             ref={sectionRef}
             id="venue"
-            className="relative w-full select-none"
+            className={`relative w-full select-none ${CLIP}`}
             style={{ height: `${RUNWAY_VH}vh` }}
         >
             <div
