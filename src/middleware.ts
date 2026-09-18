@@ -9,9 +9,14 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/", request.url));
     }
 
+    // Redirect /devfest-ticket to code of conduct
+    if (pathname === "/devfest-ticket") {
+        return NextResponse.redirect(new URL("/code-of-conduct", request.url));
+    }
+
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/register", "/ticket", "/me"],
+    matcher: ["/register", "/ticket", "/me", "/devfest-ticket"],
 };
