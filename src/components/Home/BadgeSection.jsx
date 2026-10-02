@@ -49,12 +49,11 @@ const slugFor = (name) =>
         .replace(/^-+|-+$/g, "")
         .slice(0, 40) || "attendee";
 
-const POSTER_QUERY = /\S+@\S+\.\S+/;
 
 const BadgeSection = ({ onNavigate }) => {
     const reduced = useReducedMotion();
 
-    const [email, setEmail] = useState("");
+    const [query, setQuery] = useState("");
     const [status, setStatus] = useState("idle"); // idle | loading | error
     const [message, setMessage] = useState("");
     const [attendee, setAttendee] = useState(null);
@@ -86,11 +85,11 @@ const BadgeSection = ({ onNavigate }) => {
 
     const submit = async (e) => {
         e?.preventDefault();
-        const value = email.trim();
+        const value = query.trim();
 
-        if (!POSTER_QUERY.test(value)) {
+        if (!value) {
             setStatus("error");
-            setMessage("Enter the email address you booked with.");
+            setMessage("Enter your email, phone number, or booking ID.");
             inputRef.current?.focus();
             return;
         }
@@ -100,14 +99,14 @@ const BadgeSection = ({ onNavigate }) => {
 
         try {
             const res = await fetch(
-                `/api/attendee?email=${encodeURIComponent(value)}`,
+                `/api/attendee?q=${encodeURIComponent(value)}`,
                 { cache: "no-store" }
             );
 
             if (res.status === 404) {
                 setStatus("error");
                 setMessage(
-                    "No ticket found for that email — check you used the address you booked with."
+                    "No ticket found — try your registered email, phone number, or booking ID."
                 );
                 return;
             }
@@ -240,9 +239,9 @@ const BadgeSection = ({ onNavigate }) => {
                             color: "#5f6368",
                         }}
                     >
-                        Enter the email you booked with and we&rsquo;ll make
-                        your DevFest Kolkata &rsquo;26 social pass in seconds —
-                        sized for Instagram, LinkedIn and X.
+                        Enter your registered email, phone number, or booking
+                        ID — we&rsquo;ll generate your DevFest Kolkata
+                        &rsquo;26 social pass in seconds.
                     </motion.p>
 
                     <motion.form
@@ -255,21 +254,21 @@ const BadgeSection = ({ onNavigate }) => {
                     >
                         <input
                             ref={inputRef}
-                            type="email"
-                            inputMode="email"
-                            autoComplete="email"
+                            type="text"
+                            inputMode="text"
+                            autoComplete="off"
                             spellCheck={false}
-                            value={email}
+                            value={query}
                             disabled={status === "loading"}
                             onChange={(e) => {
-                                setEmail(e.target.value);
+                                setQuery(e.target.value);
                                 if (status === "error") {
                                     setStatus("idle");
                                     setMessage("");
                                 }
                             }}
-                            placeholder="you@example.com"
-                            aria-label="The email address you booked with"
+                            placeholder="Email, phone, or booking ID"
+                            aria-label="Your registered email, phone number, or booking ID"
                             className="product_sans h-12 w-full rounded-full px-5 text-[16px] outline-none transition-colors disabled:opacity-60 sm:h-11"
                             style={{
                                 border: "2px solid #dadce0",
@@ -324,7 +323,7 @@ const BadgeSection = ({ onNavigate }) => {
                                 className="product_sans text-[13px] md:text-[14px]"
                                 style={{ color: "#80868b" }}
                             >
-                                We only read your email to find your booking —
+                                We only use your input to find your booking —
                                 nothing is stored.
                             </p>
                         )}
@@ -642,13 +641,13 @@ const BadgeSection = ({ onNavigate }) => {
                                 type="button"
                                 onClick={() => {
                                     setAttendee(null);
-                                    setEmail("");
+                                    setQuery("");
                                     setTimeout(() => inputRef.current?.focus(), 60);
                                 }}
                                 className="product_sans flex cursor-pointer items-center gap-1.5 text-[14px] text-white/80 underline underline-offset-4 transition-colors hover:text-white"
                             >
                                 <Check size={14} aria-hidden="true" />
-                                Not you? Try another email
+                                Not you? Try another entry
                             </button>
                         </div>
                     </div>

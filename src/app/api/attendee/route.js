@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import * as admin from "firebase-admin";
 
 // No-auth endpoint: browser -> Next.js server -> Firebase, exactly like
-// /api/tickets/view. The badge generator needs a name and a pass, nothing
-// else, so the lookup happens here and only those two come back out.
+// /api/tickets/view. The social pass generator needs a name and a pass,
+// nothing else, so the lookup happens here and only those fields come back.
 function getDb() {
     if (admin.apps.length) return admin.firestore();
     try {
@@ -49,21 +49,16 @@ const DAY_BY_TIER = [
 
 const DEFAULT_DAY = { day: 2, date: "22nd November, 2026" };
 
-// Same string the ticket cards print — the venue is not per-attendee data,
-// it is the one line every pass shares.
+// Same string the ticket cards print.
 const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
 
 // "DevFest Kolkata'26 Regular Ticket Phase 2" -> "Regular Ticket Phase 2".
-// The prefix is branding the badge prints separately, so leaving it in
-// would have the event name twice.
 const stripBrand = (name) =>
     String(name ?? "")
-        .replace(/^\s*devfest\s*kolkata\s*['’]26\s*/i, "")
-        .replace(/^\s*kolkata\s*['’]26\s*/i, "")
+        .replace(/^\s*devfest\s*kolkata\s*['']26\s*/i, "")
+        .replace(/^\s*kolkata\s*['']26\s*/i, "")
         .trim();
 
-// Only the two display fields come back out: spreading the entry itself
-// would carry its matcher along with it.
 const dayFor = (ticketName) => {
     const hit = DAY_BY_TIER.find(({ test }) =>
         test.test(String(ticketName ?? ""))
@@ -71,9 +66,7 @@ const dayFor = (ticketName) => {
     return hit ? { day: hit.day, date: hit.date } : DEFAULT_DAY;
 };
 
-// Free text from the registration form, trimmed and capped for the card's
-// single line. The cap falls back to a hard slice only when the whole value
-// is one word, since there is no safe place to stop otherwise.
+// Free text from the registration form, trimmed and word-boundary capped.
 const clip = (value, max) => {
     const text = String(value ?? "").trim();
     if (text.length <= max) return text;
@@ -82,11 +75,9 @@ const clip = (value, max) => {
     return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trim();
 };
 
-// Every attendee detail the badge is allowed to show. Everything else on
-// the doc — phone, email, linkedin, payment ids, invoice urls, dietary
-// preferences — stops at this function.
-const toBadge = (doc) => {
-    // The webhook writes the payload one level down, under `data`.
+// Only safe display fields come back out — phone, email, LinkedIn, payment
+// ids, invoice URLs, dietary preferences never leave this function.
+const toPass = (doc) => {
     const att = doc.data()?.data?.["Attendee Details"];
     if (!att) return null;
 
@@ -100,11 +91,6 @@ const toBadge = (doc) => {
         name,
         ticketName: stripBrand(ticketName) || "Ticket",
         bookingId: String(att["Booking Id"] ?? ""),
-        // What the attendee told the registration form. Printed as a role
-        // line under the name, so the card reads as that person's pass
-        // rather than any holder of the same tier. Capped, because an
-        // organisation name is free text and the card has one line for it,
-        // and cut on a word so the cap never lands mid-syllable.
         designation: clip(att["Your Designation"], 40),
         organisation: clip(att.Organisation, 48),
         venue: EVENT_VENUE,
@@ -112,14 +98,28 @@ const toBadge = (doc) => {
     };
 };
 
+// Normalise a phone number to digits-only for comparison so that
+// "+91 98309 89843", "9830989843", "+919830989843" all match.
+const normalisePhone = (raw) => String(raw ?? "").replace(/\D/g, "");
+
+// Determine what kind of identifier the user typed.
+// Priority: email → phone (all digits after stripping) → booking id (hex ≤ 12 chars)
+const classify = (raw) => {
+    const v = raw.trim();
+    if (/\S+@\S+\.\S+/.test(v)) return "email";
+    // Phone: starts with optional +, then 7–15 digits
+    if (/^\+?\d{7,15}$/.test(v.replace(/[\s\-().]/g, ""))) return "phone";
+    // Booking id: 6–12 lowercase hex characters (Konfhub format is 8 hex)
+    if (/^[0-9a-f]{6,12}$/i.test(v)) return "bookingId";
+    return "unknown";
+};
+
 export async function GET(request) {
     try {
-        const email = (request.nextUrl.searchParams.get("email") ?? "")
-            .trim()
-            .toLowerCase();
-        if (!email) {
+        const raw = (request.nextUrl.searchParams.get("q") ?? "").trim();
+        if (!raw) {
             return NextResponse.json(
-                { error: "Email is required" },
+                { error: "Enter your email, phone number, or booking ID" },
                 { status: 400 }
             );
         }
@@ -127,44 +127,76 @@ export async function GET(request) {
         const db = getDb();
         if (!db) throw new Error("Firebase not configured");
 
-        // The path is a field name with spaces in it, which Firestore accepts
-        // in dot notation as long as there are no dots in it.
         const field = (key) => `data.Attendee Details.${key}`;
 
-        const resolve = async (key) => {
+        // Returns the newest valid doc matching a given Firestore field/value,
+        // or null when nothing matches.
+        const queryField = async (key, value) => {
             const snap = await db
                 .collection(COLLECTION)
-                .where(field(key), "==", email)
+                .where(field(key), "==", value)
                 .limit(5)
                 .get();
             if (snap.empty) return null;
-            // Someone who booked twice leaves two docs behind; the newest is
-            // the booking that stands. `createdAt` is a timestamp on every
-            // doc, so it orders even the ones written before a field existed.
             return snap.docs
                 .map((doc) => ({ doc, at: doc.data().createdAt?.toMillis?.() ?? 0 }))
                 .sort((a, b) => b.at - a.at)
                 .map(({ doc }) => doc)
-                .find((doc) => toBadge(doc)) ?? null;
+                .find((doc) => toPass(doc)) ?? null;
         };
 
-        // A pass can be bought for someone else, so the buyer's address is
-        // tried when the attendee's own one comes back empty.
-        const match = (await resolve("Email Address")) ?? (await resolve("Buyer Email"));
-        const badge = match ? toBadge(match) : null;
+        const kind = classify(raw);
+        let match = null;
 
-        if (!badge) {
+        if (kind === "email") {
+            // Emails are stored lowercase; normalise before querying.
+            const email = raw.toLowerCase();
+            match =
+                (await queryField("Email Address", email)) ??
+                (await queryField("Buyer Email", email));
+
+        } else if (kind === "phone") {
+            // Phone numbers in Firestore are in E.164 (+91XXXXXXXXXX).
+            // We try the raw value first, then the +91 prefixed version,
+            // then the 10-digit local version so any common input works.
+            const digits = normalisePhone(raw);
+            const candidates = new Set([
+                raw.trim(),                          // exactly as typed
+                `+${digits}`,                        // e.g. +919830989843
+                digits.length === 10 ? `+91${digits}` : null, // 10-digit Indian
+                digits,                              // bare digits (unlikely in DB)
+            ].filter(Boolean));
+
+            for (const candidate of candidates) {
+                match = await queryField("Phone Number", candidate);
+                if (match) break;
+            }
+
+        } else if (kind === "bookingId") {
+            // Booking IDs are stored lowercase hex.
+            match = await queryField("Booking Id", raw.toLowerCase());
+
+        } else {
+            return NextResponse.json(
+                { error: "Enter a valid email, phone number, or booking ID" },
+                { status: 400 }
+            );
+        }
+
+        const pass = match ? toPass(match) : null;
+
+        if (!pass) {
             return NextResponse.json(
                 { error: "not_found" },
                 { status: 404 }
             );
         }
 
-        return NextResponse.json({ attendee: badge }, { status: 200 });
+        return NextResponse.json({ attendee: pass }, { status: 200 });
     } catch (error) {
         console.error("attendee: lookup failed:", error);
         return NextResponse.json(
-            { error: "Failed to look up that email" },
+            { error: "Failed to look up that entry" },
             { status: 500 }
         );
     }
