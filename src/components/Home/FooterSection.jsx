@@ -77,6 +77,7 @@ const FOOTER_NAV = [
         links: [
             { label: "Privacy Policy", href: "/privacy-policy" },
             { label: "Terms of Use", href: "/terms-of-use" },
+            { label: "Code of Conduct", href: "/code-of-conduct" },
             { label: "Support", href: "/support" },
         ],
     },
