@@ -35,10 +35,10 @@ const WHY = [
     "Free for every pass holder",
 ];
 
-// The condition, kept in one sentence and repeated wherever the badge is
+// The condition, kept in one sentence and repeated wherever the social pass is
 // handed over — on the site and on the image itself.
 const DISCLAIMER =
-    "This badge is for social media only — it does not guarantee entry to DevFest Kolkata. We verify attendees separately at the venue, so keep your original ticket email handy.";
+    "This social pass is for sharing only — it does not guarantee entry to DevFest Kolkata. We verify attendees separately at the venue, so keep your original ticket email handy.";
 
 // A filename, not a headline: lowercased, ascii-ish, no spaces.
 const slugFor = (name) =>
@@ -117,7 +117,7 @@ const BadgeSection = ({ onNavigate }) => {
             setStatus("idle");
             setAttendee(found);
         } catch (error) {
-            console.error("badge: lookup failed", error);
+            console.error("social-pass: lookup failed", error);
             setStatus("error");
             setMessage("Something went wrong. Please try again in a moment.");
         }
@@ -142,12 +142,12 @@ const BadgeSection = ({ onNavigate }) => {
             });
             const link = document.createElement("a");
             link.href = dataUrl;
-            link.download = `devfest-badge-2026-${slugFor(attendee?.name)}.png`;
+            link.download = `devfest-social-pass-2026-${slugFor(attendee?.name)}.png`;
             link.click();
         } catch (error) {
-            console.error("badge: export failed", error);
+            console.error("social-pass: export failed", error);
             toast.error(
-                "Couldn't build the file — press and hold the badge to save it."
+                "Couldn't build the file — press and hold the image to save it."
             );
         } finally {
             setExporting(false);
@@ -167,18 +167,45 @@ const BadgeSection = ({ onNavigate }) => {
 
     const open = (url) => window.open(url, "_blank", "noopener,noreferrer");
 
-    // Instagram has no web composer to hand a caption to, so its button does
-    // the useful half — copies the words — and says where to paste them.
+    // Instagram: the app deep-link on mobile opens the camera/story composer
+    // directly. On desktop the app isn't available, so we fall back to copying
+    // the caption and opening instagram.com so they can paste it themselves.
     const shareInstagram = async () => {
+        // Try the app deep-link first (works on Android/iOS)
+        const appUrl = "instagram://camera";
+        const webUrl = "https://www.instagram.com/";
+
+        // Copy caption so it's ready to paste regardless of which path runs
         try {
             await navigator.clipboard.writeText(caption);
-            toast.success("Caption copied — paste it in Instagram");
-        } catch {
-            toast.error("Couldn't copy the caption.");
-        }
+        } catch { /* silent — toast below covers it */ }
+
+        // On mobile the scheme will open the app; on desktop it'll 404 in
+        // the browser and we fall through to the web URL after a short delay.
+        const start = Date.now();
+        window.location.href = appUrl;
+        setTimeout(() => {
+            // If we're still here (i.e. the app didn't open), go to web
+            if (Date.now() - start < 2000) {
+                open(webUrl);
+            }
+        }, 1200);
+
+        toast.success("Caption copied — paste it in your Instagram post ✌️");
     };
 
     const firstName = String(attendee?.name ?? "").split(" ")[0];
+
+    // A short, personalised kicker under the greeting — different for students
+    // and professionals so the badge feels made for that specific person.
+    const designationKicker = (() => {
+        const d = String(attendee?.designation ?? "").toLowerCase();
+        if (d.includes("student"))
+            return `Your ${attendee?.ticketName} social pass is ready — time to learn, build, and connect. 🎓`;
+        if (d.includes("professional") || d.includes("pro"))
+            return `Your ${attendee?.ticketName} social pass is ready — see you at The Westin, Rajarhat. 🤝`;
+        return `Your ${attendee?.ticketName} social pass is ready — DevFest Kolkata is waiting for you. 🚀`;
+    })();
 
     return (
         <>
@@ -198,7 +225,7 @@ const BadgeSection = ({ onNavigate }) => {
                         }}
                     >
                         Got your ticket? Claim your{" "}
-                        <span style={{ color: "#F63130" }}>badge</span>.
+                        <span style={{ color: "#F63130" }}>social pass</span>.
                     </motion.h2>
 
                     <motion.p
@@ -214,8 +241,8 @@ const BadgeSection = ({ onNavigate }) => {
                         }}
                     >
                         Enter the email you booked with and we&rsquo;ll make
-                        your DevFest Kolkata &rsquo;26 badge in seconds — sized
-                        for Instagram, LinkedIn and X.
+                        your DevFest Kolkata &rsquo;26 social pass in seconds —
+                        sized for Instagram, LinkedIn and X.
                     </motion.p>
 
                     <motion.form
@@ -273,7 +300,7 @@ const BadgeSection = ({ onNavigate }) => {
                                     Finding your ticket
                                 </>
                             ) : (
-                                "Generate my badge"
+                                "Generate my social pass"
                             )}
                         </button>
                     </motion.form>
@@ -358,7 +385,7 @@ const BadgeSection = ({ onNavigate }) => {
                             style={{ lineHeight: 1.5, color: "#5a4200" }}
                         >
                             <strong style={{ fontWeight: 700 }}>
-                                It&rsquo;s a badge, not a ticket.
+                                It&rsquo;s a social pass, not a ticket.
                             </strong>{" "}
                             Made for posting on social media — it does not
                             guarantee entry. We verify attendees separately at
@@ -376,7 +403,7 @@ const BadgeSection = ({ onNavigate }) => {
                 <div
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Your DevFest badge"
+                    aria-label="Your DevFest social pass"
                     className="cs-overlay fixed inset-0 z-[100] overflow-y-auto"
                     style={{
                         background: "rgba(0,0,0,0.55)",
@@ -402,24 +429,78 @@ const BadgeSection = ({ onNavigate }) => {
                             className="product_sans mb-5 text-center text-white"
                             style={{ maxWidth: "760px" }}
                         >
+                            {/* Stamp-feel admit chip above the greeting */}
                             <div
                                 style={{
-                                    fontSize: "clamp(20px, 4vw, 30px)",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    marginBottom: "10px",
+                                    background: "rgba(255,255,255,0.12)",
+                                    border: "1px solid rgba(255,255,255,0.25)",
+                                    borderRadius: "999px",
+                                    padding: "4px 14px",
+                                    fontSize: "clamp(10px, 1.8vw, 12px)",
                                     fontWeight: 700,
-                                    lineHeight: 1.15,
+                                    letterSpacing: "0.18em",
+                                    textTransform: "uppercase",
+                                    color: "rgba(255,255,255,0.85)",
                                 }}
                             >
-                                See you there, {firstName}!
+                                <span
+                                    style={{
+                                        width: 7,
+                                        height: 7,
+                                        borderRadius: "50%",
+                                        background: "#34A853",
+                                        flexShrink: 0,
+                                    }}
+                                />
+                                Ticket confirmed · Day {attendee.day} · {attendee.date}
                             </div>
+
+                            {/* Main greeting */}
                             <div
                                 style={{
-                                    marginTop: "6px",
+                                    fontSize: "clamp(22px, 4.5vw, 34px)",
+                                    fontWeight: 700,
+                                    lineHeight: 1.1,
+                                }}
+                            >
+                                You&rsquo;re in, {firstName}! 🎉
+                            </div>
+
+                            {/* Personalised subline based on designation */}
+                            <div
+                                style={{
+                                    marginTop: "8px",
                                     fontSize: "clamp(13px, 2.4vw, 15px)",
                                     color: "rgba(255,255,255,0.75)",
+                                    lineHeight: 1.45,
                                 }}
                             >
-                                {attendee.ticketName} · Day {attendee.day} ·{" "}
-                                {attendee.date}
+                                {designationKicker}
+                            </div>
+
+                            {/* Stamp row — the same compact metadata the card prints */}
+                            <div
+                                style={{
+                                    marginTop: "10px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "10px",
+                                    flexWrap: "wrap",
+                                    fontSize: "clamp(11px, 2vw, 13px)",
+                                    color: "rgba(255,255,255,0.55)",
+                                    letterSpacing: "0.04em",
+                                }}
+                            >
+                                <span>DevFest Kolkata &rsquo;26</span>
+                                <span style={{ opacity: 0.35 }}>·</span>
+                                <span>The Westin Kolkata, Rajarhat</span>
+                                <span style={{ opacity: 0.35 }}>·</span>
+                                <span>21–22 November 2026</span>
                             </div>
                         </div>
 
@@ -453,12 +534,12 @@ const BadgeSection = ({ onNavigate }) => {
                                                 className="animate-spin"
                                                 aria-hidden="true"
                                             />
-                                            Building
+                                            Building…
                                         </>
                                     ) : (
                                         <>
                                             <Download size={16} aria-hidden="true" />
-                                            Download PNG
+                                            Download
                                         </>
                                     )}
                                 </button>
@@ -478,7 +559,7 @@ const BadgeSection = ({ onNavigate }) => {
                                         open(
                                             `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
                                                 SITE_URL
-                                            )}`
+                                            )}&summary=${encodeURIComponent(caption)}`
                                         )
                                     }
                                     className="product_sans flex h-11 cursor-pointer items-center gap-2 rounded-full border border-white/30 px-5 text-[14px] text-white transition-colors hover:bg-white/10"
@@ -500,6 +581,27 @@ const BadgeSection = ({ onNavigate }) => {
                                 >
                                     <Twitter size={16} aria-hidden="true" />
                                     X
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        open(
+                                            `https://wa.me/?text=${encodeURIComponent(caption)}`
+                                        )
+                                    }
+                                    className="product_sans flex h-11 cursor-pointer items-center gap-2 rounded-full border border-white/30 px-5 text-[14px] text-white transition-colors hover:bg-white/10"
+                                >
+                                    {/* WhatsApp icon */}
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                        style={{ width: 16, height: 16, flexShrink: 0 }}
+                                    >
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+                                    </svg>
+                                    WhatsApp
                                 </button>
 
                                 <button
@@ -530,9 +632,10 @@ const BadgeSection = ({ onNavigate }) => {
                                 className="product_sans mx-auto max-w-[560px] text-center text-[12px] md:text-[13px]"
                                 style={{ color: "rgba(255,255,255,0.55)" }}
                             >
-                                Made for sharing, not for entry — this badge
-                                does not guarantee entry. Attendee verification
-                                is done separately by us before the event.
+                                Made for sharing, not for entry — this social
+                                pass does not guarantee entry. Attendee
+                                verification is done separately by us before
+                                the event.
                             </p>
 
                             <button

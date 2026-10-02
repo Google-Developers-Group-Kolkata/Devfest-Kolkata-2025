@@ -706,14 +706,14 @@ const TicketsSection = ({ onNavigate }) => {
                                 textUnderlineOffset: "3px",
                             }}
                         >
-                            Grab your badge &rarr;
+                            Grab your social pass &rarr;
                         </span>
                     </button>
                     <p
                         className="product_sans max-w-[560px] text-center text-[12px] md:text-[13px]"
                         style={{ color: "#80868b", lineHeight: 1.5 }}
                     >
-                        The badge is for social media only and does not
+                        The social pass is for social media only and does not
                         guarantee entry — your pass is verified separately by
                         us at the venue.
                     </p>

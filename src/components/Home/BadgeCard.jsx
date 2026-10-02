@@ -30,9 +30,9 @@ const TIER_COLORS = [
 ];
 
 const PALETTE = {
-    red: { bg: "/ticket/background-red.svg", accent: "#F63130" },
-    blue: { bg: "/ticket/background-blue.svg", accent: "#4285F4" },
-    green: { bg: "/ticket/background-green.svg", accent: "#34A853" },
+    red:    { bg: "/ticket/background-red.svg",    accent: "#F63130" },
+    blue:   { bg: "/ticket/background-blue.svg",   accent: "#4285F4" },
+    green:  { bg: "/ticket/background-green.svg",  accent: "#34A853" },
     yellow: { bg: "/ticket/background-yellow.svg", accent: "#FBBC04" },
 };
 
@@ -42,11 +42,11 @@ const colorFor = (ticketName) => {
     return PALETTE[hit ? hit[1] : "red"];
 };
 
-const px = (v) => `${(v / TICKET_W) * 100}%`;
-const py = (v) => `${(v / TICKET_H) * 100}%`;
+const px  = (v) => `${(v / TICKET_W) * 100}%`;
+const py  = (v) => `${(v / TICKET_H) * 100}%`;
 // Type scales with the card rather than the viewport, so the layout holds at
 // any width the section gives it.
-const cq = (v) => `${(v / TICKET_W) * 100}cqw`;
+const cq  = (v) => `${(v / TICKET_W) * 100}cqw`;
 
 // A name is the one field with no fixed length, so it steps down instead of
 // running off the card. The tiers are wide enough that each size fits its
@@ -102,7 +102,7 @@ const CalendarIcon = () => (
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        style={{ width: cq(17), height: cq(17), flex: "0 0 auto" }}
+        style={{ width: cq(16), height: cq(16), flex: "0 0 auto" }}
     >
         <rect x="3" y="4" width="18" height="17" rx="2.5" />
         <path d="M3 9.5h18M8 2.5v4M16 2.5v4" />
@@ -118,14 +118,14 @@ const PinIcon = () => (
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        style={{ width: cq(17), height: cq(17), flex: "0 0 auto" }}
+        style={{ width: cq(16), height: cq(16), flex: "0 0 auto" }}
     >
         <path d="M20 10.5c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z" />
         <circle cx="12" cy="10.2" r="2.8" />
     </svg>
 );
 
-// What the QR carries when it is scanned: plain text, no link, so the code
+// What the QR carries when it is scanned: plain text, not a URL, so the code
 // reads the same in any scanner and asks nothing of the person receiving it.
 const qrMessage = (attendee) =>
     `${attendee.name} is joining us at DevFest Kolkata '26 on ${attendee.date}, at ${attendee.venue}.`;
@@ -140,12 +140,20 @@ const BadgeCard = ({ attendee, cardRef }) => {
     const [qr, setQr] = useState(null);
     const { bg, accent } = colorFor(attendee.ticketName);
     const name = attendee.name || "Attendee";
+
     // Only a genuine booking gets a serial. A test or placeholder pass has
     // nothing worth printing, so its stub carries neither the id nor the
-    // bars that are derived from it.
+    // bars derived from it.
     const hasPassId = Boolean(attendee.bookingId);
 
-    // Generated once per attendee; a data url rather than a rendered <img>,
+    // One line under the name: what they do, where they do it. Either half
+    // can be missing; an empty line is not drawn.
+    // Both values are already word-boundary-clipped by the API's clip().
+    const designation   = String(attendee.designation   ?? "").trim();
+    const organisation  = String(attendee.organisation  ?? "").trim();
+    const roleLine = [designation, organisation].filter(Boolean).join("  ·  ");
+
+    // Generated once per attendee — a data url rather than a rendered <img>,
     // so the rasteriser has nothing to fetch.
     useEffect(() => {
         let alive = true;
@@ -157,9 +165,7 @@ const BadgeCard = ({ attendee, cardRef }) => {
         })
             .then((url) => alive && setQr(url))
             .catch(() => alive && setQr(null));
-        return () => {
-            alive = false;
-        };
+        return () => { alive = false; };
     }, [attendee]);
 
     return (
@@ -193,28 +199,32 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 ))}
             </svg>
 
-            {/* Left stub — the scan target, and the four brand dots beneath it. */}
+            {/* ─── LEFT STUB ─────────────────────────────────────────────────
+                QR takes up most of the stub height so it is big enough to
+                scan reliably. LEARN · BUILD · CONNECT and the Google dots
+                fill the remaining space below it. */}
             <div
                 className="pointer-events-none absolute"
                 style={{
-                    left: px(BODY.left + 27),
-                    top: py(56),
-                    width: px(PERF_L - BODY.left - 54),
+                    left: px(BODY.left + 18),
+                    top: py(18),
+                    width: px(PERF_L - BODY.left - 36),
                 }}
             >
+                {/* QR — taller than before so scanners can read it */}
                 <div
                     style={{
                         width: "100%",
                         aspectRatio: "1 / 1",
                         background: qr ? `url(${qr}) center / contain no-repeat` : "#0B0B0B",
-                        borderRadius: cq(6),
+                        borderRadius: cq(5),
                     }}
                 />
                 <div
                     className="product_sans"
                     style={{
-                        marginTop: cq(9),
-                        fontSize: cq(11),
+                        marginTop: cq(6),
+                        fontSize: cq(9),
                         fontWeight: 700,
                         lineHeight: 1,
                         letterSpacing: "0.16em",
@@ -226,12 +236,50 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 </div>
             </div>
 
+            {/* LEARN · BUILD · CONNECT */}
+            <div
+                className="product_sans pointer-events-none absolute"
+                style={{
+                    left: px(BODY.left + 18),
+                    top: py(186),
+                    width: px(PERF_L - BODY.left - 36),
+                    textAlign: "center",
+                    lineHeight: 1.4,
+                }}
+            >
+                {["LEARN", "BUILD", "CONNECT"].map((word) => (
+                    <div
+                        key={word}
+                        style={{
+                            fontSize: cq(11),
+                            fontWeight: 700,
+                            letterSpacing: "0.1em",
+                            color: INK,
+                        }}
+                    >
+                        {word}
+                    </div>
+                ))}
+                <div
+                    style={{
+                        marginTop: cq(5),
+                        fontSize: cq(8),
+                        fontWeight: 500,
+                        letterSpacing: "0.04em",
+                        color: "#80868b",
+                    }}
+                >
+                    #DevFestKolkata
+                </div>
+            </div>
+
+            {/* Four Google-colour dots — below LEARN/BUILD/CONNECT */}
             <div
                 className="pointer-events-none absolute flex"
                 style={{
-                    left: px(BODY.left + 27),
-                    top: py(244),
-                    width: px(PERF_L - BODY.left - 54),
+                    left: px(BODY.left + 18),
+                    bottom: py(TICKET_H - BODY.bottom + 8),
+                    width: px(PERF_L - BODY.left - 36),
                     justifyContent: "space-between",
                 }}
                 aria-hidden="true"
@@ -240,8 +288,8 @@ const BadgeCard = ({ attendee, cardRef }) => {
                     <span
                         key={c}
                         style={{
-                            width: cq(11),
-                            height: cq(11),
+                            width: cq(10),
+                            height: cq(10),
                             borderRadius: "50%",
                             background: c,
                         }}
@@ -249,13 +297,17 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 ))}
             </div>
 
-            {/* Middle stub — brand lockup and the attending pill share the top
-                row, the name is the hero, the tier sits under it as a chip. */}
+            {/* ─── MIDDLE BODY ───────────────────────────────────────────────
+                Top row: GDG logo + "DevFest Kolkata'26" lockup on the left,
+                "I'M ATTENDING 🚀" pill on the right.
+                Below: kicker → name (hero) → role line → ticket chip → date/day/venue → disclaimer. */}
+
+            {/* Brand lockup row */}
             <div
                 className="pointer-events-none absolute flex items-center"
                 style={{
                     left: px(PERF_L + 26),
-                    top: py(22),
+                    top: py(14),
                     height: py(36),
                     gap: cq(11),
                 }}
@@ -263,12 +315,12 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 <img
                     src="/logo-brackets.svg"
                     alt=""
-                    style={{ height: cq(32), width: "auto", flex: "0 0 auto" }}
+                    style={{ height: cq(30), width: "auto", flex: "0 0 auto" }}
                 />
                 <span
                     className="product_sans whitespace-nowrap"
                     style={{
-                        fontSize: cq(38),
+                        fontSize: cq(36),
                         fontWeight: 700,
                         lineHeight: 1,
                         color: INK,
@@ -283,8 +335,8 @@ const BadgeCard = ({ attendee, cardRef }) => {
                         background: "#ECECEC",
                         color: INK,
                         borderRadius: "999px",
-                        padding: `${cq(6)} ${cq(13)}`,
-                        fontSize: cq(17),
+                        padding: `${cq(5)} ${cq(12)}`,
+                        fontSize: cq(15),
                         fontWeight: 500,
                         lineHeight: 1,
                     }}
@@ -293,34 +345,69 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 </span>
             </div>
 
+            {/* "I'M ATTENDING" pill — top-right of the body */}
             <div
                 className="product_sans pointer-events-none absolute flex items-center whitespace-nowrap"
                 style={{
                     right: px(TICKET_W - (PERF_R - 26)),
-                    top: py(24),
-                    height: py(34),
+                    top: py(14),
+                    height: py(36),
                     gap: cq(8),
                     background: "#4285F4",
                     color: "#FFFFFF",
                     borderRadius: "999px",
                     padding: `0 ${cq(18)}`,
-                    fontSize: cq(17),
+                    fontSize: cq(16),
                     fontWeight: 700,
                     lineHeight: 1,
                     letterSpacing: "0.04em",
                 }}
             >
                 I&rsquo;M ATTENDING
-                <span aria-hidden="true" style={{ fontSize: cq(16) }}>
-                    🚀
-                </span>
+                <span aria-hidden="true" style={{ fontSize: cq(15) }}>🚀</span>
             </div>
 
+            {/* Punchline below the pill — the exact line from the hero,
+                now on the badge so it carries the event's own voice. */}
+            <div
+                className="product_sans pointer-events-none absolute"
+                style={{
+                    right: px(TICKET_W - (PERF_R - 26)),
+                    top: py(55),
+                    fontSize: cq(13),
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    color: INK,
+                    textAlign: "right",
+                    maxWidth: px(340),
+                }}
+            >
+                কলকাতার ছন্দে, DevFest-এর আনন্দে !
+            </div>
+
+            {/* "This pass belongs to" kicker */}
+            <div
+                className="product_sans pointer-events-none absolute whitespace-nowrap"
+                style={{
+                    left: px(PERF_L + 26),
+                    top: py(55),
+                    fontSize: cq(10),
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: "#80868b",
+                }}
+            >
+                This pass belongs to
+            </div>
+
+            {/* ── NAME — hero text, kept well below the kicker ── */}
             <div
                 className="product_sans pointer-events-none absolute"
                 style={{
                     left: px(PERF_L + 26),
-                    top: py(80),
+                    top: py(88),
                     width: px(545),
                     fontSize: nameSizeFor(name),
                     fontWeight: 700,
@@ -338,18 +425,43 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 {name}
             </div>
 
+            {/* Role line — designation · organisation. Both values come out of
+                the API already word-boundary-clipped, so CSS just needs to
+                hide any overflow without re-truncating mid-word. */}
+            {roleLine && (
+                <div
+                    className="product_sans pointer-events-none absolute"
+                    style={{
+                        left: px(PERF_L + 26),
+                        top: py(148),
+                        width: px(545),
+                        fontSize: cq(13),
+                        fontWeight: 500,
+                        lineHeight: 1.15,
+                        color: "#5f6368",
+                        // overflow:hidden clips without adding "…" — the text
+                        // from clip() already ends at a word boundary.
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {roleLine}
+                </div>
+            )}
+
+            {/* Ticket chip */}
             <div
                 className="product_sans pointer-events-none absolute flex items-center whitespace-nowrap"
                 style={{
                     left: px(PERF_L + 26),
-                    top: py(150),
-                    height: py(30),
+                    top: py(165),
+                    height: py(26),
                     maxWidth: px(545),
                     background: accent,
                     color: "#FFFFFF",
                     borderRadius: "999px",
-                    padding: `0 ${cq(16)}`,
-                    fontSize: cq(15),
+                    padding: `0 ${cq(14)}`,
+                    fontSize: cq(13.5),
                     fontWeight: 700,
                     lineHeight: 1,
                     letterSpacing: "0.08em",
@@ -360,24 +472,22 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 {attendee.ticketName}
             </div>
 
+            {/* Date / Day / Venue row */}
             <div
                 className="product_sans pointer-events-none absolute flex items-center"
                 style={{
                     left: px(PERF_L + 26),
-                    top: py(186),
+                    top: py(196),
                     width: px(545),
-                    height: py(24),
+                    height: py(22),
                     gap: cq(9),
-                    fontSize: cq(16),
+                    fontSize: cq(14),
                     fontWeight: 500,
                     lineHeight: 1,
                     color: INK,
                 }}
             >
-                <span
-                    className="flex items-center"
-                    style={{ gap: cq(7), color: INK }}
-                >
+                <span className="flex items-center" style={{ gap: cq(6), color: INK }}>
                     <CalendarIcon />
                     {attendee.date}
                 </span>
@@ -386,8 +496,8 @@ const BadgeCard = ({ attendee, cardRef }) => {
                     style={{
                         background: "#ECECEC",
                         borderRadius: "999px",
-                        padding: `${cq(5)} ${cq(11)}`,
-                        fontSize: cq(13),
+                        padding: `${cq(4)} ${cq(10)}`,
+                        fontSize: cq(12),
                         fontWeight: 700,
                         letterSpacing: "0.08em",
                     }}
@@ -397,7 +507,7 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 <span style={{ color: "#dadce0" }}>|</span>
                 <span
                     className="flex items-center"
-                    style={{ gap: cq(7), color: "#5f6368", overflow: "hidden" }}
+                    style={{ gap: cq(6), color: "#5f6368", overflow: "hidden" }}
                 >
                     <PinIcon />
                     <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -406,40 +516,67 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 </span>
             </div>
 
-            {/* The one line that has to travel with the image: a badge is
-                not a ticket, and the card says so wherever it is reposted. */}
+            {/* Tagline row — the event's own three-word promise, centred under
+                the date row, bridges the date/venue info and the disclaimer. */}
+            <div
+                className="product_sans pointer-events-none absolute flex items-center"
+                style={{
+                    left: px(PERF_L + 26),
+                    top: py(222),
+                    width: px(545),
+                    gap: cq(8),
+                    fontSize: cq(10.5),
+                    fontWeight: 500,
+                    lineHeight: 1,
+                    color: "#80868b",
+                }}
+            >
+                {["Learn", "Build", "Connect"].map((word, i, arr) => (
+                    <span key={word} className="flex items-center" style={{ gap: cq(8) }}>
+                        <span>{word}</span>
+                        {i < arr.length - 1 && (
+                            <span style={{ fontSize: cq(8), opacity: 0.5 }}>●</span>
+                        )}
+                    </span>
+                ))}
+                <span style={{ color: "#dadce0", marginLeft: cq(4) }}>·</span>
+                <span>Organised by GDG Kolkata</span>
+            </div>
+
+            {/* Disclaimer — the one line that travels with the image wherever
+                it is reposted: a badge is not a ticket, and the card says so. */}
             <div
                 className="product_sans pointer-events-none absolute"
                 style={{
                     left: px(PERF_L + 26),
-                    top: py(216),
+                    top: py(238),
                     width: px(545),
-                    fontSize: cq(11),
+                    fontSize: cq(9.5),
                     fontWeight: 500,
                     lineHeight: 1.2,
                     color: "#80868b",
                 }}
             >
-                Social badge for sharing only — does not guarantee entry.
+                Social pass for sharing only — does not guarantee entry.
             </div>
 
-            {/* Kolkata ornament, bottom centre — the same artwork the pass
-                card carries, so both read as one family. */}
+            {/* Victoria Memorial ornament, bottom centre */}
             <img
                 src="/ticket/victoria-memorial.svg"
                 alt=""
                 className="pointer-events-none absolute"
                 style={{
-                    left: px((PERF_L + PERF_R) / 2 - 60),
+                    left: px((PERF_L + PERF_R) / 2 - 58),
                     bottom: py(TICKET_H - BODY.bottom + 2),
-                    width: px(120),
+                    width: px(116),
                     height: "auto",
                 }}
             />
 
-            {/* Right stub. A real booking prints its serial and the bars
-                hashed from it; anything else falls back to the lockup rather
-                than showing a placeholder id nobody could use. */}
+            {/* ─── RIGHT STUB ────────────────────────────────────────────────
+                A real booking prints "EVENT PASS", its serial, and the barcode
+                hashed from the serial. A placeholder falls back to the DevFest
+                lockup — no dummy id nobody could use. */}
             {hasPassId ? (
                 <>
                     <div
@@ -447,8 +584,8 @@ const BadgeCard = ({ attendee, cardRef }) => {
                         style={{
                             left: px(PERF_R),
                             width: px(BODY.right - PERF_R),
-                            top: py(32),
-                            fontSize: cq(12),
+                            top: py(28),
+                            fontSize: cq(11),
                             fontWeight: 700,
                             lineHeight: 1,
                             letterSpacing: "0.2em",
@@ -459,13 +596,14 @@ const BadgeCard = ({ attendee, cardRef }) => {
                         Event Pass
                     </div>
 
+                    {/* Serial number */}
                     <div
                         className="product_sans pointer-events-none absolute text-center"
                         style={{
                             left: px(PERF_R),
                             width: px(BODY.right - PERF_R),
-                            top: py(54),
-                            fontSize: cq(24),
+                            top: py(48),
+                            fontSize: cq(22),
                             fontWeight: 700,
                             lineHeight: 1,
                             letterSpacing: "0.04em",
@@ -479,13 +617,14 @@ const BadgeCard = ({ attendee, cardRef }) => {
                         {attendee.bookingId}
                     </div>
 
+                    {/* Barcode */}
                     <div
                         className="pointer-events-none absolute"
                         style={{
                             left: px(PERF_R + 27),
                             width: px(BODY.right - PERF_R - 54),
-                            top: py(104),
-                            height: py(146),
+                            top: py(96),
+                            height: py(140),
                         }}
                         aria-hidden="true"
                     >
@@ -493,6 +632,7 @@ const BadgeCard = ({ attendee, cardRef }) => {
                     </div>
                 </>
             ) : (
+                /* Fallback for a no-id pass */
                 <div
                     className="product_sans pointer-events-none absolute text-center"
                     style={{
@@ -503,9 +643,7 @@ const BadgeCard = ({ attendee, cardRef }) => {
                         color: INK,
                     }}
                 >
-                    <div style={{ fontSize: cq(26), fontWeight: 700 }}>
-                        DevFest
-                    </div>
+                    <div style={{ fontSize: cq(26), fontWeight: 700 }}>DevFest</div>
                     <div
                         style={{
                             fontSize: cq(15),
@@ -521,13 +659,31 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 </div>
             )}
 
+            {/* Organiser line — a ticket always names its organiser. */}
+            <div
+                className="product_sans pointer-events-none absolute text-center"
+                style={{
+                    left: px(PERF_R),
+                    width: px(BODY.right - PERF_R),
+                    top: py(252),
+                    fontSize: cq(9),
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "#80868b",
+                }}
+            >
+                Presented by GDG Kolkata
+            </div>
+
             <div
                 className="product_sans pointer-events-none absolute text-center"
                 style={{
                     left: px(PERF_R),
                     width: px(BODY.right - PERF_R),
                     bottom: py(26),
-                    fontSize: cq(13),
+                    fontSize: cq(12),
                     fontWeight: 500,
                     lineHeight: 1,
                     color: INK,

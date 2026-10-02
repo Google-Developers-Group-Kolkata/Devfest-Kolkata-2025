@@ -71,6 +71,17 @@ const dayFor = (ticketName) => {
     return hit ? { day: hit.day, date: hit.date } : DEFAULT_DAY;
 };
 
+// Free text from the registration form, trimmed and capped for the card's
+// single line. The cap falls back to a hard slice only when the whole value
+// is one word, since there is no safe place to stop otherwise.
+const clip = (value, max) => {
+    const text = String(value ?? "").trim();
+    if (text.length <= max) return text;
+    const cut = text.slice(0, max);
+    const lastSpace = cut.lastIndexOf(" ");
+    return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trim();
+};
+
 // Every attendee detail the badge is allowed to show. Everything else on
 // the doc — phone, email, linkedin, payment ids, invoice urls, dietary
 // preferences — stops at this function.
@@ -89,6 +100,13 @@ const toBadge = (doc) => {
         name,
         ticketName: stripBrand(ticketName) || "Ticket",
         bookingId: String(att["Booking Id"] ?? ""),
+        // What the attendee told the registration form. Printed as a role
+        // line under the name, so the card reads as that person's pass
+        // rather than any holder of the same tier. Capped, because an
+        // organisation name is free text and the card has one line for it,
+        // and cut on a word so the cap never lands mid-syllable.
+        designation: clip(att["Your Designation"], 40),
+        organisation: clip(att.Organisation, 48),
         venue: EVENT_VENUE,
         ...dayFor(ticketName),
     };
