@@ -496,7 +496,7 @@ const DayHeading = ({ group, progress }) => (
     </div>
 );
 
-const TicketsSection = () => {
+const TicketsSection = ({ onNavigate }) => {
     const [headingP, setHeadingP] = useState(0);
     // Every card comes from Firebase; until the fetch settles there is nothing
     // to draw, and `loaded` is what tells the empty state from the wait.
@@ -685,6 +685,38 @@ const TicketsSection = () => {
                             </div>
                         ))
                     )}
+                </div>
+
+                {/* Offered where the intent is — they have just been reading
+                    prices, and half of them already hold a pass. The rule is
+                    spelled out here too: a badge is not a ticket. */}
+                <div className="mb-12 mt-2 flex w-full flex-col items-center gap-2 md:mb-16">
+                    <button
+                        type="button"
+                        onClick={() => onNavigate?.("badge")}
+                        className="product_sans cursor-pointer text-center text-[15px] transition-colors md:text-[17px]"
+                        style={{ color: "#5f6368" }}
+                    >
+                        Already booked?{" "}
+                        <span
+                            style={{
+                                color: "#1a73e8",
+                                fontWeight: 500,
+                                textDecoration: "underline",
+                                textUnderlineOffset: "3px",
+                            }}
+                        >
+                            Grab your badge &rarr;
+                        </span>
+                    </button>
+                    <p
+                        className="product_sans max-w-[560px] text-center text-[12px] md:text-[13px]"
+                        style={{ color: "#80868b", lineHeight: 1.5 }}
+                    >
+                        The badge is for social media only and does not
+                        guarantee entry — your pass is verified separately by
+                        us at the venue.
+                    </p>
                 </div>
             </div>
         </section>

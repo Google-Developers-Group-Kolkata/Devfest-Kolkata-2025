@@ -66,6 +66,7 @@ const FOOTER_NAV = [
         links: [
             { label: "Overview", section: "about" },
             { label: "Tickets", section: "tickets" },
+            { label: "Get your badge", section: "badge" },
             { label: "Venue", section: "venue" },
             { label: "Partners", section: "partners" },
             { label: "Our Team", section: "team" },

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
+import BadgeSection from "./BadgeSection";
 import VenueSection from "./VenueSection";
 import PartnersSection from "./PartnersSection";
 import TeamSection from "./TeamSection";
@@ -170,6 +171,7 @@ const TramHero = () => {
     const sectionRefs = {
         about: useRef(null),
         tickets: useRef(null),
+        badge: useRef(null),
         venue: useRef(null),
         partners: useRef(null),
         team: useRef(null),
@@ -545,7 +547,12 @@ const TramHero = () => {
                         <AboutSection />
                     </div>
                     <div ref={sectionRefs.tickets}>
-                        <TicketsSection />
+                        <TicketsSection onNavigate={scrollToSection} />
+                    </div>
+                    {/* The badge generator sits where the purchase intent is
+                        highest: right after the tickets, before the venue. */}
+                    <div ref={sectionRefs.badge}>
+                        <BadgeSection onNavigate={scrollToSection} />
                     </div>
                     <div ref={sectionRefs.venue}>
                         <VenueSection />
