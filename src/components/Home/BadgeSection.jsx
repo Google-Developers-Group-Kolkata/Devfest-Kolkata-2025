@@ -54,6 +54,7 @@ const BadgeSection = ({ onNavigate }) => {
     const reduced = useReducedMotion();
 
     const [query, setQuery] = useState("");
+    const [honeypot, setHoneypot] = useState("");
     const [status, setStatus] = useState("idle"); // idle | loading | error
     const [message, setMessage] = useState("");
     const [attendee, setAttendee] = useState(null);
@@ -99,7 +100,7 @@ const BadgeSection = ({ onNavigate }) => {
 
         try {
             const res = await fetch(
-                `/api/attendee?q=${encodeURIComponent(value)}`,
+                `/api/attendee?q=${encodeURIComponent(value)}&_hp=${encodeURIComponent(honeypot)}`,
                 { cache: "no-store" }
             );
 
@@ -107,6 +108,13 @@ const BadgeSection = ({ onNavigate }) => {
                 setStatus("error");
                 setMessage(
                     "No ticket found — try your registered email, phone number, or booking ID."
+                );
+                return;
+            }
+            if (res.status === 429) {
+                setStatus("error");
+                setMessage(
+                    "Don't try to be too much clever, just see your own social pass. 😄 Try again in 10 minutes."
                 );
                 return;
             }
@@ -302,6 +310,28 @@ const BadgeSection = ({ onNavigate }) => {
                                 "Generate my social pass"
                             )}
                         </button>
+
+                        {/* Honeypot — invisible to humans, bots fill it automatically.
+                            position:absolute + opacity:0 keeps it out of the layout
+                            and out of sight without using display:none (some bots
+                            skip display:none fields but not opacity:0 ones). */}
+                        <input
+                            type="text"
+                            name="_hp"
+                            value={honeypot}
+                            onChange={(e) => setHoneypot(e.target.value)}
+                            tabIndex={-1}
+                            autoComplete="off"
+                            aria-hidden="true"
+                            style={{
+                                position: "absolute",
+                                opacity: 0,
+                                pointerEvents: "none",
+                                width: 0,
+                                height: 0,
+                                overflow: "hidden",
+                            }}
+                        />
                     </motion.form>
 
                     <div className="mt-4 min-h-[44px] text-center">

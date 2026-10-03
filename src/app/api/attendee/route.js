@@ -124,6 +124,14 @@ export async function GET(request) {
             );
         }
 
+        // Honeypot check — real browsers send this empty because the field
+        // is invisible. Bots fill every field they find. Silently return 404
+        // so the bot learns nothing useful (a 400 would tell it the trap exists).
+        const hp = request.nextUrl.searchParams.get("_hp") ?? "";
+        if (hp !== "") {
+            return NextResponse.json({ error: "not_found" }, { status: 404 });
+        }
+
         const db = getDb();
         if (!db) throw new Error("Firebase not configured");
 
