@@ -37,8 +37,6 @@ const WHY = [
 
 // The condition, kept in one sentence and repeated wherever the social pass is
 // handed over — on the site and on the image itself.
-const DISCLAIMER =
-    "This social pass is for sharing only — it does not guarantee entry to DevFest Kolkata. We verify attendees separately at the venue, so keep your original ticket email handy.";
 
 // A filename, not a headline: lowercased, ascii-ish, no spaces.
 const slugFor = (name) =>
@@ -384,44 +382,6 @@ const BadgeSection = ({ onNavigate }) => {
                         ))}
                     </motion.ul>
 
-                    {/* The condition, boxed so it reads as a rule rather than a
-                        footnote — a badge is not a ticket. */}
-                    <motion.div
-                        initial={reduced ? false : { opacity: 0, y: 14 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.5 }}
-                        transition={{ duration: 0.45, ease: EASE, delay: 0.3 }}
-                        className="mx-auto mt-6 flex max-w-[680px] items-start gap-3 rounded-2xl px-4 py-3.5 md:px-5"
-                        style={{
-                            background: "#fff8e1",
-                            border: "1px solid #fde293",
-                        }}
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#b06000"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            aria-hidden="true"
-                            className="mt-0.5 h-4 w-4 flex-none md:h-5 md:w-5"
-                        >
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="M12 8h.01M12 11.5v4.5" />
-                        </svg>
-                        <p
-                            className="product_sans text-[13px] md:text-[14px]"
-                            style={{ lineHeight: 1.5, color: "#5a4200" }}
-                        >
-                            <strong style={{ fontWeight: 700 }}>
-                                It&rsquo;s a social pass, not a ticket.
-                            </strong>{" "}
-                            Made for posting on social media — it does not
-                            guarantee entry. We verify attendees separately at
-                            the venue, so keep your original booking email
-                            handy.
-                        </p>
-                    </motion.div>
                 </div>
             </section>
 
@@ -655,17 +615,6 @@ const BadgeSection = ({ onNavigate }) => {
                                 every week.
                             </p>
 
-                            {/* Same rule as on the card and under the form, so
-                                nobody meets it for the first time at the gate. */}
-                            <p
-                                className="product_sans mx-auto max-w-[560px] text-center text-[12px] md:text-[13px]"
-                                style={{ color: "rgba(255,255,255,0.55)" }}
-                            >
-                                Made for sharing, not for entry — this social
-                                pass does not guarantee entry. Attendee
-                                verification is done separately by us before
-                                the event.
-                            </p>
 
                             <button
                                 type="button"

@@ -543,23 +543,6 @@ const BadgeCard = ({ attendee, cardRef }) => {
                 <span>Organised by GDG Kolkata</span>
             </div>
 
-            {/* Disclaimer — the one line that travels with the image wherever
-                it is reposted: a badge is not a ticket, and the card says so. */}
-            <div
-                className="product_sans pointer-events-none absolute"
-                style={{
-                    left: px(PERF_L + 26),
-                    top: py(238),
-                    width: px(545),
-                    fontSize: cq(9.5),
-                    fontWeight: 500,
-                    lineHeight: 1.2,
-                    color: "#80868b",
-                }}
-            >
-                Social pass for sharing only — does not guarantee entry.
-            </div>
-
             {/* Victoria Memorial ornament, bottom centre */}
             <img
                 src="/ticket/victoria-memorial.svg"
