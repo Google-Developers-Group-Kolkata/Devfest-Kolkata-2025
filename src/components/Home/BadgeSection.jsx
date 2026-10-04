@@ -25,7 +25,7 @@ const SITE_URL = "https://devfestkolkata.in";
 const captionFor = (attendee) =>
     `🚀 I'm attending DevFest Kolkata '26!` +
     `${attendee ? ` Got my ${attendee.ticketName} pass.` : ""}` +
-    ` Learn · Build · Connect — 21–22 November 2026 at The Westin Kolkata, Rajarhat.` +
+    ` Learn · Build · Connect — 21–22 November 2026${attendee?.venue && attendee.venue !== "TBD" ? ` at ${attendee.venue}` : ""}.` +
     `\n\n${SITE_URL} #DevFestKolkata #GDGKolkata`;
 
 // Three short answers to the three reasons someone would not bother.
@@ -208,7 +208,7 @@ const BadgeSection = ({ onNavigate }) => {
         if (d.includes("student"))
             return `Your ${attendee?.ticketName} social pass is ready — time to learn, build, and connect. 🎓`;
         if (d.includes("professional") || d.includes("pro"))
-            return `Your ${attendee?.ticketName} social pass is ready — see you at The Westin, Rajarhat. 🤝`;
+            return `Your ${attendee?.ticketName} social pass is ready — see you at ${attendee?.venue && attendee.venue !== "TBD" ? attendee.venue : "the venue"}. 🤝`;
         return `Your ${attendee?.ticketName} social pass is ready — DevFest Kolkata is waiting for you. 🚀`;
     })();
 
@@ -487,7 +487,7 @@ const BadgeSection = ({ onNavigate }) => {
                             >
                                 <span>DevFest Kolkata &rsquo;26</span>
                                 <span style={{ opacity: 0.35 }}>·</span>
-                                <span>The Westin Kolkata, Rajarhat</span>
+                                <span>{attendee.venue}</span>
                                 <span style={{ opacity: 0.35 }}>·</span>
                                 <span>21–22 November 2026</span>
                             </div>
