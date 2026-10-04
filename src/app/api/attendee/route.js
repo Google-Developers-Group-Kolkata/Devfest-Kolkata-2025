@@ -44,10 +44,10 @@ const DEMO_TICKET = /demo\s*\(/i;
 // is read off the tier name rather than guessed. An unknown tier falls back
 // to Day 2 rather than failing the lookup.
 const DAY_BY_TIER = [
-    { test: /workshop/i, day: 1, date: "21st November, 2026" },
+    { test: /workshop/i, day: 1, date: "21st November, 2026", venue: "TBD" },
 ];
 
-const DEFAULT_DAY = { day: 2, date: "22nd November, 2026" };
+const DEFAULT_DAY = { day: 2, date: "22nd November, 2026", venue: EVENT_VENUE };
 
 // Same string the ticket cards print.
 const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
@@ -63,7 +63,9 @@ const dayFor = (ticketName) => {
     const hit = DAY_BY_TIER.find(({ test }) =>
         test.test(String(ticketName ?? ""))
     );
-    return hit ? { day: hit.day, date: hit.date } : DEFAULT_DAY;
+    return hit
+        ? { day: hit.day, date: hit.date, venue: hit.venue }
+        : DEFAULT_DAY;
 };
 
 // Free text from the registration form, trimmed and word-boundary capped.
@@ -93,7 +95,6 @@ const toPass = (doc) => {
         bookingId: String(att["Booking Id"] ?? ""),
         designation: clip(att["Your Designation"], 40),
         organisation: clip(att.Organisation, 48),
-        venue: EVENT_VENUE,
         ...dayFor(ticketName),
     };
 };
