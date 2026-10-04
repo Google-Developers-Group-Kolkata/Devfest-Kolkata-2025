@@ -39,6 +39,9 @@ const COLLECTION = "attendees2026";
 // resolve like anyone else's.
 const DEMO_TICKET = /demo\s*\(/i;
 
+// Same string the ticket cards print.
+const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
+
 // Passes are grouped by the day they admit to. Everything on the site is
 // ticketed for Day 2; the workshop is the one tier sold against Day 1, so it
 // is read off the tier name rather than guessed. An unknown tier falls back
@@ -48,9 +51,6 @@ const DAY_BY_TIER = [
 ];
 
 const DEFAULT_DAY = { day: 2, date: "22nd November, 2026", venue: EVENT_VENUE };
-
-// Same string the ticket cards print.
-const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
 
 // "DevFest Kolkata'26 Regular Ticket Phase 2" -> "Regular Ticket Phase 2".
 const stripBrand = (name) =>
