@@ -55,7 +55,8 @@ const BadgeSection = ({ onNavigate }) => {
     const [honeypot, setHoneypot] = useState("");
     const [status, setStatus] = useState("idle"); // idle | loading | error
     const [message, setMessage] = useState("");
-    const [attendee, setAttendee] = useState(null);
+    const [attendees, setAttendees] = useState(null); // null | array of passes
+    const [attendee, setAttendee] = useState(null);   // the one being shown
     const [exporting, setExporting] = useState(false);
 
     const cardRef = useRef(null);
@@ -65,22 +66,25 @@ const BadgeSection = ({ onNavigate }) => {
     // scrolling, and comes back at exactly the place it was left — nothing
     // here moves the scroll position itself.
     useEffect(() => {
-        if (!attendee) return;
+        if (!attendee && !attendees) return;
         const prev = document.body.style.overflow;
         document.body.style.overflow = "hidden";
         return () => {
             document.body.style.overflow = prev;
         };
-    }, [attendee]);
+    }, [attendee, attendees]);
 
     useEffect(() => {
-        if (!attendee) return;
+        if (!attendee && !attendees) return;
         const onKey = (e) => {
-            if (e.key === "Escape") setAttendee(null);
+            if (e.key === "Escape") {
+                if (attendee) setAttendee(null);
+                else setAttendees(null);
+            }
         };
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
-    }, [attendee]);
+    }, [attendee, attendees]);
 
     const submit = async (e) => {
         e?.preventDefault();
@@ -118,9 +122,17 @@ const BadgeSection = ({ onNavigate }) => {
             }
             if (!res.ok) throw new Error(`lookup failed: ${res.status}`);
 
-            const { attendee: found } = await res.json();
+            const data = await res.json();
             setStatus("idle");
-            setAttendee(found);
+
+            // Multiple tickets → show the picker first
+            if (data.attendees && data.attendees.length > 1) {
+                setAttendees(data.attendees);
+            } else {
+                // Single ticket (new shape has attendees[0], old shape has attendee)
+                const found = data.attendee ?? data.attendees?.[0] ?? null;
+                setAttendee(found);
+            }
         } catch (error) {
             console.error("social-pass: lookup failed", error);
             setStatus("error");
@@ -388,6 +400,147 @@ const BadgeSection = ({ onNavigate }) => {
             {/* Result — a full-screen sheet over the page. It closes from the
                 X, the Escape key or the backdrop, and the page behind it keeps
                 the scroll position it had. */}
+            {attendees && !attendee && (
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Choose your ticket"
+                    className="cs-overlay fixed inset-0 z-[100] overflow-y-auto"
+                    style={{
+                        background: "rgba(0,0,0,0.55)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                    }}
+                    onClick={() => setAttendees(null)}
+                >
+                    <div
+                        className="flex min-h-full w-full flex-col items-center justify-center px-4 py-10 sm:px-8"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            onClick={() => setAttendees(null)}
+                            aria-label="Close"
+                            className="fixed right-4 top-4 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-black/40 text-white transition-colors hover:bg-black/60 sm:right-6 sm:top-6"
+                        >
+                            <X size={20} aria-hidden="true" />
+                        </button>
+
+                        <div
+                            className="product_sans mb-6 text-center text-white"
+                            style={{ maxWidth: "680px" }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: "clamp(20px, 4vw, 28px)",
+                                    fontWeight: 700,
+                                    lineHeight: 1.1,
+                                }}
+                            >
+                                You have {attendees.length} tickets 🎟️
+                            </div>
+                            <div
+                                style={{
+                                    marginTop: "8px",
+                                    fontSize: "clamp(13px, 2.2vw, 15px)",
+                                    color: "rgba(255,255,255,0.65)",
+                                }}
+                            >
+                                Pick the one you want to generate a social pass for.
+                            </div>
+                        </div>
+
+                        <div
+                            className="w-full flex flex-col gap-3"
+                            style={{ maxWidth: "560px" }}
+                        >
+                            {attendees.map((pass, i) => {
+                                // Reuse the same accent colour logic as BadgeCard
+                                const TIER_COLORS_PICKER = [
+                                    [/workshop/i, "#4285F4"],
+                                    [/early\s*bird/i, "#FBBC04"],
+                                    [/exclusive/i, "#F63130"],
+                                    [/phase\s*1/i, "#4285F4"],
+                                    [/phase\s*3/i, "#F63130"],
+                                    [/phase\s*2/i, "#34A853"],
+                                ];
+                                const name = String(pass.ticketName ?? "");
+                                const hit = TIER_COLORS_PICKER.find(([re]) => re.test(name));
+                                const accent = hit ? hit[1] : "#F63130";
+
+                                return (
+                                    <button
+                                        key={pass.bookingId || i}
+                                        type="button"
+                                        onClick={() => {
+                                            setAttendees(null);
+                                            setAttendee(pass);
+                                        }}
+                                        className="product_sans w-full cursor-pointer rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-left text-white transition-all hover:bg-white/20 hover:scale-[1.01] active:scale-[0.99]"
+                                    >
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex flex-col gap-1 min-w-0">
+                                                <span
+                                                    className="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider text-white"
+                                                    style={{ background: accent, alignSelf: "flex-start" }}
+                                                >
+                                                    {pass.ticketName}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontSize: "clamp(15px, 3vw, 18px)",
+                                                        fontWeight: 700,
+                                                        lineHeight: 1.15,
+                                                    }}
+                                                >
+                                                    {pass.name}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        fontSize: "13px",
+                                                        color: "rgba(255,255,255,0.55)",
+                                                    }}
+                                                >
+                                                    Day {pass.day} · {pass.date}
+                                                    {pass.venue && pass.venue !== "TBD" ? ` · ${pass.venue}` : ""}
+                                                </span>
+                                            </div>
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                style={{ width: 20, height: 20, flexShrink: 0, opacity: 0.6 }}
+                                                aria-hidden="true"
+                                            >
+                                                <path d="M9 18l6-6-6-6" />
+                                            </svg>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setAttendees(null);
+                                setQuery("");
+                                setTimeout(() => inputRef.current?.focus(), 60);
+                            }}
+                            className="product_sans mt-6 flex cursor-pointer items-center gap-1.5 text-[14px] text-white/70 underline underline-offset-4 transition-colors hover:text-white"
+                        >
+                            Not you? Try another entry
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Result — a full-screen sheet over the page. It closes from the
+                X, the Escape key or the backdrop, and the page behind it keeps
+                the scroll position it had. */}
             {attendee && (
                 <div
                     role="dialog"
@@ -408,10 +561,17 @@ const BadgeSection = ({ onNavigate }) => {
                         <button
                             type="button"
                             onClick={() => setAttendee(null)}
-                            aria-label="Close"
+                            aria-label={attendees ? "Back to ticket list" : "Close"}
                             className="fixed right-4 top-4 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-black/40 text-white transition-colors hover:bg-black/60 sm:right-6 sm:top-6"
                         >
-                            <X size={20} aria-hidden="true" />
+                            {attendees ? (
+                                /* back arrow — returns to the picker */
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }} aria-hidden="true">
+                                    <path d="M15 18l-6-6 6-6" />
+                                </svg>
+                            ) : (
+                                <X size={20} aria-hidden="true" />
+                            )}
                         </button>
 
                         <div
@@ -620,6 +780,7 @@ const BadgeSection = ({ onNavigate }) => {
                                 type="button"
                                 onClick={() => {
                                     setAttendee(null);
+                                    setAttendees(null);
                                     setQuery("");
                                     setTimeout(() => inputRef.current?.focus(), 60);
                                 }}

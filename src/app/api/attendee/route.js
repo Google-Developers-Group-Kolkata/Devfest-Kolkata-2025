@@ -138,52 +138,67 @@ export async function GET(request) {
 
         const field = (key) => `data.Attendee Details.${key}`;
 
-        // Returns the newest valid doc matching a given Firestore field/value,
-        // or null when nothing matches.
+        // Returns ALL valid passes matching a given Firestore field/value,
+        // sorted newest-first. Returns an empty array when nothing matches.
         const queryField = async (key, value) => {
             const snap = await db
                 .collection(COLLECTION)
                 .where(field(key), "==", value)
-                .limit(5)
+                .limit(20)
                 .get();
-            if (snap.empty) return null;
+            if (snap.empty) return [];
             return snap.docs
                 .map((doc) => ({ doc, at: doc.data().createdAt?.toMillis?.() ?? 0 }))
                 .sort((a, b) => b.at - a.at)
-                .map(({ doc }) => doc)
-                .find((doc) => toPass(doc)) ?? null;
+                .map(({ doc }) => toPass(doc))
+                .filter(Boolean);
         };
 
         const kind = classify(raw);
-        let match = null;
+        let passes = [];
 
         if (kind === "email") {
             // Emails are stored lowercase; normalise before querying.
             const email = raw.toLowerCase();
-            match =
-                (await queryField("Email Address", email)) ??
-                (await queryField("Buyer Email", email));
+            const [a, b] = await Promise.all([
+                queryField("Email Address", email),
+                queryField("Buyer Email", email),
+            ]);
+            // Merge, deduplicating by bookingId
+            const seen = new Set();
+            for (const p of [...a, ...b]) {
+                if (!seen.has(p.bookingId)) {
+                    seen.add(p.bookingId);
+                    passes.push(p);
+                }
+            }
 
         } else if (kind === "phone") {
             // Phone numbers in Firestore are in E.164 (+91XXXXXXXXXX).
             // We try the raw value first, then the +91 prefixed version,
             // then the 10-digit local version so any common input works.
             const digits = normalisePhone(raw);
-            const candidates = new Set([
-                raw.trim(),                          // exactly as typed
-                `+${digits}`,                        // e.g. +919830989843
-                digits.length === 10 ? `+91${digits}` : null, // 10-digit Indian
-                digits,                              // bare digits (unlikely in DB)
-            ].filter(Boolean));
+            const candidates = [...new Set([
+                raw.trim(),
+                `+${digits}`,
+                digits.length === 10 ? `+91${digits}` : null,
+                digits,
+            ].filter(Boolean))];
 
+            const seen = new Set();
             for (const candidate of candidates) {
-                match = await queryField("Phone Number", candidate);
-                if (match) break;
+                const results = await queryField("Phone Number", candidate);
+                for (const p of results) {
+                    if (!seen.has(p.bookingId)) {
+                        seen.add(p.bookingId);
+                        passes.push(p);
+                    }
+                }
             }
 
         } else if (kind === "bookingId") {
-            // Booking IDs are stored lowercase hex.
-            match = await queryField("Booking Id", raw.toLowerCase());
+            // A booking ID is unique — always one result at most.
+            passes = await queryField("Booking Id", raw.toLowerCase());
 
         } else {
             return NextResponse.json(
@@ -192,16 +207,20 @@ export async function GET(request) {
             );
         }
 
-        const pass = match ? toPass(match) : null;
-
-        if (!pass) {
+        if (passes.length === 0) {
             return NextResponse.json(
                 { error: "not_found" },
                 { status: 404 }
             );
         }
 
-        return NextResponse.json({ attendee: pass }, { status: 200 });
+        // Single result: keep the old shape so any existing client still works.
+        // Multiple results: return the array so the UI can offer a picker.
+        if (passes.length === 1) {
+            return NextResponse.json({ attendee: passes[0], attendees: passes }, { status: 200 });
+        }
+
+        return NextResponse.json({ attendees: passes }, { status: 200 });
     } catch (error) {
         console.error("attendee: lookup failed:", error);
         return NextResponse.json(

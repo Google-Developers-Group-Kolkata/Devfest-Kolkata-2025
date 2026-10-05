@@ -16,6 +16,31 @@ const PARTNER_GROUPS = [
             },
         ],
     },
+    {
+        label: "Healthcare Partner",
+        items: [
+            {
+                name: "Sasta Sundar",
+                logo: "/sponsors/sasta-sundar.png",
+                href: "https://www.sastasundar.com/",
+            },
+        ],
+    },
+    {
+        label: "Media Partners",
+        items: [
+            {
+                name: "Candid Kolkata",
+                logo: "/sponsors/candid-kolkata.png",
+                href: null,
+            },
+            {
+                name: "West Bengal",
+                logo: "/sponsors/west-bengal.webp",
+                href: null,
+            },
+        ],
+    },
 ];
 
 const EASE = [0.33, 0, 0.2, 1];
