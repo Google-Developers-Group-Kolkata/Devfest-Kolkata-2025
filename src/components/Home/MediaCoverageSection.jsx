@@ -266,6 +266,8 @@ const MEDIA_PARTNERS = [
     },
 ];
 
+const MARQUEE_COPIES = 4;
+
 const CoverageChip = ({ item }) => {
     const meta = PLATFORMS[item.platform] ?? PLATFORMS.Website;
     const Icon = meta.icon;
@@ -366,26 +368,39 @@ const MediaCoverageSection = () => {
 
             </div>
 
-            <div className="marquee-wrap relative w-full overflow-hidden py-6 motion-reduce:overflow-x-auto">
+            <div className="relative w-full px-5 sm:px-8 md:px-10 xl:px-16">
                 <div
-                    className="marquee-track items-stretch"
-                    style={{ "--marquee-duration": "65s" }}
+                    className="marquee-wrap relative overflow-hidden py-6 motion-reduce:overflow-x-auto"
+                    style={{
+                        WebkitMaskImage:
+                            "linear-gradient(to right, transparent, #000 3%, #000 97%, transparent)",
+                        maskImage:
+                            "linear-gradient(to right, transparent, #000 3%, #000 97%, transparent)",
+                    }}
                 >
-                    {[0, 1].map((copy) => (
-                        <div
-                            key={copy}
-                            className="flex shrink-0 items-stretch gap-6 pr-6 md:gap-8 md:pr-8"
-                            aria-hidden={copy === 1 ? true : undefined}
-                            inert={copy === 1 ? true : undefined}
-                        >
-                            {MEDIA_PARTNERS.map((partner) => (
-                                <MediaPartnerCard
-                                    key={partner.name}
-                                    partner={partner}
-                                />
-                            ))}
-                        </div>
-                    ))}
+                    <div
+                        className="marquee-track items-stretch"
+                        style={{
+                            "--marquee-duration": "65s",
+                            "--marquee-shift": `-${100 / MARQUEE_COPIES}%`,
+                        }}
+                    >
+                        {Array.from({ length: MARQUEE_COPIES }).map((_, copy) => (
+                            <div
+                                key={copy}
+                                className="flex shrink-0 items-stretch gap-6 pr-6 md:gap-8 md:pr-8"
+                                aria-hidden={copy > 0 ? true : undefined}
+                                inert={copy > 0 ? true : undefined}
+                            >
+                                {MEDIA_PARTNERS.map((partner) => (
+                                    <MediaPartnerCard
+                                        key={partner.name}
+                                        partner={partner}
+                                    />
+                                ))}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
