@@ -17,6 +17,17 @@ const PARTNER_GROUPS = [
         ],
     },
     {
+        label: "Digital News Partner",
+        items: [
+            {
+                name: "How.",
+                logo: "/sponsors/how.png",
+                href: null,
+                dark: true,
+            },
+        ],
+    },
+    {
         label: "Healthcare Partner",
         items: [
             {
@@ -35,8 +46,23 @@ const PARTNER_GROUPS = [
                 href: null,
             },
             {
+                name: "Kolkata Calling",
+                logo: "/sponsors/kolkata-calling.png",
+                href: null,
+            },
+            {
                 name: "West Bengal",
-                logo: "/sponsors/west-bengal.webp",
+                logo: "/sponsors/west-bengal.png",
+                href: null,
+            },
+        ],
+    },
+    {
+        label: "Community Partner",
+        items: [
+            {
+                name: "Kolkata IT Hub",
+                logo: "/sponsors/kolkata-it-hub.png",
                 href: null,
             },
         ],
@@ -66,14 +92,37 @@ const PartnerCard = ({ partner }) => {
                 boxShadow: "0 12px 34px rgba(0,0,0,0.08)",
             }}
         >
-            <div className="flex min-h-[112px] items-center justify-center rounded-[23px] bg-white px-8 py-7 md:min-h-[132px] md:px-10 md:py-8">
-                <img
-                    src={partner.logo}
-                    alt={partner.name}
-                    draggable={false}
-                    loading="lazy"
-                    className="h-8 w-auto max-w-full transition-transform duration-300 ease-out group-hover:scale-[1.04] md:h-10 xl:h-11"
-                />
+            <div className="flex min-h-[150px] flex-col items-center justify-center gap-4 rounded-[23px] bg-white px-8 py-7 md:min-h-[186px] md:gap-5 md:px-10 md:py-8">
+                {partner.dark ? (
+                    <div className="flex w-full items-center justify-center rounded-2xl bg-[#111111] px-8 py-5">
+                        <img
+                            src={partner.logo}
+                            alt={partner.name}
+                            draggable={false}
+                            loading="lazy"
+                            className="h-16 w-auto max-w-full object-contain transition-transform duration-300 ease-out group-hover:scale-[1.04] md:h-20 xl:h-24"
+                        />
+                    </div>
+                ) : (
+                    <img
+                        src={partner.logo}
+                        alt={partner.name}
+                        draggable={false}
+                        loading="lazy"
+                        className="h-20 w-auto max-w-full object-contain transition-transform duration-300 ease-out group-hover:scale-[1.04] md:h-24 xl:h-28"
+                    />
+                )}
+                <div
+                    className="product_sans text-center text-[13px] md:text-[14px] xl:text-[15px]"
+                    style={{
+                        fontWeight: 600,
+                        lineHeight: 1.3,
+                        letterSpacing: "0.01em",
+                        color: "#3c4043",
+                    }}
+                >
+                    {partner.name}
+                </div>
             </div>
         </Tag>
     );
