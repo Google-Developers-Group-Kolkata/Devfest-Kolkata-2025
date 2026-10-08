@@ -573,14 +573,15 @@
   }
 }
 
-/* Infinite right-to-left marquee. The track holds two identical copies of the
-   content and slides exactly one copy's width, so the seam lands off-screen. */
+/* Infinite right-to-left marquee. The track holds several identical copies of
+   the content and slides exactly one copy's width (--marquee-shift), so the
+   seam is always off-screen and the loop never runs dry on wide viewports. */
 @keyframes marquee-x {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(var(--marquee-shift, -50%));
   }
 }
 
