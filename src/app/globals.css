@@ -572,3 +572,33 @@
     font-family: var(--font-google-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
+
+/* Infinite right-to-left marquee. The track holds two identical copies of the
+   content and slides exactly one copy's width, so the seam lands off-screen. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x var(--marquee-duration, 48s) linear infinite;
+  will-change: transform;
+}
+
+/* Let a reader stop the motion to click a link. */
+.marquee-wrap:hover .marquee-track,
+.marquee-wrap:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}

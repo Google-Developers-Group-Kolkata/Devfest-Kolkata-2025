@@ -70,6 +70,7 @@ const FOOTER_NAV = [
             { label: "Venue", section: "venue" },
             { label: "Partners", section: "partners" },
             { label: "Previous Sponsors", section: "pastSponsors" },
+            { label: "Media Coverage", section: "mediaCoverage" },
             { label: "Our Team", section: "team" },
             { label: "FAQ", section: "faqs" },
         ],
