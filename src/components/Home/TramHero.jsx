@@ -6,6 +6,7 @@ import TicketsSection from "./TicketsSection";
 import BadgeSection from "./BadgeSection";
 import VenueSection from "./VenueSection";
 import PartnersSection from "./PartnersSection";
+import PreviousSponsorsSection from "./PreviousSponsorsSection";
 import TeamSection from "./TeamSection";
 import FaqSection from "./FaqSection";
 import FooterSection from "./FooterSection";
@@ -174,6 +175,7 @@ const TramHero = () => {
         badge: useRef(null),
         venue: useRef(null),
         partners: useRef(null),
+        pastSponsors: useRef(null),
         team: useRef(null),
         faqs: useRef(null),
     };
@@ -559,6 +561,9 @@ const TramHero = () => {
                     </div>
                     <div ref={sectionRefs.partners}>
                         <PartnersSection />
+                    </div>
+                    <div ref={sectionRefs.pastSponsors}>
+                        <PreviousSponsorsSection />
                     </div>
                     <div ref={sectionRefs.team}>
                         <TeamSection />
