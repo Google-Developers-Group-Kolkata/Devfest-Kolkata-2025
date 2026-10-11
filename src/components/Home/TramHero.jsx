@@ -9,6 +9,7 @@ import PartnersSection from "./PartnersSection";
 import PreviousSponsorsSection from "./PreviousSponsorsSection";
 import MediaCoverageSection from "./MediaCoverageSection";
 import PreviousYearsSection from "./PreviousYearsSection";
+import PreviousSpeakersSection from "./PreviousSpeakersSection";
 import TeamSection from "./TeamSection";
 import FaqSection from "./FaqSection";
 import FooterSection from "./FooterSection";
@@ -180,6 +181,7 @@ const TramHero = () => {
         pastSponsors: useRef(null),
         mediaCoverage: useRef(null),
         previousYears: useRef(null),
+        previousSpeakers: useRef(null),
         team: useRef(null),
         faqs: useRef(null),
     };
@@ -574,6 +576,9 @@ const TramHero = () => {
                     </div>
                     <div ref={sectionRefs.previousYears}>
                         <PreviousYearsSection />
+                    </div>
+                    <div ref={sectionRefs.previousSpeakers}>
+                        <PreviousSpeakersSection />
                     </div>
                     <div ref={sectionRefs.team}>
                         <TeamSection />
