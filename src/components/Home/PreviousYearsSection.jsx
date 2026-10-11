@@ -5,11 +5,15 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FaPlay, FaYoutube } from "react-icons/fa6";
 
 const PHOTOS = [
-    { src: "/Rectangle%2021210.png", alt: "Speaker on stage at DevFest Kolkata" },
-    { src: "/Rectangle%2021209.png", alt: "Attendees gathering at the DevFest registration desk" },
-    { src: "/Rectangle%2021206.png", alt: "Full auditorium during a DevFest keynote" },
-    { src: "/Rectangle%2021212.png", alt: "Attendees with laptops in the audience" },
-    { src: "/Rectangle%2021207.png", alt: "Volunteers handing out saplings at the venue" },
+    { src: "/previous-years/previous-years-01.webp", alt: "Attendees at the DevFest Kolkata booth under a bamboo pavilion" },
+    { src: "/previous-years/previous-years-02.webp", alt: "The keynote beginning on the main stage" },
+    { src: "/previous-years/previous-years-03.webp", alt: "A packed hall during a DevFest session" },
+    { src: "/previous-years/previous-years-04.webp", alt: "Attendees filling the main auditorium" },
+    { src: "/previous-years/previous-years-05.webp", alt: "A full session hall during the conference" },
+    { src: "/previous-years/previous-years-06.webp", alt: "Volunteers at the registration desk" },
+    { src: "/previous-years/previous-years-07.webp", alt: "Attendees seated through a session" },
+    { src: "/previous-years/previous-years-08.webp", alt: "Attendees networking between sessions" },
+    { src: "/previous-years/previous-years-09.webp", alt: "Lunch being served at the venue" },
 ];
 
 const VIDEOS = [
