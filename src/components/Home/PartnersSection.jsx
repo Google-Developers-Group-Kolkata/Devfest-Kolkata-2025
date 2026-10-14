@@ -22,13 +22,13 @@ const PARTNER_GROUPS = [
             {
                 name: "How.",
                 logo: "/sponsors/how.png",
-                href: null,
+                href: "https://howbengali.com/",
                 dark: true,
             },
             {
                 name: "News Ei Samay",
                 logo: "/sponsors/news-ei-samay.png",
-                href: null,
+                href: "https://newseisamay.com/",
             },
         ],
     },
@@ -48,17 +48,17 @@ const PARTNER_GROUPS = [
             {
                 name: "Candid Kolkata",
                 logo: "/sponsors/candid-kolkata.png",
-                href: null,
+                href: "https://www.instagram.com/candidkolkata/",
             },
             {
                 name: "Kolkata Calling",
                 logo: "/sponsors/kolkata-calling.png",
-                href: null,
+                href: "https://www.kolkatacalling.com/",
             },
             {
                 name: "West Bengal",
                 logo: "/sponsors/west-bengal.png",
-                href: null,
+                href: "https://www.instagram.com/WestBengal/",
             },
         ],
     },
@@ -68,7 +68,7 @@ const PARTNER_GROUPS = [
             {
                 name: "Kolkata IT Hub",
                 logo: "/sponsors/kolkata-it-hub.png",
-                href: null,
+                href: "https://in.linkedin.com/company/kolkata-it-hub",
             },
         ],
     },
