@@ -25,6 +25,11 @@ const PARTNER_GROUPS = [
                 href: null,
                 dark: true,
             },
+            {
+                name: "News Ei Samay",
+                logo: "/sponsors/news-ei-samay.png",
+                href: null,
+            },
         ],
     },
     {
