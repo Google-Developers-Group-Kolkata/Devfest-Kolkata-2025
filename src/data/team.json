@@ -100,6 +100,24 @@
       }
     },
     {
+      "id": 28,
+      "name": "Abhipsa Dey",
+      "role": "Graphics",
+      "image": "/team/Abhipsa Dey.png"
+    },
+    {
+      "id": 29,
+      "name": "Devargho Chakraborty",
+      "role": "Graphics",
+      "image": "/team/Devargho Chakraborty.png"
+    },
+    {
+      "id": 30,
+      "name": "Neel Goswami",
+      "role": "Graphics",
+      "image": "/team/Neel Goswami.png"
+    },
+    {
       "id": 18,
       "name": "Titash Shil",
       "role": "PR and Outreach",
@@ -109,6 +127,12 @@
         "linkedin": "https://linkedin.com/in/titash-shil-844857292",
         "instagram": "https://instagram.com/its_me_titash"
       }
+    },
+    {
+      "id": 31,
+      "name": "Pranay Chatterjee",
+      "role": "PR and Outreach",
+      "image": "/team/Pranay Chatterjee.png"
     },
     {
       "id": 22,
@@ -165,44 +189,24 @@
         "linkedin": "https://linkedin.com/in/suchinta-chanda",
         "instagram": "https://instagram.com/raj_.suchinta_"
       }
+    },
+    {
+      "id": 32,
+      "name": "Saugata Sarkar",
+      "role": "Emcee",
+      "image": "/team/Saugata Sarkar.png"
+    },
+    {
+      "id": 33,
+      "name": "Bristi Sen",
+      "role": "Emcee",
+      "image": "/team/Bristi Sen.png"
+    },
+    {
+      "id": 34,
+      "name": "Aditi Arya",
+      "role": "Emcee",
+      "image": "/team/Aditi Arya.png"
     }
-  ],
-  "blobColors": [
-    "#4285F4",
-    "#DB4437",
-    "#F4B400",
-    "#0F9D58"
-  ],
-  "blobShapes": [
-    "rounded-[60%_40%_30%_70%_/_60%_30%_70%_40%]",
-    "rounded-[40%_60%_70%_30%_/_50%_60%_40%_50%]",
-    "rounded-[55%_45%_60%_40%_/_40%_70%_30%_60%]",
-    "rounded-[65%_35%_45%_55%_/_55%_45%_65%_35%]",
-    "rounded-[30%_70%_60%_40%_/_50%_60%_40%_70%]",
-    "rounded-[70%_40%_60%_30%_/_60%_30%_70%_40%]",
-    "rounded-[50%_60%_40%_70%_/_60%_40%_70%_50%]",
-    "rounded-[45%_55%_35%_65%_/_65%_35%_55%_45%]",
-    "rounded-[35%_65%_55%_45%_/_70%_40%_60%_30%]",
-    "rounded-[70%_30%_50%_60%_/_60%_50%_30%_70%]",
-    "rounded-[65%_35%_70%_30%_/_50%_70%_30%_50%]",
-    "rounded-[60%_40%_70%_50%_/_40%_60%_70%_50%]",
-    "rounded-[55%_45%_65%_35%_/_65%_35%_55%_45%]",
-    "rounded-[40%_70%_50%_60%_/_70%_40%_60%_30%]",
-    "rounded-[50%_70%_30%_60%_/_40%_60%_50%_70%]",
-    "rounded-[30%_70%_50%_60%_/_60%_40%_70%_50%]",
-    "rounded-[70%_50%_60%_40%_/_40%_60%_50%_70%]",
-    "rounded-[60%_30%_70%_40%_/_70%_40%_50%_60%]",
-    "rounded-[55%_65%_45%_35%_/_60%_30%_70%_40%]",
-    "rounded-[45%_35%_70%_55%_/_70%_40%_60%_30%]",
-    "rounded-[65%_45%_50%_35%_/_55%_65%_35%_60%]",
-    "rounded-[35%_70%_45%_65%_/_60%_50%_40%_70%]",
-    "rounded-[50%_40%_60%_50%_/_50%_70%_40%_60%]",
-    "rounded-[40%_60%_50%_70%_/_70%_40%_60%_30%]",
-    "rounded-[60%_50%_70%_30%_/_40%_70%_50%_60%]",
-    "rounded-[70%_60%_40%_50%_/_60%_30%_50%_70%]",
-    "rounded-[55%_70%_35%_60%_/_50%_40%_70%_60%]",
-    "rounded-[30%_60%_70%_40%_/_60%_40%_70%_50%]",
-    "rounded-[65%_35%_70%_50%_/_50%_70%_30%_60%]",
-    "rounded-[70%_50%_40%_60%_/_60%_40%_70%_30%]"
   ]
 }
