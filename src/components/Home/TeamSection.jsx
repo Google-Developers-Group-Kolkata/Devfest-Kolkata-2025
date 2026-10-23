@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { motion, useReducedMotion } from "framer-motion";
 import teamData from "@/data/team.json";
 
@@ -190,17 +191,20 @@ const TeamCard = ({ member }) => (
     </div>
 );
 
+const EASE = [0.33, 0, 0.2, 1];
+
+// The page dots take Google's four colours in turn, so paging through the team
+// walks the brand palette.
+const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC04", "#34A853"];
+
 const NavButton = ({ dir, onClick }) => (
     <button
         type="button"
         onClick={onClick}
-        aria-label={dir === "prev" ? "Previous team member" : "Next team member"}
-        className={`absolute top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 cursor-pointer
-            items-center justify-center rounded-full bg-black/85 transition-colors
-            hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2
-            focus-visible:outline-black md:h-12 md:w-12 ${
-                dir === "prev" ? "left-1 md:left-2" : "right-1 md:right-2"
-            }`}
+        aria-label={dir === "prev" ? "Previous team members" : "Next team members"}
+        className="flex h-11 w-11 flex-none cursor-pointer items-center justify-center rounded-full
+            bg-[#202124] transition-colors hover:bg-[#4285F4] focus-visible:outline-2
+            focus-visible:outline-offset-2 focus-visible:outline-[#4285F4] md:h-12 md:w-12"
     >
         <Image
             src={dir === "prev" ? "/left-arrow.svg" : "/right-arrow.svg"}
@@ -212,60 +216,46 @@ const NavButton = ({ dir, onClick }) => (
     </button>
 );
 
-// Three cards at a time from `lg` up, the middle one at full size; one at a
-// time below that, where three would leave the labels too small to read. The
-// breakpoint lives in the slides' own classes — the middle card is whichever
-// one Embla has snapped to, at either size, so nothing else has to know how
-// many are on screen.
+// A row of evenly sized cards that pages a screenful at a time: three from
+// `lg`, two from `sm`, and on a phone one card with the edge of the next one
+// showing, so it reads as swipeable. The card's labels scale with its width,
+// which is what keeps the row at three.
 const TeamSection = () => {
     const reduced = useReducedMotion();
     const members = teamData.teamMembers;
+
+    const [emblaRef, emblaApi] = useEmblaCarousel(
+        { loop: true, align: "start", slidesToScroll: "auto" },
+        reduced
+            ? []
+            : [Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })]
+    );
+
+    // One dot per page, and how many pages there are depends on how many cards
+    // fit, so both are re-read whenever Embla re-inits on a resize.
+    const [snaps, setSnaps] = useState([]);
     const [selected, setSelected] = useState(0);
-    // Matches the `lg` breakpoint the slides switch layouts at: three cards
-    // from here up, one below.
-    const [threeUp, setThreeUp] = useState(false);
 
-    useEffect(() => {
-        const mq = window.matchMedia("(min-width: 1024px)");
-        const on = () => setThreeUp(mq.matches);
-        on();
-        mq.addEventListener?.("change", on);
-        return () => mq.removeEventListener?.("change", on);
-    }, []);
-
-    // Where the carousel opens. With three cards on screen the middle one is
-    // the one being shown off, so it starts on the second member and the first
-    // sits to its left; with one card on screen the middle card is the only
-    // card, so it starts on the first.
-    const startIndex = Math.min(threeUp ? 1 : 0, Math.max(members.length - 1, 0));
-
-    const [emblaRef, emblaApi] = useEmblaCarousel({
-        loop: true,
-        align: "center",
-        skipSnaps: false,
-        dragFree: false,
-        // Changing this re-inits Embla, which is how the carousel re-centres
-        // when the viewport crosses the breakpoint.
-        startIndex,
-    });
-
-    const onSelect = useCallback(() => {
-        if (emblaApi) setSelected(emblaApi.selectedScrollSnap());
+    const sync = useCallback(() => {
+        if (!emblaApi) return;
+        setSnaps(emblaApi.scrollSnapList());
+        setSelected(emblaApi.selectedScrollSnap());
     }, [emblaApi]);
 
     useEffect(() => {
         if (!emblaApi) return;
-        onSelect();
-        emblaApi.on("select", onSelect);
-        emblaApi.on("reInit", onSelect);
+        sync();
+        emblaApi.on("select", sync);
+        emblaApi.on("reInit", sync);
         return () => {
-            emblaApi.off("select", onSelect);
-            emblaApi.off("reInit", onSelect);
+            emblaApi.off("select", sync);
+            emblaApi.off("reInit", sync);
         };
-    }, [emblaApi, onSelect]);
+    }, [emblaApi, sync]);
 
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+    const scrollTo = useCallback((i) => emblaApi?.scrollTo(i), [emblaApi]);
 
     return (
         <section id="team" className="relative w-full select-none">
@@ -283,61 +273,82 @@ const TeamSection = () => {
                 </h2>
 
                 <motion.div
-                    className="relative mt-10 md:mt-14 xl:mt-16"
+                    className="mt-10 md:mt-14 xl:mt-16"
                     initial={reduced ? false : { opacity: 0, y: 28 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.5, ease: [0.33, 0, 0.2, 1] }}
+                    transition={{ duration: 0.5, ease: EASE }}
                 >
-                    {/* The viewport clips the track horizontally, so it needs a
-                        little vertical padding of its own or it would crop the
-                        cards' drop shadows. */}
+                    {/* The viewport clips the track. A negative margin cancels
+                        the slides' gutters at the two outer edges so the row
+                        lines up with the heading's column. The cards' drop
+                        shadow reaches 58px below them, so the bottom padding
+                        holds all of it (the matching negative margin gives the
+                        space back to the controls); at the sides only the
+                        gutter is free, so the clip fades out across it rather
+                        than cutting the shadow off in a hard line. */}
                     <div
-                        className="overflow-hidden py-4 md:py-6"
+                        className="-mx-2.5 -mb-10 overflow-hidden pb-16 pt-6 [--fade:10px] lg:-mx-3 lg:[--fade:12px]"
+                        style={{
+                            WebkitMaskImage:
+                                "linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent)",
+                            maskImage:
+                                "linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent)",
+                        }}
                         ref={emblaRef}
                         aria-roledescription="carousel"
                         aria-label="DevFest Kolkata team"
                     >
-                        {/* Cards shrink rather than move, so the track centres
-                            them against the full-size middle card. */}
-                        <div className="flex items-center">
+                        <div className="flex touch-pan-y">
                             {members.map((member, i) => (
                                 <div
                                     key={member.id}
                                     role="group"
                                     aria-roledescription="slide"
-                                    aria-label={`${member.name}, ${roleLabel(member.role)}`}
-                                    className="min-w-0 flex-[0_0_100%] px-2 lg:flex-[0_0_33.333%] lg:px-3"
+                                    aria-label={`${i + 1} of ${members.length}: ${member.name}, ${roleLabel(member.role)}`}
+                                    className="min-w-0 flex-[0_0_86%] px-2.5 sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] lg:px-3"
                                 >
-                                    {/* One card to a view would otherwise
-                                        stretch to the full container width on a
-                                        tablet, so cap it there and let the
-                                        three-up row size the cards instead. */}
-                                    <div
-                                        className={`relative mx-auto w-full max-w-[360px] origin-center transition-transform duration-500 ease-out motion-reduce:transition-none lg:max-w-none ${
-                                            i === selected ? "scale-100" : "scale-[0.84]"
-                                        }`}
-                                    >
-                                        <TeamCard member={member} />
-                                        {/* The cards either side are veiled
-                                            rather than faded: the section's
-                                            background illustration shows
-                                            straight through a card whose own
-                                            opacity is below 1. */}
-                                        <div
-                                            aria-hidden="true"
-                                            className={`pointer-events-none absolute inset-0 rounded-2xl bg-white transition-opacity duration-500 motion-reduce:transition-none ${
-                                                i === selected ? "opacity-0" : "opacity-45"
-                                            }`}
-                                        />
-                                    </div>
+                                    <TeamCard member={member} />
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <NavButton dir="prev" onClick={scrollPrev} />
-                    <NavButton dir="next" onClick={scrollNext} />
+                    <div className="mt-4 flex items-center justify-center gap-5 md:mt-6">
+                        <NavButton dir="prev" onClick={scrollPrev} />
+
+                        {/* On a phone every card is its own page — far more dots
+                            than fit beside the arrows — so phones get a counter
+                            instead. */}
+                        <div className="hidden items-center gap-2 sm:flex">
+                            {snaps.map((_, i) => (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() => scrollTo(i)}
+                                    aria-label={`Go to page ${i + 1} of ${snaps.length}`}
+                                    aria-current={i === selected ? "true" : undefined}
+                                    className={`h-2.5 cursor-pointer rounded-full transition-all duration-300 motion-reduce:transition-none ${
+                                        i === selected ? "w-7" : "w-2.5 bg-[#dadce0] hover:bg-[#bdc1c6]"
+                                    }`}
+                                    style={
+                                        i === selected
+                                            ? { backgroundColor: GOOGLE_COLORS[i % GOOGLE_COLORS.length] }
+                                            : undefined
+                                    }
+                                />
+                            ))}
+                        </div>
+                        <span
+                            className="product_sans min-w-[64px] text-center text-[15px] tabular-nums sm:hidden"
+                            style={{ fontWeight: 500, color: "#5f6368" }}
+                            aria-live="polite"
+                        >
+                            {selected + 1} / {snaps.length || members.length}
+                        </span>
+
+                        <NavButton dir="next" onClick={scrollNext} />
+                    </div>
                 </motion.div>
             </div>
         </section>
