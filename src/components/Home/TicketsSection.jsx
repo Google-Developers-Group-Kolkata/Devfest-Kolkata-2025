@@ -417,9 +417,9 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
 // optionally venue and date) -> card model. A card is buyable only when it is active, not coming soon, and carries
 // a purchase link.
 const toCard = (t, i) => {
-    const url = t.url || null;
     const isActive = t.isActive ?? false;
     const isComingSoon = t.isComingSoon ?? false;
+    const url = t.isComingSoon ? "https://www.devfestkolkata.in/" : t.url || null;
     return {
         key: String(t.id ?? i),
         name: t.title || "Ticket",
