@@ -5,6 +5,7 @@ import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { motion, useReducedMotion } from "framer-motion";
+import { FaArrowsRotate, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import teamData from "@/data/team.json";
 
 // The card is drawn against the 336x480 artboard from the design; every offset
@@ -43,15 +44,32 @@ const ROLE_LABELS = {
 
 const roleLabel = (role) => ROLE_LABELS[role] ?? role;
 
-const TeamCard = ({ member }) => (
-    <div
-        className="relative w-full overflow-hidden rounded-2xl bg-white"
-        style={{
-            aspectRatio: `${CARD_W} / ${CARD_H}`,
-            containerType: "inline-size",
-            boxShadow: "0 18px 40px rgba(0,0,0,0.10)",
-        }}
-    >
+const SOCIALS = [
+    { key: "linkedin", label: "LinkedIn", icon: FaLinkedinIn },
+    { key: "instagram", label: "Instagram", icon: FaInstagram },
+    { key: "twitter", label: "X", icon: FaXTwitter },
+];
+
+// team.json fills a missing handle with the bare site ("https://x.com"), which
+// would only open X's front page — so a link has to name someone to count.
+const isProfile = (href) => /^https?:\/\/[^/]+\/[^/?#]/.test(href ?? "");
+
+const profileLinks = (member) =>
+    SOCIALS.filter(({ key }) => isProfile(member.socialLinks?.[key])).map((s) => ({
+        ...s,
+        href: member.socialLinks[s.key],
+    }));
+
+// Both faces are the full card, stacked, each hiding itself while it faces away.
+const FACE = "absolute inset-0 overflow-hidden rounded-2xl bg-white backface-hidden";
+const FACE_STYLE = {
+    containerType: "inline-size",
+    boxShadow: "0 18px 40px rgba(0,0,0,0.10)",
+};
+
+// The city both faces share: the arch and skyline above, the bridge below.
+const CityFrame = () => (
+    <>
         {/* Arch — an ellipse far wider than the card, so only its lower curve
             shows: black at the card's top, dipping to y=196 at the centre and
             rising to the corners. It paints the panel and masks it at once, so
@@ -97,6 +115,24 @@ const TeamCard = ({ member }) => (
             className="absolute left-0 block"
             style={{ top: pctH(325), width: "100%", height: pctH(149) }}
         />
+    </>
+);
+
+const CardFront = ({ member, flippable }) => (
+    <div className={FACE} style={FACE_STYLE}>
+        <CityFrame />
+
+        {/* A touch screen has no hover to give the back away, so cards that
+            turn over say so in the arch's corner. */}
+        {flippable && (
+            <span
+                aria-hidden="true"
+                className="absolute flex items-center justify-center rounded-full bg-white/15 text-white [@media(hover:hover)]:hidden"
+                style={{ top: cqw(14), right: cqw(14), width: cqw(30), height: cqw(30) }}
+            >
+                <FaArrowsRotate style={{ width: cqw(13), height: cqw(13) }} />
+            </span>
+        )}
 
         <img
             src={RIBBON}
@@ -191,6 +227,120 @@ const TeamCard = ({ member }) => (
     </div>
 );
 
+// The back keeps the city and puts the person on the arch's lowest point, small,
+// with their links underneath. Its name and role repeat the front for the eye
+// only — the slide's label already says both.
+const CardBack = ({ member, links, flipped }) => (
+    <div
+        className={`${FACE} rotate-y-180 ${
+            flipped ? "pointer-events-auto" : "pointer-events-none group-hover:pointer-events-auto"
+        }`}
+        style={FACE_STYLE}
+    >
+        <CityFrame />
+
+        <div
+            className="absolute overflow-hidden rounded-full"
+            style={{
+                left: pctW(110),
+                top: pctH(138),
+                width: pctW(116),
+                aspectRatio: "1",
+                backgroundColor: "#FEBC2F",
+                border: `${cqw(5)} solid #ffffff`,
+            }}
+        >
+            <img
+                src={member.image}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                loading="lazy"
+                className="absolute left-0 block w-full object-cover object-top"
+                style={{ top: "8%", height: "92%" }}
+            />
+        </div>
+
+        <div
+            aria-hidden="true"
+            className="absolute left-0 flex w-full flex-col items-center px-[6%]"
+            style={{ top: pctH(272), gap: cqw(8) }}
+        >
+            <span
+                className="open_sans block max-w-full truncate leading-none text-black"
+                style={{ fontWeight: 700, fontSize: cqw(18) }}
+            >
+                {member.name}
+            </span>
+            <span
+                className="open_sans block max-w-full truncate leading-none"
+                style={{ fontWeight: 600, fontSize: cqw(13), color: "#5f6368" }}
+            >
+                {roleLabel(member.role)}
+            </span>
+        </div>
+
+        <ul className="absolute left-0 flex w-full justify-center" style={{ top: pctH(326), gap: cqw(12) }}>
+            {links.map(({ key, label, icon: Icon, href }) => (
+                <li key={key}>
+                    <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${member.name} on ${label}`}
+                        className="flex items-center justify-center rounded-full bg-[#202124] text-white
+                            transition-colors hover:bg-[#4285F4] focus-visible:outline-2
+                            focus-visible:outline-offset-2 focus-visible:outline-[#4285F4]"
+                        style={{ width: cqw(46), height: cqw(46) }}
+                    >
+                        <Icon aria-hidden="true" style={{ width: cqw(18), height: cqw(18) }} />
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </div>
+);
+
+const FLIP_EASE = "ease-[cubic-bezier(0.33,0,0.2,1)]";
+
+// With a mouse the card turns while the pointer is over it; on a touch screen,
+// where there is no hover, a tap turns it and another tap turns it back. A
+// keyboard user tabbing onto one of the links turns it too. Cards with no
+// links to show stay face up.
+const TeamCard = ({ member, flipped, onToggle }) => {
+    const links = profileLinks(member);
+    const flippable = links.length > 0;
+
+    const handleClick = (e) => {
+        // Hover already has it turned, and a link should just be followed.
+        if (window.matchMedia("(hover: hover)").matches || e.target.closest("a")) return;
+        onToggle();
+    };
+
+    return (
+        <div
+            className={`group relative w-full perspective-[1200px] ${
+                flippable ? "[@media(hover:none)]:cursor-pointer" : ""
+            }`}
+            style={{ aspectRatio: `${CARD_W} / ${CARD_H}` }}
+            onClick={flippable ? handleClick : undefined}
+        >
+            <div
+                className={`relative h-full w-full transform-3d transition-transform duration-700 ${FLIP_EASE} motion-reduce:transition-none ${
+                    !flippable
+                        ? ""
+                        : flipped
+                          ? "rotate-y-180"
+                          : "group-hover:rotate-y-180 group-has-[:focus-visible]:rotate-y-180"
+                }`}
+            >
+                <CardFront member={member} flippable={flippable} />
+                {flippable && <CardBack member={member} links={links} flipped={flipped} />}
+            </div>
+        </div>
+    );
+};
+
 const EASE = [0.33, 0, 0.2, 1];
 
 // The page dots take Google's four colours in turn, so paging through the team
@@ -242,16 +392,33 @@ const TeamSection = () => {
         setSelected(emblaApi.selectedScrollSnap());
     }, [emblaApi]);
 
+    // The card a tap has turned over, if any — one at a time. Paging on puts it
+    // face up again.
+    const [flippedId, setFlippedId] = useState(null);
+    const toggleFlip = useCallback((id) => setFlippedId((cur) => (cur === id ? null : id)), []);
+
     useEffect(() => {
         if (!emblaApi) return;
+        const faceUp = () => setFlippedId(null);
         sync();
         emblaApi.on("select", sync);
+        emblaApi.on("select", faceUp);
         emblaApi.on("reInit", sync);
         return () => {
             emblaApi.off("select", sync);
+            emblaApi.off("select", faceUp);
             emblaApi.off("reInit", sync);
         };
     }, [emblaApi, sync]);
+
+    // Someone reading a card's back shouldn't have it paged away under them.
+    // A mouse gets this from `stopOnMouseEnter`; a tap needs it done here.
+    useEffect(() => {
+        if (flippedId == null) return;
+        const autoplay = emblaApi?.plugins().autoplay;
+        autoplay?.stop();
+        return () => autoplay?.play();
+    }, [emblaApi, flippedId]);
 
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -308,7 +475,11 @@ const TeamSection = () => {
                                     aria-label={`${i + 1} of ${members.length}: ${member.name}, ${roleLabel(member.role)}`}
                                     className="min-w-0 flex-[0_0_86%] px-2.5 sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] lg:px-3"
                                 >
-                                    <TeamCard member={member} />
+                                    <TeamCard
+                                        member={member}
+                                        flipped={flippedId === member.id}
+                                        onToggle={() => toggleFlip(member.id)}
+                                    />
                                 </div>
                             ))}
                         </div>
