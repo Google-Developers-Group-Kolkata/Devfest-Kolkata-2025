@@ -20,12 +20,6 @@ const PARTNER_GROUPS = [
         label: "Digital News Partner",
         items: [
             {
-                name: "How.",
-                logo: "/sponsors/how.png",
-                href: "https://howbengali.com/",
-                dark: true,
-            },
-            {
                 name: "News Ei Samay",
                 logo: "/sponsors/news-ei-samay.png",
                 href: "https://newseisamay.com/",
@@ -60,6 +54,11 @@ const PARTNER_GROUPS = [
                 logo: "/sponsors/west-bengal.png",
                 href: "https://www.instagram.com/WestBengal/",
             },
+            {
+                name: "Wiki Kolkata",
+                logo: "/sponsors/wiki-kolkata.png",
+                href: "https://www.wikikolkata.com/",
+            },
         ],
     },
     {
@@ -69,6 +68,15 @@ const PARTNER_GROUPS = [
                 name: "Kolkata IT Hub",
                 logo: "/sponsors/kolkata-it-hub.png",
                 href: "https://in.linkedin.com/company/kolkata-it-hub",
+            },
+        ],
+    },
+    {
+        label: "In Associations",
+        items: [
+            {
+                name: "FRIENDS FM",
+                logo: "/sponsors/friends-fm.png",
             },
         ],
     },
