@@ -62,12 +62,22 @@ const PARTNER_GROUPS = [
         ],
     },
     {
-        label: "Community Partner",
+        label: "Community Partners",
         items: [
             {
                 name: "Kolkata IT Hub",
                 logo: "/sponsors/kolkata-it-hub.png",
                 href: "https://in.linkedin.com/company/kolkata-it-hub",
+            },
+            {
+                name: "Open Source Con",
+                logo: "/sponsors/open-source-con.png",
+                href: "https://opensourcecon.in/",
+            },
+            {
+                name: "Friends of Figma Kolkata",
+                logo: "/sponsors/friends-of-figma-kolkata.png",
+                href: "https://friends.figma.com/kolkata/",
             },
         ],
     },
@@ -77,6 +87,7 @@ const PARTNER_GROUPS = [
             {
                 name: "FRIENDS FM",
                 logo: "/sponsors/friends-fm.png",
+                href: "https://www.instagram.com/919friendsfm/",
             },
         ],
     },
