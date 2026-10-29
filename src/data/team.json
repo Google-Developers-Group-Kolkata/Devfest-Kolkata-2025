@@ -41,11 +41,11 @@
       "socialLinks": {
         "twitter": "https://x.com",
         "linkedin": "https://linkedin.com/in/akash-kumar-majumder-62b384196",
-        "instagram": "https://instagram.com/ak_maj"
+        "instagram": "https://www.instagram.com/ak_majumder"
       }
     },
     {
-      "id": 6,
+      "id": 5,
       "name": "Ankan Saha",
       "role": "Web Dev",
       "image": "/team/Ankan Saha.png",
@@ -56,7 +56,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 6,
       "name": "Rahul Pal",
       "role": "Web Dev",
       "image": "/team/rahul.png",
@@ -67,7 +67,7 @@
       }
     },
     {
-      "id": 10,
+      "id": 7,
       "name": "Subhadip Das",
       "role": "Web Dev",
       "image": "/team/Subhadip Das.png",
@@ -78,7 +78,7 @@
       }
     },
     {
-      "id": 11,
+      "id": 8,
       "name": "Udity Banerjee",
       "role": "Graphics",
       "image": "/team/Udity.png",
@@ -89,7 +89,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 9,
       "name": "Protyoy Bhandary",
       "role": "Graphics",
       "image": "/team/Protyoy.png",
@@ -100,25 +100,25 @@
       }
     },
     {
-      "id": 28,
+      "id": 10,
       "name": "Abhipsa Dey",
       "role": "Graphics",
       "image": "/team/Abhipsa Dey.png"
     },
     {
-      "id": 29,
+      "id": 11,
       "name": "Devargho Chakraborty",
       "role": "Graphics",
       "image": "/team/Devargho Chakraborty.png"
     },
     {
-      "id": 30,
+      "id": 12,
       "name": "Neel Goswami",
       "role": "Graphics",
       "image": "/team/Neel Goswami.png"
     },
     {
-      "id": 18,
+      "id": 13,
       "name": "Titash Shil",
       "role": "PR and Outreach",
       "image": "/team/Titash Shil.png",
@@ -129,13 +129,13 @@
       }
     },
     {
-      "id": 31,
+      "id": 14,
       "name": "Pranay Chatterjee",
       "role": "PR and Outreach",
       "image": "/team/Pranay Chatterjee.png"
     },
     {
-      "id": 22,
+      "id": 15,
       "name": "Soumyadeep Halder",
       "role": "Videography",
       "image": "/team/Soumyadeep Halder.png",
@@ -145,9 +145,20 @@
         "instagram": "https://instagram.com/smydppp"
       }
     },
+    {
+      "id": 16,
+      "name": "Gurdil Singh",
+      "role": "Photography",
+      "image": "/team/gurdil.jpeg",
+      "socialLinks": {
+        "twitter": "https://x.com",
+        "linkedin": "https://www.linkedin.com/in/gurdil-singh-05124b339",
+        "instagram": "https://www.instagram.com/shotbygurdil"
+      }
+    },
 
     {
-      "id": 24,
+      "id": 17,
       "name": "Sweety Jha",
       "role": "Social Media",
       "image": "/team/Sweety Jha.png",
@@ -158,7 +169,7 @@
       }
     },
     {
-      "id": 25,
+      "id": 18,
       "name": "Shromana Majumder",
       "role": "Emcee",
       "image": "/team/Shromana Majumder.png",
@@ -169,7 +180,7 @@
       }
     },
     {
-      "id": 26,
+      "id": 19,
       "name": "Simran Sharma",
       "role": "Emcee",
       "image": "/team/Simran Sharma.png",
@@ -180,7 +191,7 @@
       }
     },
     {
-      "id": 27,
+      "id": 20,
       "name": "Suchinta Chanda",
       "role": "Emcee",
       "image": "/team/Suchinta Chanda.png",
@@ -191,19 +202,19 @@
       }
     },
     {
-      "id": 32,
+      "id": 21,
       "name": "Saugata Sarkar",
       "role": "Emcee",
       "image": "/team/Saugata Sarkar.png"
     },
     {
-      "id": 33,
+      "id": 22,
       "name": "Bristi Sen",
       "role": "Emcee",
       "image": "/team/Bristi Sen.png"
     },
     {
-      "id": 34,
+      "id": 23,
       "name": "Aditi Arya",
       "role": "Emcee",
       "image": "/team/Aditi Arya.png"
