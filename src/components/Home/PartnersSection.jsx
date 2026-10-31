@@ -79,10 +79,15 @@ const PARTNER_GROUPS = [
                 logo: "/sponsors/friends-of-figma-kolkata.png",
                 href: "https://friends.figma.com/kolkata/",
             },
+            {
+                name: "JetBrains",
+                logo: "/sponsors/jetbrains.png",
+                href: "https://www.jetbrains.com/",
+            },
         ],
     },
     {
-        label: "In Associations",
+        label: "In Association with",
         items: [
             {
                 name: "FRIENDS FM",
