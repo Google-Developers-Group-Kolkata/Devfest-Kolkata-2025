@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { FaArrowsRotate, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import teamData from "@/data/team.json";
 
@@ -373,12 +373,21 @@ const NavButton = ({ dir, onClick }) => (
 const TeamSection = () => {
     const reduced = useReducedMotion();
     const members = teamData.teamMembers;
+    const sectionRef = useRef(null);
+    const isInView = useInView(sectionRef, { amount: 0.2 });
 
     const [emblaRef, emblaApi] = useEmblaCarousel(
         { loop: true, align: "start", slidesToScroll: "auto" },
         reduced
             ? []
-            : [Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })]
+            : [
+                  Autoplay({
+                      delay: 5000,
+                      playOnInit: false,
+                      stopOnInteraction: false,
+                      stopOnMouseEnter: true,
+                  }),
+              ]
     );
 
     // One dot per page, and how many pages there are depends on how many cards
@@ -411,21 +420,40 @@ const TeamSection = () => {
         };
     }, [emblaApi, sync]);
 
+    // When the team section enters focus/view, start from the first slide (Organizer)
+    // and start autoplay. When out of view, stop autoplay.
+    useEffect(() => {
+        if (!emblaApi) return;
+        const autoplay = emblaApi.plugins().autoplay;
+
+        if (isInView) {
+            setFlippedId(null);
+            emblaApi.scrollTo(0, true);
+            if (!reduced) {
+                autoplay?.play();
+            }
+        } else {
+            autoplay?.stop();
+        }
+    }, [isInView, emblaApi, reduced]);
+
     // Someone reading a card's back shouldn't have it paged away under them.
     // A mouse gets this from `stopOnMouseEnter`; a tap needs it done here.
     useEffect(() => {
         if (flippedId == null) return;
         const autoplay = emblaApi?.plugins().autoplay;
         autoplay?.stop();
-        return () => autoplay?.play();
-    }, [emblaApi, flippedId]);
+        return () => {
+            if (isInView) autoplay?.play();
+        };
+    }, [emblaApi, flippedId, isInView]);
 
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
     const scrollTo = useCallback((i) => emblaApi?.scrollTo(i), [emblaApi]);
 
     return (
-        <section id="team" className="relative w-full select-none">
+        <section id="team" ref={sectionRef} className="relative w-full select-none">
             <div className="mx-auto w-full max-w-[1120px] px-5 py-16 sm:px-8 md:px-10 md:py-24 xl:px-16 xl:py-28">
                 <h2
                     className="product_sans text-center text-[28px] sm:text-[34px] md:text-[42px] lg:text-[52px] xl:text-[56px]"
