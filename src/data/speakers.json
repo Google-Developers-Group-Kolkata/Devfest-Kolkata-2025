@@ -1,0 +1,30 @@
+{
+  "speakers": [
+    {
+      "id": 1,
+      "name": "Speaker Name",
+      "company": "Company",
+      "position": "Position",
+      "talk": "",
+      "image": "",
+      "socialLinks": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": ""
+      }
+    },
+    {
+      "id": 2,
+      "name": "Speaker Name",
+      "company": "Company",
+      "position": "Position",
+      "talk": "",
+      "image": "",
+      "socialLinks": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": ""
+      }
+    }
+  ]
+}

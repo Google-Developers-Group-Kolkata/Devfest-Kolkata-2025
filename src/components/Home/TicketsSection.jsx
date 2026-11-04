@@ -48,14 +48,25 @@ const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
 // The festival runs over two days and each day is ticketed on its own. A doc
 // says which one it belongs to with `day`; the API also infers it from the
 // doc's `date` when that field is all it has. The date here is what a pass
-// prints unless its doc overrides it.
+// prints unless its doc overrides it. `perRow` is how many passes sit side by
+// side on large screens; `null` puts the whole day on one line.
 const DAYS = [
-    { day: 1, label: "Day 1", date: "21st November, 2026", accent: "#4285F4" },
-    { day: 2, label: "Day 2", date: "22nd November, 2026", accent: RED },
+    { day: 1, label: "Day 1", date: "21st November, 2026", accent: "#4285F4", perRow: null },
+    { day: 2, label: "Day 2", date: "22nd November, 2026", accent: RED, perRow: 2 },
 ];
 
 // Passes whose day cannot be determined still have to appear somewhere.
-const UNGROUPED = { day: null, label: "Other passes", date: null, accent: "#5f6368" };
+const UNGROUPED = { day: null, label: "Other passes", date: null, accent: "#5f6368", perRow: 2 };
+
+// Gap between passes in a row, shared by the layout and the width maths.
+const CARD_GAP = "1.5rem";
+
+// Width of one pass on large screens: the row, less its gaps, shared by the
+// day's `perRow` (or by all of its passes when the day sits on one line).
+const cardWidthFor = (group) => {
+    const cols = Math.max(1, group.perRow ?? group.cards.length);
+    return `calc((100% - ${cols - 1} * ${CARD_GAP}) / ${cols})`;
+};
 
 const EVENT_DATE = DAYS[1].date;
 
@@ -70,7 +81,7 @@ const maskWith = (bg) => ({
 });
 
 // The name sits in the price stub, which is only 205 units wide, so a long
-// one has to step down to keep to three lines.
+// one has to step down to keep to four lines.
 const nameSizeFor = (name) => {
     const n = (name || "").length;
     if (n <= 12) return cq(23);
@@ -138,7 +149,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
             onClick={() => {
                 if (live) window.open(ticket.url, "_blank", "noopener,noreferrer");
             }}
-            className="relative w-full max-w-[760px] overflow-hidden"
+            className="relative w-full overflow-hidden"
             style={{
                 aspectRatio: `${TICKET_W} / ${TICKET_H}`,
                 containerType: "inline-size",
@@ -239,7 +250,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                     left: px(PERF_L + 30),
                     top: py(101),
                     width: px(175),
-                    fontSize: cq(18),
+                    fontSize: floor(10, cq(18)),
                     fontWeight: 500,
                     lineHeight: 1.3,
                     color: INK,
@@ -254,7 +265,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                     right: px(TICKET_W - PERF_R + 26),
                     top: py(101),
                     width: px(150),
-                    fontSize: cq(18),
+                    fontSize: floor(10, cq(18)),
                     fontWeight: 500,
                     lineHeight: 1.3,
                     color: INK,
@@ -291,7 +302,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                     color: INK,
                     textTransform: "uppercase",
                     display: "-webkit-box",
-                    WebkitLineClamp: 3,
+                    WebkitLineClamp: 4,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
                     overflowWrap: "anywhere",
@@ -622,10 +633,10 @@ const TicketsSection = ({ onNavigate }) => {
                 </h2>
 
                 {/* Ticket cards, one day section at a time — flexible:
-                    renders however many the server returns for each day. One
-                    card to a row: the artwork is close to 3:1, so side by side
-                    would leave the venue and date too small to read at any
-                    sensible page width. */}
+                    renders however many the server returns for each day. On
+                    large screens each day lays its passes out `perRow` to a
+                    row (an odd one out is centred); below that the artwork,
+                    close to 3:1, is too short to share a row, so it stacks. */}
                 <div className="mt-8 mb-5 flex w-full flex-col items-center gap-6 md:mt-12 md:gap-7 xl:mt-16 xl:mb-8 xl:gap-8">
                     {/* Nothing at all from Firebase is one message for the
                         whole section, not an empty line under every day. Shown
@@ -657,22 +668,36 @@ const TicketsSection = ({ onNavigate }) => {
                                     }
                                 />
 
-                                {group.cards.map(({ ticket, index }) => (
-                                    <TicketCard
-                                        key={ticket.key}
-                                        ticket={ticket}
-                                        index={index}
-                                        stampStarted={stampStarted}
-                                        stampTick={stampTick}
-                                        reveal={{
-                                            opacity: cardP[index] ?? 0,
-                                            transform: `translateY(${(1 - (cardP[index] ?? 0)) * 22}px) scale(${0.85 + (cardP[index] ?? 0) * 0.15})`,
+                                {group.cards.length > 0 && (
+                                    <div
+                                        className="flex w-full flex-wrap justify-center"
+                                        style={{
+                                            gap: CARD_GAP,
+                                            "--card-w": cardWidthFor(group),
                                         }}
-                                        revealRef={(el) => {
-                                            cardRefs.current[index] = el;
-                                        }}
-                                    />
-                                ))}
+                                    >
+                                        {group.cards.map(({ ticket, index }) => (
+                                            <div
+                                                key={ticket.key}
+                                                className="w-full max-w-[520px] lg:w-[var(--card-w)] lg:max-w-none"
+                                            >
+                                                <TicketCard
+                                                    ticket={ticket}
+                                                    index={index}
+                                                    stampStarted={stampStarted}
+                                                    stampTick={stampTick}
+                                                    reveal={{
+                                                        opacity: cardP[index] ?? 0,
+                                                        transform: `translateY(${(1 - (cardP[index] ?? 0)) * 22}px) scale(${0.85 + (cardP[index] ?? 0) * 0.15})`,
+                                                    }}
+                                                    revealRef={(el) => {
+                                                        cardRefs.current[index] = el;
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {loaded && group.cards.length === 0 && (
                                     <p
