@@ -103,7 +103,12 @@
       "id": 10,
       "name": "Abhipsa Dey",
       "role": "Graphics",
-      "image": "/team/Abhipsa Dey.png"
+      "image": "/team/Abhipsa Dey.png",
+      "socialLinks": {
+        "twitter": "https://x.com",
+        "linkedin": "https://www.linkedin.com/in/abhipsa-dey-12a0a8419",
+        "instagram": "https://www.instagram.com/bongo__nar_i"
+      }
     },
     {
       "id": 11,
@@ -115,7 +120,12 @@
       "id": 12,
       "name": "Neel Goswami",
       "role": "Graphics",
-      "image": "/team/Neel Goswami.png"
+      "image": "/team/Neel Goswami.png",
+      "socialLinks": {
+        "twitter": "https://x.com/HyperJOD",
+        "linkedin": "https://www.linkedin.com/in/neel-goswami-aa0653392",
+        "instagram": "https://www.instagram.com/neelgoswami_"
+      }
     },
     {
       "id": 13,
@@ -205,7 +215,12 @@
       "id": 21,
       "name": "Saugata Sarkar",
       "role": "Emcee",
-      "image": "/team/Saugata Sarkar.png"
+      "image": "/team/Saugata Sarkar.png",
+      "socialLinks": {
+        "twitter": "https://x.com/TreySarkar",
+        "linkedin": "https://www.linkedin.com/in/saugata-sarkar-8863531a1",
+        "instagram": "https://www.instagram.com/treysarkar"
+      }
     },
     {
       "id": 22,
@@ -217,7 +232,12 @@
       "id": 23,
       "name": "Aditi Arya",
       "role": "Emcee",
-      "image": "/team/Aditi Arya.png"
+      "image": "/team/Aditi Arya.png",
+      "socialLinks": {
+        "twitter": "https://x.com",
+        "linkedin": "https://www.linkedin.com/in/aditiarya294",
+        "instagram": "https://www.instagram.com/callheraditi"
+      }
     }
   ]
 }
