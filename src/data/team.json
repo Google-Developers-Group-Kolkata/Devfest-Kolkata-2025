@@ -226,7 +226,12 @@
       "id": 22,
       "name": "Bristi Sen",
       "role": "Emcee",
-      "image": "/team/Bristi Sen.png"
+      "image": "/team/Bristi Sen.png",
+      "socialLinks": {
+        "twitter": "https://x.com",
+        "linkedin": "https://www.linkedin.com/in/bristi-sen-709548311",
+        "instagram": "https://www.instagram.com/sen_bristi_"
+      }
     },
     {
       "id": 23,
