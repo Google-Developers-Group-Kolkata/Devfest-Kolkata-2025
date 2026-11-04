@@ -114,7 +114,12 @@
       "id": 11,
       "name": "Devargho Chakraborty",
       "role": "Graphics",
-      "image": "/team/Devargho Chakraborty.png"
+      "image": "/team/Devargho Chakraborty.png",
+      "socialLinks": {
+        "twitter": "https://x.com",
+        "linkedin": "https://www.linkedin.com/in/devargho",
+        "instagram": "https://www.instagram.com/being_mr_tomato"
+      }
     },
     {
       "id": 12,
@@ -142,7 +147,12 @@
       "id": 14,
       "name": "Pranay Chatterjee",
       "role": "PR and Outreach",
-      "image": "/team/Pranay Chatterjee.png"
+      "image": "/team/Pranay Chatterjee.png",
+      "socialLinks": {
+        "twitter": "https://x.com",
+        "linkedin": "https://www.linkedin.com/in/pranay-chatterjee-346717244",
+        "instagram": "https://www.instagram.com/heypranayy"
+      }
     },
     {
       "id": 15,
