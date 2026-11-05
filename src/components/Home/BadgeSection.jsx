@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { toPng } from "html-to-image";
 import toast from "react-hot-toast";
@@ -399,8 +400,10 @@ const BadgeSection = ({ onNavigate }) => {
 
             {/* Result — a full-screen sheet over the page. It closes from the
                 X, the Escape key or the backdrop, and the page behind it keeps
-                the scroll position it had. */}
-            {attendees && !attendee && (
+                the scroll position it had. Both sheets are portalled to
+                <body>: the section sits inside a SlideUp, and its transform
+                mid-rise would otherwise become their containing block. */}
+            {attendees && !attendee && createPortal(
                 <div
                     role="dialog"
                     aria-modal="true"
@@ -535,13 +538,14 @@ const BadgeSection = ({ onNavigate }) => {
                             Not you? Try another entry
                         </button>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* Result — a full-screen sheet over the page. It closes from the
                 X, the Escape key or the backdrop, and the page behind it keeps
                 the scroll position it had. */}
-            {attendee && (
+            {attendee && createPortal(
                 <div
                     role="dialog"
                     aria-modal="true"
@@ -791,7 +795,8 @@ const BadgeSection = ({ onNavigate }) => {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

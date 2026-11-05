@@ -14,6 +14,7 @@ import PreviousSpeakersSection from "./PreviousSpeakersSection";
 import TeamSection from "./TeamSection";
 import FaqSection from "./FaqSection";
 import FooterSection from "./FooterSection";
+import SlideUp from "@/components/common/SlideUp";
 
 // Looping, muted YouTube footage behind the Desktop 4 hero.
 const HERO_VIDEO_SRC = "https://www.youtube-nocookie.com/embed/tcrpjKyCQ2g?start=6&autoplay=1&mute=1&loop=1&playlist=tcrpjKyCQ2g&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1";
@@ -556,41 +557,41 @@ const TramHero = () => {
                     <div ref={sectionRefs.about}>
                         <AboutSection />
                     </div>
-                    <div ref={sectionRefs.tickets}>
+                    <SlideUp ref={sectionRefs.tickets}>
                         <TicketsSection onNavigate={scrollToSection} />
-                    </div>
+                    </SlideUp>
                     {/* The badge generator sits where the purchase intent is
                         highest: right after the tickets, before the venue. */}
-                    <div ref={sectionRefs.badge}>
+                    <SlideUp ref={sectionRefs.badge}>
                         <BadgeSection onNavigate={scrollToSection} />
-                    </div>
-                    <div ref={sectionRefs.venue}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.venue}>
                         <VenueSection />
-                    </div>
-                    {/* <div ref={sectionRefs.speakers}>
+                    </SlideUp>
+                    {/* <SlideUp ref={sectionRefs.speakers}>
                         <SpeakersSection />
-                    </div> */}
-                    <div ref={sectionRefs.partners}>
+                    </SlideUp> */}
+                    <SlideUp ref={sectionRefs.partners}>
                         <PartnersSection />
-                    </div>
-                    <div ref={sectionRefs.pastSponsors}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.pastSponsors}>
                         <PreviousSponsorsSection />
-                    </div>
-                    <div ref={sectionRefs.mediaCoverage}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.mediaCoverage}>
                         <MediaCoverageSection />
-                    </div>
-                    <div ref={sectionRefs.previousYears}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.previousYears}>
                         <PreviousYearsSection />
-                    </div>
-                    <div ref={sectionRefs.previousSpeakers}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.previousSpeakers}>
                         <PreviousSpeakersSection />
-                    </div>
-                    <div ref={sectionRefs.team}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.team}>
                         <TeamSection />
-                    </div>
-                    <div ref={sectionRefs.faqs}>
+                    </SlideUp>
+                    <SlideUp ref={sectionRefs.faqs}>
                         <FaqSection />
-                    </div>
+                    </SlideUp>
                 </div>
             </div>
         )}
