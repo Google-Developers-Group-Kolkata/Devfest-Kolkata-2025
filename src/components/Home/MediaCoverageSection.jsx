@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
     motion,
     useAnimationFrame,
@@ -31,6 +32,9 @@ const PLATFORMS = {
 const MEDIA_PARTNERS = [
     {
         name: "Sangbaad Pratidin",
+        // The photo their post-DevFest article ran with.
+        image: "/media-coverage/sangbad-pratidin-post-devfest.jpg",
+        imagePosition: "15% 50%",
         items: [
             {
                 platform: "Website",
@@ -201,6 +205,7 @@ const MEDIA_PARTNERS = [
     },
     {
         name: "OH Kolkata",
+        video: "https://firebasestorage.googleapis.com/v0/b/gdg-devfest-app-94337.firebasestorage.app/o/oh%20kolkata.mp4?alt=media&token=5314826b-248d-4088-b578-f4cd5b30d537",
         items: [
             {
                 platform: "Instagram",
@@ -231,6 +236,9 @@ const MEDIA_PARTNERS = [
     },
     {
         name: "Aajkaal In (Digital)",
+        // The photo their post-DevFest article ran with.
+        image: "/media-coverage/aajkaal-post-devfest.jpg",
+        imagePosition: "100% 50%",
         items: [
             {
                 platform: "Website",
@@ -251,6 +259,7 @@ const MEDIA_PARTNERS = [
     },
     {
         name: "Adi Kolkata",
+        video: "https://firebasestorage.googleapis.com/v0/b/gdg-devfest-app-94337.firebasestorage.app/o/adi%20kolkata.mp4?alt=media&token=f139f2ba-5fc5-4f49-8ecd-fa66096cbe64",
         items: [
             {
                 platform: "Instagram",
@@ -276,14 +285,18 @@ const MEDIA_PARTNERS = [
     },
 ];
 
-// What plays behind a partner's card. A partner can name its own clip with
-// `video` (an mp4 under /public, e.g. a reel saved from Instagram); otherwise
-// the first of its YouTube links is used. Instagram and Facebook links cannot
-// be played this way — their embeds do not autoplay — so a partner with only
-// those keeps the plain card until a clip is added.
-const videoFor = (partner) => {
+// What sits behind a partner's card. A partner can name its own clip with
+// `video` (an mp4 under /public or in Firebase Storage, e.g. a reel saved from
+// Instagram), or a still with `image` (e.g. the photo a news article ran
+// with); otherwise the first of its YouTube links is used. Instagram and
+// Facebook links cannot be played this way — their embeds do not autoplay —
+// so a partner with only those keeps the plain card until one is added.
+const backdropFor = (partner) => {
     if (partner.video) {
         return { kind: "file", src: partner.video, poster: partner.poster ?? null };
+    }
+    if (partner.image) {
+        return { kind: "image", src: partner.image, position: partner.imagePosition ?? "50% 50%" };
     }
     for (const item of partner.items) {
         if (item.platform !== "YouTube") continue;
@@ -386,6 +399,23 @@ const FileBackdrop = ({ src, poster, active }) => {
     );
 };
 
+// A still photo, cropped to cover the card. `position` picks which part of a
+// landscape photo stays in the portrait card.
+const ImageBackdrop = ({ src, position }) => (
+    <Image
+        src={src}
+        alt=""
+        fill
+        sizes="(min-width: 768px) 330px, 280px"
+        draggable={false}
+        className="object-cover"
+        style={{ objectPosition: position }}
+    />
+);
+
+// Over a video or photo the chips are frosted glass: a see-through, blurred
+// pane with a bright top edge. The platform icon sits in a small white disc so
+// its brand colour reads on any frame.
 const CoverageChip = ({ item, onVideo }) => {
     const meta = PLATFORMS[item.platform] ?? PLATFORMS.Website;
     const Icon = meta.icon;
@@ -395,13 +425,16 @@ const CoverageChip = ({ item, onVideo }) => {
             target="_blank"
             rel="noopener noreferrer"
             title={`${meta.label} · ${item.timing}`}
-            className={`group/chip inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:text-[13px] ${
+            className={`inline-flex items-center gap-2 rounded-full border py-1 pl-1 pr-3 text-[12px] font-medium transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 md:text-[13px] ${
                 onVideo
-                    ? "border-white/40 bg-white/90 text-zinc-800 backdrop-blur-sm hover:border-transparent hover:bg-white"
-                    : "border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-transparent hover:bg-white"
+                    ? "border-white/35 bg-white/15 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_6px_18px_rgba(0,0,0,0.22)] backdrop-blur-md backdrop-saturate-150 hover:border-white/60 hover:bg-white/25 focus-visible:outline-white"
+                    : "border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-transparent hover:bg-white hover:shadow-md focus-visible:outline-[#4285F4]"
             }`}
+            style={onVideo ? { textShadow: "0 1px 2px rgba(0,0,0,0.35)" } : undefined}
         >
-            <Icon className="size-3.5 shrink-0" style={{ color: meta.color }} />
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white shadow-sm">
+                <Icon className="size-3" style={{ color: meta.color }} />
+            </span>
             <span className="product_sans">{meta.label}</span>
         </a>
     );
@@ -430,7 +463,7 @@ const TimingRow = ({ label, items, onVideo }) => {
 };
 
 const MediaPartnerCard = ({ partner, live }) => {
-    const video = videoFor(partner);
+    const video = backdropFor(partner);
     const active = Boolean(video) && live;
     const pre = partner.items.filter((i) => i.timing === "Pre-DevFest");
     const post = partner.items.filter((i) => i.timing === "Post-DevFest");
@@ -461,6 +494,8 @@ const MediaPartnerCard = ({ partner, live }) => {
                         >
                             {video.kind === "youtube" ? (
                                 <YouTubeBackdrop id={video.id} active={active} />
+                            ) : video.kind === "image" ? (
+                                <ImageBackdrop src={video.src} position={video.position} />
                             ) : (
                                 <FileBackdrop
                                     src={video.src}
