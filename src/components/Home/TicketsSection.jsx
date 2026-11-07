@@ -53,7 +53,7 @@ const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
 // EVENT_VENUE). `perRow` is how many passes sit side by side on large screens;
 // `null` puts the whole day on one line.
 const DAYS = [
-    { day: 0, label: "Pre-DevFest", date: "14th November, 2026", venue: "Venue TBA", accent: GREEN, perRow: 2 },
+    { day: 0, label: "Day 0", date: "14th November, 2026", venue: "Venue TBA", accent: GREEN, perRow: 2 },
     { day: 1, label: "Day 1", date: "21st November, 2026", venue: null, accent: "#4285F4", perRow: null },
     { day: 2, label: "Day 2", date: "22nd November, 2026", venue: null, accent: RED, perRow: 2 },
 ];
