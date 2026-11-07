@@ -45,15 +45,23 @@ const cq = (v) => `${(v / TICKET_W) * 100}cqw`;
 // Firestore doc — a doc can still override it with its own `venue` string.
 const EVENT_VENUE = "The Westin Kolkata, Rajarhat";
 
-// The festival runs over two days and each day is ticketed on its own. A doc
-// says which one it belongs to with `day`; the API also infers it from the
-// doc's `date` when that field is all it has. The date here is what a pass
-// prints unless its doc overrides it. `perRow` is how many passes sit side by
-// side on large screens; `null` puts the whole day on one line.
+// The festival runs over two days and each day is ticketed on its own; the
+// Pre-DevFest a week ahead is ticketed on its own too, as day 0. A doc says
+// which one it belongs to with `day`; the API also infers it from the doc's
+// `date` when that field is all it has. The date and venue here are what a
+// pass prints unless its doc overrides them (a null venue falls back to
+// EVENT_VENUE). `perRow` is how many passes sit side by side on large screens;
+// `null` puts the whole day on one line.
 const DAYS = [
-    { day: 1, label: "Day 1", date: "21st November, 2026", accent: "#4285F4", perRow: null },
-    { day: 2, label: "Day 2", date: "22nd November, 2026", accent: RED, perRow: 2 },
+    { day: 0, label: "Pre-DevFest", date: "14th November, 2026", venue: "Venue TBA", accent: GREEN, perRow: 2 },
+    { day: 1, label: "Day 1", date: "21st November, 2026", venue: null, accent: "#4285F4", perRow: null },
+    { day: 2, label: "Day 2", date: "22nd November, 2026", venue: null, accent: RED, perRow: 2 },
 ];
+
+// Shown under a day's heading when any of its passes is approval-based: the
+// pass link is an application, not a checkout.
+const APPROVAL_NOTE =
+    "Registration is approval-based. Apply for a pass below — once your application is approved, you'll receive a payment link to confirm your seat.";
 
 // Passes whose day cannot be determined still have to appear somewhere.
 const UNGROUPED = { day: null, label: "Other passes", date: null, accent: "#5f6368", perRow: 2 };
@@ -68,7 +76,7 @@ const cardWidthFor = (group) => {
     return `calc((100% - ${cols - 1} * ${CARD_GAP}) / ${cols})`;
 };
 
-const EVENT_DATE = DAYS[1].date;
+const EVENT_DATE = DAYS.find((d) => d.day === 2).date;
 
 // Clips an overlay to the ticket silhouette, so nothing leaks past the notches.
 const maskWith = (bg) => ({
@@ -143,6 +151,9 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
     // green, since it is still to come rather than gone.
     const stampInk = ticket?.isActive ? GREEN : RED;
     const name = ticket?.name || "Ticket";
+    // An approval-based pass links to an application, not a checkout; the
+    // payment link follows once the application is approved.
+    const approval = !!ticket?.requiresApproval;
     return (
         <div
             ref={revealRef}
@@ -340,6 +351,11 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
+                        title={
+                            approval
+                                ? "Approval-based — the payment link is shared once you're approved"
+                                : undefined
+                        }
                         className="product_sans"
                         style={{
                             background: accent,
@@ -352,7 +368,7 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
                             textDecoration: "none",
                         }}
                     >
-                        Purchase
+                        {approval ? "Apply" : "Purchase"}
                     </a>
                 </div>
             )}
@@ -425,8 +441,9 @@ const TicketCard = ({ reveal, revealRef, stampStarted, stampTick, index, ticket 
 };
 
 // Firestore doc (color, isActive, isCommingSoon, day, price, title, url, and
-// optionally venue and date) -> card model. A card is buyable only when it is active, not coming soon, and carries
-// a purchase link.
+// optionally venue, date and requiresApproval) -> card model. A card is
+// buyable only when it is active, not coming soon, and carries a purchase
+// link — for an approval-based pass, that link is the application form.
 const toCard = (t, i) => {
     const isActive = t.isActive ?? false;
     const isComingSoon = t.isComingSoon ?? false;
@@ -443,8 +460,9 @@ const toCard = (t, i) => {
         // Both optional: the card falls back to the event-wide strings.
         venue: t.venue || null,
         date: t.date || null,
-        // 1, 2, or null when Firebase gives nothing to go on.
+        // 0 (Pre-DevFest), 1, 2, or null when Firebase gives nothing to go on.
         day: t.day ?? null,
+        requiresApproval: t.requiresApproval ?? false,
         isActive,
         isComingSoon,
         live: isActive && !isComingSoon && !!url,
@@ -459,23 +477,34 @@ const toCard = (t, i) => {
 // animation tracks its progress by.
 const groupByDay = (tickets) => {
     let index = 0;
-    const take = (group) => ({
-        ...group,
-        cards: tickets
+    const take = (group) => {
+        const cards = tickets
             .filter((t) => t.day === group.day)
             .map((ticket) => ({
-                // The day's date is what the pass prints unless its own doc
-                // spells one out.
-                ticket: { ...ticket, date: ticket.date || group.date },
+                // The day's date and venue are what the pass prints unless
+                // its own doc spells them out.
+                ticket: {
+                    ...ticket,
+                    date: ticket.date || group.date,
+                    venue: ticket.venue || group.venue || null,
+                },
                 index: index++,
-            })),
-    });
+            }));
+        return {
+            ...group,
+            cards,
+            note: cards.some((c) => c.ticket.requiresApproval)
+                ? APPROVAL_NOTE
+                : null,
+        };
+    };
     const days = DAYS.map(take);
     const rest = take(UNGROUPED);
     return rest.cards.length ? [...days, rest] : days;
 };
 
-// Day heading — the label over its date, under a short bar in the day's colour.
+// Day heading — the label over its date, under a short bar in the day's
+// colour, with the day's note (if any) beneath.
 const DayHeading = ({ group, progress }) => (
     <div
         className="flex w-full flex-col items-center"
@@ -503,6 +532,19 @@ const DayHeading = ({ group, progress }) => (
             >
                 {group.date}
             </div>
+        )}
+        {group.note && (
+            <p
+                className="product_sans mt-3 max-w-[560px] rounded-2xl px-4 py-2.5 text-center text-[13px] md:mt-4 md:text-[15px]"
+                style={{
+                    lineHeight: 1.45,
+                    color: "#3c4043",
+                    background: `${group.accent}14`,
+                    border: `1px solid ${group.accent}40`,
+                }}
+            >
+                {group.note}
+            </p>
         )}
     </div>
 );

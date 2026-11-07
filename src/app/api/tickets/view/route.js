@@ -41,15 +41,26 @@ const toNumber = (v) => {
 };
 
 // Which day of the festival a pass admits to. A doc can say so outright with a
-// `day` of 1 or 2; failing that the day is read off the `date` string it
-// already carries, so passes written before the two-day split still land in
-// the right section. Anything else comes back as null and the section groups
-// it separately rather than dropping it.
-const DAY_DATE_MARKS = { 1: /\b21(st)?\b/i, 2: /\b22(nd)?\b/i };
+// `day` of 0 (the Pre-DevFest on 14th November), 1 or 2; failing that the day
+// is read off the `date` string it already carries, so passes written before
+// the split still land in the right section. Anything else comes back as null
+// and the section groups it separately rather than dropping it.
+const DAYS = [0, 1, 2];
+const DAY_DATE_MARKS = {
+    0: /\b14(th)?\b/i,
+    1: /\b21(st)?\b/i,
+    2: /\b22(nd)?\b/i,
+};
 
 const dayOf = (d) => {
-    const n = Number(d.day);
-    if (n === 1 || n === 2) return n;
+    // Only a real number or a non-blank string counts: Number() turns null,
+    // "" and false into 0, which would otherwise file them under day 0.
+    const raw = d.day;
+    const given =
+        typeof raw === "number" ||
+        (typeof raw === "string" && raw.trim() !== "");
+    const n = given ? Number(raw) : NaN;
+    if (DAYS.includes(n)) return n;
     const date = String(d.date ?? "");
     if (!date) return null;
     for (const [day, mark] of Object.entries(DAY_DATE_MARKS)) {
@@ -75,7 +86,8 @@ export async function GET() {
 
         // Firestore doc shape: color, isActive, isCommingSoon, isHidden, day,
         // price, title, url, and optionally venue and date, which override the
-        // event-wide strings the card otherwise prints.
+        // event-wide strings the card otherwise prints, and requiresApproval,
+        // which marks `url` as an application form rather than a checkout.
         const tickets = visible.map((doc, index) => {
             const d = doc.data();
             const color = String(d.color ?? "").toLowerCase();
@@ -88,6 +100,8 @@ export async function GET() {
                 venue: d.venue ?? null,
                 date: d.date ?? null,
                 day: dayOf(d),
+                // Only an explicit `true` makes a pass approval-based.
+                requiresApproval: d.requiresApproval === true,
                 isActive: d.isActive ?? false,
                 // Note the field's spelling in Firestore; the corrected one is
                 // accepted too, in case the doc is ever fixed up.
