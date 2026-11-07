@@ -63,6 +63,11 @@ const DAYS = [
 const APPROVAL_NOTE =
     "Registration is approval-based. Apply for a pass below — once your application is approved, you'll receive a payment link to confirm your seat.";
 
+// Shown with the approval note, in a red box: the fee paid for an
+// approval-based pass is a deposit, returned only to those who turn up.
+const REFUND_NOTE =
+    "The ticket amount will be refunded once you successfully attend the event. No attendance, no refund.";
+
 // Passes whose day cannot be determined still have to appear somewhere.
 const UNGROUPED = { day: null, label: "Other passes", date: null, accent: "#5f6368", perRow: 2 };
 
@@ -490,12 +495,12 @@ const groupByDay = (tickets) => {
                 },
                 index: index++,
             }));
+        const approval = cards.some((c) => c.ticket.requiresApproval);
         return {
             ...group,
             cards,
-            note: cards.some((c) => c.ticket.requiresApproval)
-                ? APPROVAL_NOTE
-                : null,
+            note: approval ? APPROVAL_NOTE : null,
+            refundNote: approval ? REFUND_NOTE : null,
         };
     };
     const days = DAYS.map(take);
@@ -504,7 +509,7 @@ const groupByDay = (tickets) => {
 };
 
 // Day heading — the label over its date, under a short bar in the day's
-// colour, with the day's note (if any) beneath.
+// colour, with the day's notes (if any) beneath.
 const DayHeading = ({ group, progress }) => (
     <div
         className="flex w-full flex-col items-center"
@@ -544,6 +549,20 @@ const DayHeading = ({ group, progress }) => (
                 }}
             >
                 {group.note}
+            </p>
+        )}
+        {group.refundNote && (
+            <p
+                className="product_sans mt-3 max-w-[560px] rounded-2xl px-4 py-2.5 text-center text-[13px] md:text-[15px]"
+                style={{
+                    lineHeight: 1.45,
+                    color: "#B3261E",
+                    fontWeight: 500,
+                    background: `${RED}12`,
+                    border: `2px solid ${RED}`,
+                }}
+            >
+                {group.refundNote}
             </p>
         )}
     </div>
