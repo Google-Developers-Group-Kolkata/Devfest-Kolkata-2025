@@ -14,14 +14,52 @@ import speakersData from "@/data/speakers.json";
 const SPEAKERS = speakersData.speakers ?? [];
 
 // Each speaker takes the next Google colour: `soft` fills the card behind the
-// photo (so cut-out portraits sit on colour, not on nothing) and `solid` fills
-// the corner badge.
+// photo (so cut-out portraits sit on colour, not on nothing), `solid` fills
+// the corner badge, `tint` washes the session panel, and `text` is the shade
+// of the colour dark enough to read as type on white.
 const ACCENTS = [
-    { solid: "#4285F4", soft: "#D2E3FC", ink: "#ffffff" },
-    { solid: "#EA4335", soft: "#FAD2CF", ink: "#ffffff" },
-    { solid: "#FBBC04", soft: "#FEEFC3", ink: "#202124" },
-    { solid: "#34A853", soft: "#CEEAD6", ink: "#ffffff" },
+    { solid: "#4285F4", soft: "#D2E3FC", tint: "#E8F0FE", text: "#1967D2", ink: "#ffffff" },
+    { solid: "#EA4335", soft: "#FAD2CF", tint: "#FCE8E6", text: "#C5221F", ink: "#ffffff" },
+    { solid: "#FBBC04", soft: "#FEEFC3", tint: "#FEF7E0", text: "#B06000", ink: "#202124" },
+    { solid: "#34A853", soft: "#CEEAD6", tint: "#E6F4EA", text: "#137333", ink: "#ffffff" },
 ];
+
+const GOOGLE_RULE =
+    "linear-gradient(to right, #4285F4 0 25%, #EA4335 25% 50%, #FBBC04 50% 75%, #34A853 75% 100%)";
+
+// The festival day a speaker is on, keyed by `day` in speakers.json. Labels,
+// dates and colours follow the passes in TicketsSection (Day 1 blue, Day 2
+// red), so a speaker's chip matches the ticket for their day.
+const DAYS = {
+    1: { label: "Day 1", kind: "Workshop", date: "21 Nov", spoken: "21st November", color: "#4285F4" },
+    2: { label: "Day 2", kind: "DevFest", date: "22 Nov", spoken: "22nd November", color: "#F63130" },
+};
+
+// Pinned to the foot of the card: which day this speaker is on.
+const DayChip = ({ day }) => (
+    <div
+        className="product_sans pointer-events-none absolute bottom-[4.5%] left-[5%] z-10 flex items-center gap-[0.55em] whitespace-nowrap rounded-full bg-white/90 py-[0.32em] pl-[0.32em] pr-[0.95em] shadow-[0_6px_18px_rgba(0,0,0,0.14)] backdrop-blur-sm"
+        style={{ fontSize: "clamp(11px, 3.3cqw, 15px)", lineHeight: 1.2 }}
+    >
+        <span
+            className="rounded-full px-[0.8em] py-[0.38em] uppercase"
+            style={{
+                background: day.color,
+                color: "#ffffff",
+                fontWeight: 700,
+                fontSize: "0.82em",
+                letterSpacing: "0.08em",
+            }}
+        >
+            {day.label}
+        </span>
+        <span style={{ fontWeight: 600, color: "#202124" }}>{day.kind}</span>
+        <span aria-hidden="true" style={{ color: "#BDC1C6" }}>
+            •
+        </span>
+        <span style={{ fontWeight: 500, color: "#5f6368" }}>{day.date}</span>
+    </div>
+);
 
 // Mask for the deck window: solid over the card on show, then fading to
 // nothing at the screen edge, so the queued cards blend into the page.
@@ -293,21 +331,72 @@ const Badge = ({ speaker, accent, slideKey, reduced }) => {
     );
 };
 
+// What the cut-out portrait stands in front of: a pool of light where the
+// head sits, rings radiating out behind it, and a dot grid in the corner the
+// badge leaves free — all in the card's own colour.
+const RINGS = [30, 46, 62, 78, 94];
+
+const CardBackdrop = ({ accent }) => (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div
+            className="absolute inset-0"
+            style={{
+                background:
+                    "radial-gradient(115% 70% at 50% 22%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 62%)",
+            }}
+        />
+        <svg
+            className="absolute left-1/2 top-[38%] w-[175%] -translate-x-1/2 -translate-y-1/2"
+            viewBox="0 0 200 200"
+            fill="none"
+        >
+            {RINGS.map((r, i) => (
+                <circle
+                    key={r}
+                    cx="100"
+                    cy="100"
+                    r={r}
+                    stroke={accent.solid}
+                    strokeOpacity={0.26 - i * 0.04}
+                    strokeWidth="0.5"
+                />
+            ))}
+        </svg>
+        <svg className="absolute right-[7%] top-[5.5%] w-[17%]" viewBox="0 0 50 50">
+            {Array.from({ length: 25 }, (_, k) => (
+                <circle
+                    key={k}
+                    cx={5 + (k % 5) * 10}
+                    cy={5 + Math.floor(k / 5) * 10}
+                    r="1.7"
+                    fill={accent.solid}
+                    fillOpacity="0.5"
+                />
+            ))}
+        </svg>
+    </div>
+);
+
 // Photo, or — until a speaker's photo is in — their initials on their colour.
 const CardFace = ({ speaker, accent, eager }) =>
     speaker.image ? (
-        <img
-            src={speaker.image}
-            alt={speaker.name}
-            draggable={false}
-            loading={eager ? "eager" : "lazy"}
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover"
-        />
+        <>
+            <CardBackdrop accent={accent} />
+            <img
+                src={speaker.image}
+                alt={speaker.name}
+                draggable={false}
+                loading={eager ? "eager" : "lazy"}
+                decoding="async"
+                className="absolute inset-0 h-full w-full origin-bottom object-cover transition-transform duration-700 group-hover/card:scale-[1.04]"
+                style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+            />
+        </>
     ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+            <CardBackdrop accent={accent} />
             <span
-                className="product_sans"
+                className="product_sans relative"
                 style={{
                     fontSize: "clamp(56px, 30cqw, 140px)",
                     fontWeight: 700,
@@ -319,7 +408,7 @@ const CardFace = ({ speaker, accent, eager }) =>
                 {initialsOf(speaker.name)}
             </span>
             <span
-                className="product_sans text-[12px] uppercase sm:text-[13px]"
+                className="product_sans relative text-[12px] uppercase sm:text-[13px]"
                 style={{ fontWeight: 600, letterSpacing: "0.16em", color: "#5f6368" }}
             >
                 Photo coming soon
@@ -334,7 +423,7 @@ const ArrowButton = ({ dir, onClick, label }) => {
             type="button"
             onClick={onClick}
             aria-label={label}
-            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-[#3c4043] transition-colors duration-300 hover:bg-black/10 focus-visible:bg-black/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A73E8] lg:h-12 lg:w-12"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-[#dadce0] bg-white/80 text-[#3c4043] backdrop-blur-sm transition-colors duration-300 hover:border-transparent hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] focus-visible:border-transparent focus-visible:bg-[var(--accent)] focus-visible:text-[var(--accent-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A73E8] lg:h-12 lg:w-12"
         >
             {/* At rest the arrows lean diagonally (↙ ↘) and straighten out
                 when the pointer reaches the controls (or keyboard focus does);
@@ -351,20 +440,43 @@ const ArrowButton = ({ dir, onClick, label }) => {
     );
 };
 
+// A small caps caption over each value; the value carries its own type size,
+// since the name, role and session each sit at a different weight.
+// A pill per speaker (the one on show stretches out in its colour) beside the
+// arrows. It sits under the index on small screens and at the foot of the
+// info column on large ones, so the page renders it in both places and shows
+// one.
+const Pager = ({ active, onPrev, onNext, className }) => (
+    <div className={`group/arrows ${className}`}>
+        <div aria-hidden="true" className="flex items-center gap-1.5">
+            {SPEAKERS.map((s, i) => (
+                <span
+                    key={s.id ?? i}
+                    className="h-1.5 rounded-full transition-[width,background-color] duration-500"
+                    style={{
+                        width: i === active ? 22 : 6,
+                        background: i === active ? ACCENTS[i % ACCENTS.length].solid : "#DADCE0",
+                        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                    }}
+                />
+            ))}
+        </div>
+        <div className="flex gap-2">
+            <ArrowButton dir={-1} onClick={onPrev} label="Previous speaker" />
+            <ArrowButton dir={1} onClick={onNext} label="Next speaker" />
+        </div>
+    </div>
+);
+
 const Field = ({ label, children }) => (
     <div>
         <div
-            className="product_sans text-[14px] md:text-[15px]"
-            style={{ fontWeight: 500, color: "#202124", lineHeight: 1.4 }}
+            className="product_sans text-[12px] uppercase md:text-[13px]"
+            style={{ fontWeight: 600, letterSpacing: "0.14em", color: "#5f6368", lineHeight: 1.3 }}
         >
             {label}
         </div>
-        <div
-            className="product_sans mt-0.5 text-[14px] md:text-[15px]"
-            style={{ fontWeight: 400, color: "#5f6368", lineHeight: 1.45 }}
-        >
-            {children}
-        </div>
+        <div className="product_sans mt-1.5 md:mt-2">{children}</div>
     </div>
 );
 
@@ -434,7 +546,7 @@ const SpeakersSection = () => {
                 </motion.h2>
 
                 <motion.p
-                    className="product_sans mx-auto mt-4 max-w-[640px] text-center text-[15px] md:mt-6 md:text-[17px] xl:text-[18px]"
+                    className="product_sans mx-auto mt-4 max-w-[640px] text-center text-[16px] sm:text-[17px] md:mt-6 md:text-[19px] xl:text-[20px]"
                     style={{ fontWeight: 400, lineHeight: 1.5, color: "#5f6368" }}
                     {...reveal(reduced, 0.08)}
                 >
@@ -458,22 +570,30 @@ const SpeakersSection = () => {
                             if (e.key === "ArrowLeft") prev();
                         }}
                         className="relative mt-12 px-6 py-10 sm:px-10 sm:py-12 md:mt-16 lg:px-14 lg:py-16"
+                        style={{
+                            "--accent": accent.solid,
+                            "--accent-ink": accent.ink,
+                        }}
                         {...reveal(reduced, 0.1)}
                     >
                         <p className="sr-only" aria-live="polite">
                             {`Speaker ${active + 1} of ${n}: ${speaker.name}${
                                 companyLine.length ? `, ${companyLine.join(", ")}` : ""
+                            }${
+                                DAYS[speaker.day]
+                                    ? `, ${DAYS[speaker.day].label} ${DAYS[speaker.day].kind}, ${DAYS[speaker.day].spoken}`
+                                    : ""
                             }`}
                         </p>
 
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1.55fr)] lg:grid-rows-[1fr_auto_auto] lg:gap-x-6">
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:grid-rows-[1fr_auto_auto] lg:gap-x-10 xl:gap-x-12">
                             {/* The stage: the card on show, with the rest of
                                 the deck queued to its right so the next speaker
                                 peeks in. It is a size container, so the card is
                                 sized off the stage (`--card-w`) even inside the
                                 deck window, which is wider. */}
                             <motion.div
-                                className="relative col-span-2 row-start-1 -mr-6 [--card-w:min(74cqw,420px)] sm:-mr-10 sm:[--card-w:min(62cqw,420px)] lg:col-span-1 lg:col-start-3 lg:row-span-3 lg:-mr-14 lg:[--card-w:min(76cqw,420px)]"
+                                className="relative col-span-2 row-start-1 -mr-6 [--card-w:min(74cqw,420px)] sm:-mr-10 sm:[--card-w:min(62cqw,420px)] lg:col-span-1 lg:col-start-2 lg:row-span-3 lg:-mr-14 lg:[--card-w:min(84cqw,440px)]"
                                 style={{ touchAction: "pan-y", containerType: "inline-size" }}
                                 onPointerDown={() => {
                                     panned.current = false;
@@ -486,6 +606,18 @@ const SpeakersSection = () => {
                                     else if (info.offset.x > 40) prev();
                                 }}
                             >
+                                {/* A soft glow in the speaker's colour behind the
+                                    card on show, so the deck lifts off the page. */}
+                                <div
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute left-0 top-[7cqw] aspect-[4/5] w-[var(--card-w)] lg:top-[6cqw]"
+                                >
+                                    <div
+                                        className="absolute inset-x-[4%] bottom-[-5%] top-[14%] rounded-[45%] opacity-35 blur-[56px] transition-colors duration-700"
+                                        style={{ background: accent.solid }}
+                                    />
+                                </div>
+
                                 {/* Slot: holds the card's 4:5 box in the flow so
                                     the stage has height, and carries the badge
                                     above the deck window so it is never clipped. */}
@@ -525,7 +657,7 @@ const SpeakersSection = () => {
                                                         if (panned.current) return;
                                                         if (d === 1) next();
                                                     }}
-                                                    className="absolute inset-0 overflow-hidden"
+                                                    className="group/card absolute inset-0 overflow-hidden shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
                                                     style={{
                                                         background: cardAccent.soft,
                                                         transformOrigin: "0% 0%",
@@ -547,6 +679,7 @@ const SpeakersSection = () => {
                                                         accent={cardAccent}
                                                         eager={d >= -1 && d <= 2}
                                                     />
+                                                    {DAYS[s.day] && <DayChip day={DAYS[s.day]} />}
                                                 </motion.div>
                                             );
                                         })}
@@ -554,74 +687,153 @@ const SpeakersSection = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Index: a short rule, then the big number. */}
-                            <div className="col-start-1 row-start-2 mt-8 lg:row-start-2 lg:mt-0">
+                            {/* Index: a short rule in the four Google colours,
+                                then the big number over the count. */}
+                            <div className="col-start-1 row-start-2 mt-8 lg:mt-0">
                                 <motion.div
-                                    className="h-px w-24 origin-left bg-[#9AA0A6] lg:w-36"
+                                    className="h-[3px] w-24 origin-left rounded-full lg:w-36"
+                                    style={{ background: GOOGLE_RULE }}
                                     initial={reduced ? false : { scaleX: 0 }}
                                     whileInView={{ scaleX: 1 }}
                                     viewport={{ once: true, amount: 1 }}
                                     transition={{ duration: 0.9, ease: EASE_OUT, delay: 0.2 }}
                                 />
-                                <div className="mt-4 lg:mt-6">
+                                <div className="mt-4 flex items-end gap-2 lg:mt-6 lg:gap-3">
                                     <BigIndex value={number} dir={dir} reduced={reduced} />
+                                    <span
+                                        aria-hidden="true"
+                                        className="product_sans pb-[0.3em] text-[18px] sm:text-[20px] lg:text-[24px] xl:text-[26px]"
+                                        style={{
+                                            fontWeight: 500,
+                                            color: "#9AA0A6",
+                                            fontVariantNumeric: "tabular-nums",
+                                        }}
+                                    >
+                                        / {String(n).padStart(2, "0")}
+                                    </span>
                                 </div>
                             </div>
 
                             {n > 1 && (
-                                <div className="group/arrows col-start-2 row-start-2 flex items-end gap-1 self-end lg:row-start-3 lg:pb-0">
-                                    <ArrowButton dir={-1} onClick={prev} label="Previous speaker" />
-                                    <ArrowButton dir={1} onClick={next} label="Next speaker" />
-                                </div>
+                                <Pager
+                                    active={active}
+                                    onPrev={prev}
+                                    onNext={next}
+                                    className="col-start-2 row-start-2 flex flex-col items-center gap-4 self-end pb-1 lg:hidden"
+                                />
                             )}
 
                             {/* Who they are. */}
-                            <div className="col-span-2 row-start-3 mt-6 flex flex-col gap-4 lg:col-span-1 lg:col-start-1 lg:mt-8">
+                            <div className="col-span-2 row-start-3 mt-8 flex flex-col gap-5 lg:col-span-1 lg:col-start-1 lg:mt-6">
                                 <Field label="Name">
                                     <Swap swapKey={`name-${active}`} dir={dir} reduced={reduced}>
-                                        {speaker.name}
+                                        <h3
+                                            className="text-[28px] sm:text-[32px] lg:text-[34px] xl:text-[38px]"
+                                            style={{
+                                                fontWeight: 700,
+                                                lineHeight: 1.1,
+                                                letterSpacing: "-0.015em",
+                                                color: "#202124",
+                                            }}
+                                        >
+                                            {speaker.name}
+                                        </h3>
                                     </Swap>
                                 </Field>
 
                                 {companyLine.length > 0 && (
                                     <Field label="Company & Position">
                                         <Swap swapKey={`role-${active}`} dir={dir} reduced={reduced}>
-                                            {companyLine.map((line, i) => (
-                                                <div key={i}>
-                                                    {line}
-                                                    {i < companyLine.length - 1 ? "," : ""}
-                                                </div>
-                                            ))}
+                                            <p
+                                                className="text-[17px] md:text-[18px] xl:text-[19px]"
+                                                style={{ lineHeight: 1.4 }}
+                                            >
+                                                {speaker.company && (
+                                                    <span
+                                                        className="block"
+                                                        style={{ fontWeight: 700, color: accent.text }}
+                                                    >
+                                                        {speaker.company}
+                                                        {speaker.position ? "," : ""}
+                                                    </span>
+                                                )}
+                                                {speaker.position && (
+                                                    <span
+                                                        className="block"
+                                                        style={{ fontWeight: 400, color: "#3c4043" }}
+                                                    >
+                                                        {speaker.position}
+                                                    </span>
+                                                )}
+                                            </p>
                                         </Swap>
                                     </Field>
                                 )}
 
                                 {speaker.talk && (
-                                    <Field label="Session">
-                                        <Swap swapKey={`talk-${active}`} dir={dir} reduced={reduced}>
-                                            {speaker.talk}
-                                        </Swap>
-                                    </Field>
+                                    <div
+                                        className="relative overflow-hidden rounded-2xl py-4 pl-5 pr-4 transition-colors duration-500 md:py-5 md:pl-6 md:pr-5"
+                                        style={{ background: accent.tint }}
+                                    >
+                                        <span
+                                            aria-hidden="true"
+                                            className="absolute inset-y-4 left-0 w-1 rounded-r-full transition-colors duration-500"
+                                            style={{ background: accent.solid }}
+                                        />
+                                        <Field label="Session">
+                                            <Swap swapKey={`talk-${active}`} dir={dir} reduced={reduced}>
+                                                <p
+                                                    className="text-[18px] md:text-[19px] xl:text-[21px]"
+                                                    style={{
+                                                        fontWeight: 500,
+                                                        lineHeight: 1.35,
+                                                        letterSpacing: "-0.005em",
+                                                        color: "#202124",
+                                                    }}
+                                                >
+                                                    {speaker.talk}
+                                                </p>
+                                            </Swap>
+                                        </Field>
+                                    </div>
                                 )}
 
-                                {socials.length > 0 && (
-                                    <Swap swapKey={`social-${active}`} dir={dir} reduced={reduced}>
-                                        <div className="flex gap-2">
-                                            {socials.map(({ key, label, icon: Icon }) => (
-                                                <a
-                                                    key={key}
-                                                    href={speaker.socialLinks[key]}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    aria-label={`${speaker.name} on ${label}`}
-                                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-[#3c4043] transition-colors duration-300 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A73E8]"
-                                                >
-                                                    <Icon className="h-4 w-4" />
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </Swap>
-                                )}
+                                {/* Foot: their links, and on large screens the
+                                    pager, where the arrows have always sat. */}
+                                <div
+                                    className={`items-center gap-4 ${
+                                        socials.length > 0 ? "flex" : "hidden lg:flex"
+                                    }`}
+                                >
+                                    {socials.length > 0 && (
+                                        <Swap swapKey={`social-${active}`} dir={dir} reduced={reduced}>
+                                            <div className="flex flex-wrap gap-2">
+                                                {socials.map(({ key, label, icon: Icon }) => (
+                                                    <a
+                                                        key={key}
+                                                        href={speaker.socialLinks[key]}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        aria-label={`${speaker.name} on ${label}`}
+                                                        className="product_sans inline-flex h-10 items-center gap-2 rounded-full border border-[#dadce0] bg-white px-4 text-[14px] text-[#3c4043] transition-colors duration-300 hover:border-transparent hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A73E8] md:text-[15px]"
+                                                        style={{ fontWeight: 500 }}
+                                                    >
+                                                        <Icon className="h-4 w-4" aria-hidden="true" />
+                                                        {label}
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        </Swap>
+                                    )}
+                                    {n > 1 && (
+                                        <Pager
+                                            active={active}
+                                            onPrev={prev}
+                                            onNext={next}
+                                            className="ml-auto hidden items-center gap-4 lg:flex"
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </motion.div>

@@ -86,6 +86,11 @@ const PARTNERS = [
         logo: "/sponsors/jetbrains.png",
         href: "https://www.jetbrains.com/",
     },
+    {
+        name: "Oh Kolkata",
+        logo: "/sponsors/ohkolkatalogocircle.png",
+        href: "https://ohkolkata.com/",
+    },
 ];
 
 // The staircase shape, one per breakpoint. Each string is a grid row:

@@ -568,9 +568,9 @@ const TramHero = () => {
                     <SlideUp ref={sectionRefs.venue}>
                         <VenueSection />
                     </SlideUp>
-                    {/* <SlideUp ref={sectionRefs.speakers}>
+                    <SlideUp ref={sectionRefs.speakers}>
                         <SpeakersSection />
-                    </SlideUp> */}
+                    </SlideUp>
                     <SlideUp ref={sectionRefs.partners}>
                         <PartnersSection />
                     </SlideUp>

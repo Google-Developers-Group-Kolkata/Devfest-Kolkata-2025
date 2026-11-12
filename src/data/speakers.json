@@ -2,27 +2,43 @@
   "speakers": [
     {
       "id": 1,
-      "name": "Speaker Name",
-      "company": "Company",
-      "position": "Position",
-      "talk": "",
-      "image": "",
+      "name": "Neel Shah",
+      "company": "StackGen",
+      "position": "Developer Advocate",
+      "talk": "Cloud-Native Development with GCP: Build, Deploy and Automate",
+      "day": 1,
+      "image": "/speakers/neelShah.png",
       "socialLinks": {
         "twitter": "",
-        "linkedin": "",
+        "linkedin": "https://www.linkedin.com/in/neelcshah",
+        "instagram": ""
+      } 
+    },
+    {
+      "id": 2,
+      "name": "Rishi Mondal",
+      "company": "Obmondo",
+      "position": "Site Reliability Engineer",
+      "talk": "Let Your AI Agent Code, Not Compromise: Hands-On Sandboxing with Docker",
+      "day": 1,
+      "image": "/speakers/rishi-mondal.png",
+      "socialLinks": {
+        "twitter": "",
+        "linkedin": "https://www.linkedin.com/in/rishi-mondal-5238b2282",
         "instagram": ""
       }
     },
     {
-      "id": 2,
-      "name": "Speaker Name",
-      "company": "Company",
-      "position": "Position",
-      "talk": "",
-      "image": "",
+      "id": 3,
+      "name": "Belal Khan",
+      "company": "American Express",
+      "position": "Experienced Mobile Engineer",
+      "talk": "Build AI-Powered Android Apps with Gemma and RAG",
+      "day": 2,
+      "image": "/speakers/belal-khan.png",
       "socialLinks": {
         "twitter": "",
-        "linkedin": "",
+        "linkedin": "https://www.linkedin.com/in/probelalkhan",
         "instagram": ""
       }
     }
