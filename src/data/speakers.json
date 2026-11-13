@@ -41,6 +41,20 @@
         "linkedin": "https://www.linkedin.com/in/probelalkhan",
         "instagram": ""
       }
+    },
+    {
+      "id": 4,
+      "name": "Parichay Das",
+      "company": "LTM",
+      "position": "Solution Lead & Enterprise Architect - AI Solutions",
+      "talk": "On Device Intelligent Agents with Gemma 4, Google ADK, and Vector Search for Industrial AI",
+      "day": 2,
+      "image": "/speakers/parichay-das.png",
+      "socialLinks": {
+        "twitter": "",
+        "linkedin": "https://www.linkedin.com/in/parichaydas",
+        "instagram": ""
+      }
     }
   ]
 }
