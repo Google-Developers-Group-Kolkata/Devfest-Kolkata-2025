@@ -55,6 +55,20 @@
         "linkedin": "https://www.linkedin.com/in/parichaydas",
         "instagram": ""
       }
+    },
+    {
+      "id": 5,
+      "name": "Jitendra Gupta",
+      "company": "EPAM Systems",
+      "position": "Enterprise Architect - Cloud & AI",
+      "talk": "Secure by Design: Building Enterprise AI Agents on Google Cloud",
+      "day": 2,
+      "image": "/speakers/jitendra-gupta.png",
+      "socialLinks": {
+        "twitter": "",
+        "linkedin": "https://www.linkedin.com/in/jitu028",
+        "instagram": ""
+      }
     }
   ]
 }
