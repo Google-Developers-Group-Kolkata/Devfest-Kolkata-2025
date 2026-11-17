@@ -9,9 +9,6 @@ import {
 } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
-import speakersData from "@/data/speakers.json";
-
-const SPEAKERS = speakersData.speakers ?? [];
 
 // Each speaker takes the next Google colour: `soft` fills the card behind the
 // photo (so cut-out portraits sit on colour, not on nothing), `solid` fills
@@ -27,7 +24,7 @@ const ACCENTS = [
 const GOOGLE_RULE =
     "linear-gradient(to right, #4285F4 0 25%, #EA4335 25% 50%, #FBBC04 50% 75%, #34A853 75% 100%)";
 
-// The festival day a speaker is on, keyed by `day` in speakers.json. Labels,
+// The festival day a speaker is on, keyed by each speaker's `day`. Labels,
 // dates and colours follow the passes in TicketsSection (Day 1 blue, Day 2
 // red), so a speaker's chip matches the ticket for their day.
 const DAYS = {
@@ -446,10 +443,10 @@ const ArrowButton = ({ dir, onClick, label }) => {
 // arrows. It sits under the index on small screens and at the foot of the
 // info column on large ones, so the page renders it in both places and shows
 // one.
-const Pager = ({ active, onPrev, onNext, className }) => (
+const Pager = ({ speakers, active, onPrev, onNext, className }) => (
     <div className={`group/arrows ${className}`}>
         <div aria-hidden="true" className="flex items-center gap-1.5">
-            {SPEAKERS.map((s, i) => (
+            {speakers.map((s, i) => (
                 <span
                     key={s.id ?? i}
                     className="h-1.5 rounded-full transition-[width,background-color] duration-500"
@@ -489,11 +486,36 @@ const reveal = (reduced, delay = 0) => ({
 
 const SpeakersSection = () => {
     const reduced = useReducedMotion();
-    const n = SPEAKERS.length;
+    // The speakers come from the `speakers2026` collection in Firestore, read
+    // server-side by /api/speakers/view. `loaded` tells the empty state ("to be
+    // announced") from the wait, so the empty message never flashes up first.
+    const [speakers, setSpeakers] = useState([]);
+    const [loaded, setLoaded] = useState(false);
+    const n = speakers.length;
     const [active, setActive] = useState(0);
     const [dir, setDir] = useState(1);
     const prevOffsets = useRef({});
     const panned = useRef(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch("/api/speakers/view");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!Array.isArray(data.speakers)) return;
+                if (!cancelled) setSpeakers(data.speakers);
+            } catch {
+                // leave the list empty
+            } finally {
+                if (!cancelled) setLoaded(true);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const go = useCallback(
         (step) => {
@@ -506,12 +528,12 @@ const SpeakersSection = () => {
     const next = useCallback(() => go(1), [go]);
     const prev = useCallback(() => go(-1), [go]);
 
-    const offsets = SPEAKERS.map((_, i) => offsetOf(i, active, n));
+    const offsets = speakers.map((_, i) => offsetOf(i, active, n));
     useEffect(() => {
         prevOffsets.current = Object.fromEntries(offsets.map((d, i) => [i, d]));
     });
 
-    const speaker = SPEAKERS[active];
+    const speaker = speakers[active];
     const accent = ACCENTS[active % ACCENTS.length];
     const number = String(active + 1).padStart(2, "0");
     const socials = speaker
@@ -553,7 +575,7 @@ const SpeakersSection = () => {
                     The people taking the stage at DevFest Kolkata 2026.
                 </motion.p>
 
-                {n === 0 ? (
+                {!loaded ? null : n === 0 ? (
                     <p
                         className="product_sans mt-10 text-center text-[15px] md:text-[17px]"
                         style={{ color: "#5f6368" }}
@@ -646,7 +668,7 @@ const SpeakersSection = () => {
                                         className="absolute left-0 top-[7cqw] aspect-[4/5] w-[var(--card-w)] lg:top-[6cqw]"
                                         style={{ containerType: "inline-size" }}
                                     >
-                                        {SPEAKERS.map((s, i) => {
+                                        {speakers.map((s, i) => {
                                             const d = offsets[i];
                                             const cardAccent = ACCENTS[i % ACCENTS.length];
                                             return (
@@ -716,6 +738,7 @@ const SpeakersSection = () => {
 
                             {n > 1 && (
                                 <Pager
+                                    speakers={speakers}
                                     active={active}
                                     onPrev={prev}
                                     onNext={next}
@@ -827,6 +850,7 @@ const SpeakersSection = () => {
                                     )}
                                     {n > 1 && (
                                         <Pager
+                                            speakers={speakers}
                                             active={active}
                                             onPrev={prev}
                                             onNext={next}
