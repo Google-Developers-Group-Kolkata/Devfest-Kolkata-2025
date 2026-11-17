@@ -5,6 +5,7 @@ import {
     AnimatePresence,
     motion,
     useAnimationControls,
+    useInView,
     useReducedMotion,
 } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -442,23 +443,27 @@ const ArrowButton = ({ dir, onClick, label }) => {
 // A pill per speaker (the one on show stretches out in its colour) beside the
 // arrows. It sits under the index on small screens and at the foot of the
 // info column on large ones, so the page renders it in both places and shows
-// one.
-const Pager = ({ speakers, active, onPrev, onNext, className }) => (
+// one. The trail grows with the line-up, so past `maxDots` speakers it is
+// dropped rather than left to push the arrows out of their column; the index
+// ("04 / 17") still says where you are.
+const Pager = ({ speakers, active, onPrev, onNext, maxDots, className }) => (
     <div className={`group/arrows ${className}`}>
-        <div aria-hidden="true" className="flex items-center gap-1.5">
-            {speakers.map((s, i) => (
-                <span
-                    key={s.id ?? i}
-                    className="h-1.5 rounded-full transition-[width,background-color] duration-500"
-                    style={{
-                        width: i === active ? 22 : 6,
-                        background: i === active ? ACCENTS[i % ACCENTS.length].solid : "#DADCE0",
-                        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                    }}
-                />
-            ))}
-        </div>
-        <div className="flex gap-2">
+        {speakers.length <= maxDots && (
+            <div aria-hidden="true" className="flex items-center gap-1.5">
+                {speakers.map((s, i) => (
+                    <span
+                        key={s.id ?? i}
+                        className="h-1.5 rounded-full transition-[width,background-color] duration-500"
+                        style={{
+                            width: i === active ? 22 : 6,
+                            background: i === active ? ACCENTS[i % ACCENTS.length].solid : "#DADCE0",
+                            transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                        }}
+                    />
+                ))}
+            </div>
+        )}
+        <div className="flex shrink-0 gap-2">
             <ArrowButton dir={-1} onClick={onPrev} label="Previous speaker" />
             <ArrowButton dir={1} onClick={onNext} label="Next speaker" />
         </div>
@@ -477,6 +482,9 @@ const Field = ({ label, children }) => (
     </div>
 );
 
+// How long a speaker stays on show before the deck moves on by itself.
+const AUTOPLAY_MS = 5000;
+
 const reveal = (reduced, delay = 0) => ({
     initial: reduced ? false : { opacity: 0, y: 24 },
     whileInView: { opacity: 1, y: 0 },
@@ -486,7 +494,7 @@ const reveal = (reduced, delay = 0) => ({
 
 const SpeakersSection = () => {
     const reduced = useReducedMotion();
-    // The speakers come from the `speakers2026` collection in Firestore, read
+    // The speakers come from the `speaker` collection in Firestore, read
     // server-side by /api/speakers/view. `loaded` tells the empty state ("to be
     // announced") from the wait, so the empty message never flashes up first.
     const [speakers, setSpeakers] = useState([]);
@@ -496,6 +504,23 @@ const SpeakersSection = () => {
     const [dir, setDir] = useState(1);
     const prevOffsets = useRef({});
     const panned = useRef(false);
+
+    // The deck moves on by itself, like the Team section's carousel: only while
+    // the section is on screen and the tab is in front, never for someone who
+    // asked for reduced motion, and not while a pointer is over the deck or
+    // keyboard focus is in it, so nobody has a speaker paged away mid-read.
+    const sectionRef = useRef(null);
+    const inView = useInView(sectionRef, { amount: 0.3 });
+    const [tabVisible, setTabVisible] = useState(true);
+    const [hovered, setHovered] = useState(false);
+    const [focused, setFocused] = useState(false);
+
+    useEffect(() => {
+        const sync = () => setTabVisible(!document.hidden);
+        sync();
+        document.addEventListener("visibilitychange", sync);
+        return () => document.removeEventListener("visibilitychange", sync);
+    }, []);
 
     useEffect(() => {
         let cancelled = false;
@@ -528,6 +553,16 @@ const SpeakersSection = () => {
     const next = useCallback(() => go(1), [go]);
     const prev = useCallback(() => go(-1), [go]);
 
+    // One timer per speaker on show: any change of `active`, manual or not,
+    // starts the next wait from zero, so a click on the arrows is never
+    // followed straight away by an automatic move.
+    const playing = !reduced && n > 1 && inView && tabVisible && !hovered && !focused;
+    useEffect(() => {
+        if (!playing) return;
+        const id = setTimeout(next, AUTOPLAY_MS);
+        return () => clearTimeout(id);
+    }, [playing, active, next]);
+
     const offsets = speakers.map((_, i) => offsetOf(i, active, n));
     useEffect(() => {
         prevOffsets.current = Object.fromEntries(offsets.map((d, i) => [i, d]));
@@ -550,6 +585,7 @@ const SpeakersSection = () => {
         // sideways (without becoming a scroll box) so nothing can overhang.
         <section
             id="speakers"
+            ref={sectionRef}
             className="relative w-full select-none overflow-x-clip [--pad:1.25rem] sm:[--pad:2rem] md:[--pad:2.5rem] xl:[--pad:4rem]"
             style={{ "--to-edge": "calc(max(0px, 50vw - 560px) + var(--pad))" }}
         >
@@ -591,6 +627,16 @@ const SpeakersSection = () => {
                             if (e.key === "ArrowRight") next();
                             if (e.key === "ArrowLeft") prev();
                         }}
+                        onPointerEnter={() => setHovered(true)}
+                        onPointerLeave={() => setHovered(false)}
+                        onFocus={(e) => {
+                            // Keyboard focus only: a mouse click on an arrow
+                            // focuses it too, and must not leave autoplay stuck.
+                            if (e.target.matches(":focus-visible")) setFocused(true);
+                        }}
+                        onBlur={(e) => {
+                            if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+                        }}
                         className="relative mt-12 px-6 py-10 sm:px-10 sm:py-12 md:mt-16 lg:px-14 lg:py-16"
                         style={{
                             "--accent": accent.solid,
@@ -598,7 +644,9 @@ const SpeakersSection = () => {
                         }}
                         {...reveal(reduced, 0.1)}
                     >
-                        <p className="sr-only" aria-live="polite">
+                        {/* Quiet while the deck turns itself, or a screen reader
+                            would be interrupted every few seconds. */}
+                        <p className="sr-only" aria-live={playing ? "off" : "polite"}>
                             {`Speaker ${active + 1} of ${n}: ${speaker.name}${
                                 companyLine.length ? `, ${companyLine.join(", ")}` : ""
                             }${
@@ -742,6 +790,7 @@ const SpeakersSection = () => {
                                     active={active}
                                     onPrev={prev}
                                     onNext={next}
+                                    maxDots={8}
                                     className="col-start-2 row-start-2 flex flex-col items-center gap-4 self-end pb-1 lg:hidden"
                                 />
                             )}
@@ -824,7 +873,7 @@ const SpeakersSection = () => {
                                 {/* Foot: their links, and on large screens the
                                     pager, where the arrows have always sat. */}
                                 <div
-                                    className={`items-center gap-4 ${
+                                    className={`flex-wrap items-center gap-x-4 gap-y-4 ${
                                         socials.length > 0 ? "flex" : "hidden lg:flex"
                                     }`}
                                 >
@@ -854,7 +903,8 @@ const SpeakersSection = () => {
                                             active={active}
                                             onPrev={prev}
                                             onNext={next}
-                                            className="ml-auto hidden items-center gap-4 lg:flex"
+                                            maxDots={20}
+                                            className="ml-auto hidden max-w-full items-center gap-4 lg:flex"
                                         />
                                     )}
                                 </div>
