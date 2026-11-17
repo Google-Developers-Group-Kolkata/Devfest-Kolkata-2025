@@ -52,13 +52,13 @@ const imageOf = (v) => {
     return /^(https?:\/\/|\/)/.test(url) ? url : null;
 };
 
-// "Sridatree Mukherjee" -> "sridatree-mukherjee"
-const slugOf = (s) =>
+// What a name is matched on: "Neel Shah", "neel-shah" and "neelShah" are all
+// "neelshah", so a photo is found however its file was named.
+const keyOf = (s) =>
     s
         .toLowerCase()
         .normalize("NFKD")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+        .replace(/[^a-z0-9]/g, "");
 
 // Photos uploaded to Firebase Storage stand in for a speaker who has no
 // "Profile Picture". The project's default bucket unless one is set.
@@ -79,7 +79,7 @@ async function storagePhotos() {
             if (!token || !f.metadata.contentType?.startsWith("image/")) continue;
             const base = f.name.split("/").pop().replace(/\.[^.]+$/, "");
             photos.set(
-                slugOf(base),
+                keyOf(base),
                 `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encodeURIComponent(f.name)}?alt=media&token=${token}`
             );
         }
@@ -108,17 +108,17 @@ export async function GET() {
             .filter(({ d }) => d.isHidden !== true && text(d.Owner));
 
         // A Storage photo is matched by the speaker's full name
-        // ("sridatree-mukherjee.png") or by their first name ("sridatree.png"),
-        // but the first name only counts when no other speaker shares it, so a
-        // photo never lands on the wrong person.
-        const firstOf = (name) => slugOf(name.split(/\s+/)[0]);
+        // ("rishi-mondal.png", "neelShah.png") or by their first name
+        // ("sridatree.png"), but the first name only counts when no other
+        // speaker shares it, so a photo never lands on the wrong person.
+        const firstOf = (name) => keyOf(name.split(/\s+/)[0]);
         const firstNames = {};
         for (const { d } of docs) {
             const first = firstOf(text(d.Owner));
             firstNames[first] = (firstNames[first] ?? 0) + 1;
         }
         const storagePhotoOf = (name) =>
-            photos.get(slugOf(name)) ??
+            photos.get(keyOf(name)) ??
             (firstNames[firstOf(name)] === 1 ? photos.get(firstOf(name)) : undefined) ??
             null;
 
