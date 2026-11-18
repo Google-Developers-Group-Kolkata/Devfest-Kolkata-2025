@@ -87,9 +87,9 @@ const PARTNERS = [
         href: "https://www.jetbrains.com/",
     },
     {
-        name: "Oh Kolkata",
-        logo: "/sponsors/ohkolkatalogocircle.png",
-        href: "https://ohkolkata.com/",
+        name: "Viral Kolkata",
+        logo: "/sponsors/viral-kolkata.png",
+        href: "https://www.instagram.com/itsviralkolkata",
     },
 ];
 
