@@ -62,7 +62,15 @@ async function makeCookie(
     return `${count}:${windowStart}:${sig}`;
 }
 
-async function rateLimit(request: NextRequest): Promise<NextResponse | null> {
+type Limit = { cookie: string; max: number; path: string };
+
+const ATTENDEE_LIMIT: Limit = { cookie: COOKIE, max: MAX, path: "/api/attendee" };
+// Certificate attempts: a typo or two is normal, a script trying many emails
+// is not. Each attempt is also a Firestore read, so keep this modest.
+const CERTIFICATE_LIMIT: Limit = { cookie: "_rlc", max: 10, path: "/api/certificate" };
+
+async function rateLimit(request: NextRequest, limit: Limit): Promise<NextResponse | null> {
+    const { cookie: COOKIE, max: MAX, path } = limit;
     // Signing key — reuse an existing env var so no new secret is needed.
     // FIREBASE_CLIENT_EMAIL is always set (the app won't start without it)
     // and it is long enough to be a usable HMAC key.
@@ -115,7 +123,7 @@ async function rateLimit(request: NextRequest): Promise<NextResponse | null> {
         sameSite: "strict",
         secure: process.env.NODE_ENV === "production",
         maxAge: WINDOW,
-        path: "/api/attendee",
+        path,
     });
     return allowed;
 }
@@ -130,7 +138,11 @@ export async function middleware(request: NextRequest) {
         // rateLimit always returns a NextResponse:
         // - 429 when the limit is exceeded
         // - NextResponse.next() + updated cookie when the request is allowed
-        return await rateLimit(request);
+        return await rateLimit(request, ATTENDEE_LIMIT);
+    }
+
+    if (pathname === "/api/certificate") {
+        return await rateLimit(request, CERTIFICATE_LIMIT);
     }
 
     // Redirect /register and /ticket to home page
@@ -147,5 +159,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/api/attendee", "/register", "/ticket", "/me", "/devfest-ticket"],
+    matcher: ["/api/attendee", "/api/certificate", "/register", "/ticket", "/me", "/devfest-ticket"],
 };

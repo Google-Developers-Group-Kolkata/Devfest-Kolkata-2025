@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import AboutSection from "./AboutSection";
 import TicketsSection from "./TicketsSection";
 import BadgeSection from "./BadgeSection";
+import CertificateSection from "./CertificateSection";
 import VenueSection from "./VenueSection";
 import SpeakersSection from "./SpeakersSection";
 import PartnersSection from "./PartnersSection";
@@ -564,6 +565,9 @@ const TramHero = () => {
                         highest: right after the tickets, before the venue. */}
                     <SlideUp ref={sectionRefs.badge}>
                         <BadgeSection onNavigate={scrollToSection} />
+                    </SlideUp>
+                    <SlideUp>
+                        <CertificateSection />
                     </SlideUp>
                     <SlideUp ref={sectionRefs.venue}>
                         <VenueSection />
